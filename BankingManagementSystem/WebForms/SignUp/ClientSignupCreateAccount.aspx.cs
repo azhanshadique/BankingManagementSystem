@@ -1,9 +1,16 @@
 ﻿using BankingManagementSystem.BLL;
+using BankingManagementSystem.DAL;
+using BankingManagementSystem.Helpers;
+using BankingManagementSystem.Models.API;
 using BankingManagementSystem.Models.DTOs;
+using Microsoft.Ajax.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.UI;
@@ -17,7 +24,7 @@ namespace BankingManagementSystem.WebForms.SignUp
         {
 
         }
-        protected void BtnSubmit_Click(object sender, EventArgs e)
+        protected async void BtnSubmit_Click(object sender, EventArgs e)
         {
             // Extract all input values into variables
             string fullName = TextBox_fullname.Text.Trim();
@@ -36,8 +43,8 @@ namespace BankingManagementSystem.WebForms.SignUp
             string pincode = TextBox_pincode.Text.Trim();
             string accountType = ddl_accounttype.SelectedValue;
             string isJoint = ddlIsJointAccount.SelectedValue;
-            string jointId = TextBox_jointaccclient.Text.Trim();
-            string relation = TextBox_relationship.Text.Trim();
+            string jointClientId = TextBox_jointaccclient.Text.Trim();
+            string jointRelation = TextBox_relationship.Text.Trim();
             string username = TextBox_username.Text.Trim();
             string password = TextBox_password.Text.Trim();
             string confirmPassword = TextBox_confirmpassword.Text.Trim();
@@ -47,7 +54,7 @@ namespace BankingManagementSystem.WebForms.SignUp
             Dictionary<string, string> requiredFields = new Dictionary<string, string>
             {
                 { "Full Name", fullName },
-                { "Parent's Name", parentName },
+                { "Parent\\'s Name", parentName },
                 { "DOB", dob },
                 { "Gender", gender },
                 { "Nationality", nationality },
@@ -68,80 +75,95 @@ namespace BankingManagementSystem.WebForms.SignUp
             };
 
            
-
-
-            // Validate Required Fields
+            // Validate required fields
             if (!ValidateRequiredFields(requiredFields))
-            {
                 return;
-            }
 
-            // Validate if Online Account already exists or not
-            if (ValidateClientExists(aadhaar, pan))
+            // Validate joint account required fields (if joint account)
+            if (isJoint == "Yes")
             {
-                return;
+
+                Dictionary<string, string> requiredJointFields = new Dictionary<string, string>
+                {
+                    { "Co-holder\\'s Client ID", jointClientId },
+                    { "Relationship", jointRelation }
+
+                };
+
+                if (!ValidateRequiredFields(requiredJointFields))
+                {
+                    return;
+
+                }
             }
-
-            // Check if joint account, validate extra fields
-            //if (!ValidateJointAccount())
-            //{
-            //    return;
-            //}
-
-            //// Check if the username already exists
-            //if (ValidateUsernameExists())
-            //{
-            //    Response.Write("<script>alert('Username Already Exists, Try Another Username.');</script>");
-            //    return;
-            //}
-
-            // Validate for Strong Password
-            if (ValidatePassword(password, confirmPassword))
+      
+            // Create DTO
+            ClientDTO client = new ClientDTO
             {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", $"showAlert('Signed Up Successfully', 'danger');", true);
+                FullName = fullName,
+                ParentName = parentName,
+                DOB = dob,
+                Gender = gender,
+                Nationality = nationality,
+                Occupation = occupation,
+                AadhaarNumber = aadhaar,
+                PANNumber = pan,
+                MobileNumber = mobile,
+                EmailId = email,
+                Address = address,
+                State = state,
+                City = city,
+                Pincode = pincode,
+                AccountType = accountType,
+                IsJointAccount = isJoint == "Yes",
+                JointClientId = string.IsNullOrWhiteSpace(jointClientId) ? 0 : Convert.ToInt32(jointClientId),
+                JointRelationship = jointRelation,
+                Username = username,
+                Password = password,
+                ConfirmPassword = confirmPassword,
+                CoHolderApproved = false,
+                AdminApproved = false
+            };
 
-                // If all validations pass, redirect to next step
-                //SignUpNewClient();
+            try
+            {
+                ApiResponseMessage result = await RegistrationService.RegisterClientAsync(client);
+
+                string extraMessage = "";
+                if (result.MessageType == "success")
+                {
+                    extraMessage = isJoint == "Yes"
+                       ? " Awaiting Admin & Joint Account Co-holder\\'s approval."
+                       : " Awaiting administration approval.";
+                }
+
+                string errorMessage;
+
+                if (result.MessageContent.StartsWith("{") && result.MessageContent.Contains("Message"))
+                {
+                    var parsed = JsonConvert.DeserializeObject<ApiErrorMessageWrapper>(result.MessageContent);
+                    errorMessage = parsed?.Message;
+                }
+                else
+                {
+                    errorMessage = result.MessageContent;
+                }
+
+                string fullMessage = $"{errorMessage}\\n{extraMessage}";
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('{fullMessage}', '{result.MessageType}');", true);
+            }
+            catch (Exception ex)
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('Registration failed due to a technical error.', 'danger');", true);
             }
 
-            //ClientDTO client = new ClientDTO
-            //{
-            //    FullName = TextBox_fullname.Text.Trim(),
-            //    ParentName = TextBox_parentname.Text.Trim(),
-            //    DOB = Convert.ToDateTime(TextBox_dob.Text),
-            //    Gender = ddl_gender.SelectedValue,
-            //    Nationality = TextBox_nationality.Text.Trim(),
-            //    Occupation = TextBox_occupation.Text.Trim(),
-            //    AadhaarNumber = TextBox_aadhaar.Text.Trim(),
-            //    PANNumber = TextBox_pan.Text.Trim(),
-            //    MobileNumber = TextBox_mobilenumber.Text.Trim(),
-            //    EmailId = TextBox_emailid.Text.Trim(),
-            //    Address = TextBox_fulladdress.Text.Trim(),
-            //    State = TextBox_state.Text.Trim(),
-            //    City = TextBox_city.Text.Trim(),
-            //    Pincode = TextBox_pincode.Text.Trim(),
-            //    AccountType = ddl_accounttype.SelectedValue,
-            //    IsJointAccount = ddlIsJointAccount.SelectedValue == "Yes",
-            //    JointClientId = TextBox_jointaccclient.Text.Trim(),
-            //    Relationship = TextBox_relationship.Text.Trim(),
-            //    Username = TextBox_username.Text.Trim(),
-            //    Password = TextBox_password.Text.Trim()
-            //};
 
-            //bool isRegistered = new ClientBLL().RegisterClient(client);
 
-            //if (isRegistered)
-            //{
-            //    ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Account created successfully!', 'success');", true);
 
-            //}
-            //else
-            //{
-            //    ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Registration failed. Try again!', 'danger');", true);
-            //}
         }
         protected bool ValidateRequiredFields(Dictionary<string, string> requiredFields)
         {
+
             foreach (var field in requiredFields)
             {
                 if (string.IsNullOrWhiteSpace(field.Value))
@@ -152,26 +174,57 @@ namespace BankingManagementSystem.WebForms.SignUp
             }
             return true;
         }
-        protected bool ValidateClientExists(string aadhaar, string pan)
-        {
-            if (ClientBLL.DoesClientExists(aadhaar, pan))
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Client already exists with these credentials!', 'danger');", true);
-                return true;
-            }
-            return false;
-        }
-        protected bool ValidatePassword(string password, string confirmPassword)
-        {
-            string errorMessage;
-            if (!PasswordValidatorBLL.IsStrongPassword(password, confirmPassword, out errorMessage))
-            {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", $"showAlert('{errorMessage}', 'danger');", true);
-                return false;
-            }
-            return true;
 
+        protected void DdlIsJoint_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (ddlIsJointAccount.SelectedValue == "Yes")
+            {
+                fsJointAccount.Visible = true;
+            }
+            else
+            {
+                TextBox_jointaccclient.Text = string.Empty;
+                TextBox_relationship.Text = string.Empty;
+                fsJointAccount.Visible = false;     
+
+            }
         }
-       
+        protected void BtnClear_Click(object sender, EventArgs e)
+        {
+            // Clear textboxes
+            TextBox_fullname.Text = "";
+            TextBox_parentname.Text = "";
+            TextBox_dob.Text = "";
+            TextBox_nationality.Text = "";
+            TextBox_occupation.Text = "";
+            TextBox_aadhaar.Text = "";
+            TextBox_pan.Text = "";
+            TextBox_mobilenumber.Text = "";
+            TextBox_emailid.Text = "";
+            TextBox_fulladdress.Text = "";
+            TextBox_state.Text = "";
+            TextBox_city.Text = "";
+            TextBox_pincode.Text = "";
+            TextBox_username.Text = "";
+            TextBox_password.Text = "";
+            TextBox_confirmpassword.Text = "";
+            TextBox_jointaccclient.Text = "";
+            TextBox_relationship.Text = "";
+
+            // Reset dropdowns
+            ddl_gender.SelectedIndex = 0;
+            ddl_accounttype.SelectedIndex = 0;
+            ddlIsJointAccount.SelectedIndex = 0;
+
+            // Hide Joint Account Section
+            fsJointAccount.Visible = false;
+
+            // Uncheck checkbox
+            CheckBox_terms.Checked = false;
+        }
+
+
+
+
     }
 }

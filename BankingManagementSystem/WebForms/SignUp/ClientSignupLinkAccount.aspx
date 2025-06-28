@@ -9,7 +9,7 @@
             <div class="card-body px-5">
                 <%--<h2 class="mb-4 fw-bold border-bottom pb-2 text-center">Link to Existing Account</h2>--%>
                 <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
-                    <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back</a>
+                    <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back to Home</a>
 
                     <h2 class="mb-0 mx-auto fw-bold text-center flex-grow-1">Link to Existing Account</h2>
 
@@ -99,7 +99,8 @@
                 <hr class="my-4" />
 
                 <div class="d-flex justify-content-between">
-                    <span style="width: 80px;"></span>
+                    <%--<span style="width: 80px;"></span>--%>
+                    <asp:Button ID="Button_clear" runat="server" CssClass="btn btn-primary btn-sm shadow-sm" Text="Clear Form" />
                     <asp:Button ID="Button_submit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm" Text="Submit" />
                 </div>
             </div>

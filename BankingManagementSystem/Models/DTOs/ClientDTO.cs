@@ -10,7 +10,7 @@ namespace BankingManagementSystem.Models.DTOs
     {
         public string FullName { get; set; }
         public string ParentName { get; set; }
-        public DateTime DOB { get; set; }
+        public string DOB { get; set; }
         public string Gender { get; set; }
         public string Nationality { get; set; }
         public string Occupation { get; set; }
@@ -24,10 +24,13 @@ namespace BankingManagementSystem.Models.DTOs
         public string Pincode { get; set; }
         public string AccountType { get; set; }
         public bool IsJointAccount { get; set; }
-        public string JointClientId { get; set; }
-        public string Relationship { get; set; }
+        public int JointClientId { get; set; }
+        public string JointRelationship { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+        public bool CoHolderApproved { get; set; }
+        public bool AdminApproved { get; set; }
     }
 
 }

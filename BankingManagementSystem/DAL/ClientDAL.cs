@@ -2,6 +2,7 @@
 using BankingManagementSystem.Models.API;
 using BankingManagementSystem.Models.Constants;
 using BankingManagementSystem.Models.ConstraintTypes;
+using BankingManagementSystem.Models.DTOs;
 using System;
 using System.Configuration;
 using System.Data;
@@ -10,10 +11,10 @@ using System.Diagnostics.Eventing.Reader;
 
 namespace BankingManagementSystem.DAL
 {
-	public class ClientDAL
-	{
-        private readonly String CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
-      
+    public class ClientDAL
+    {
+        private static readonly String CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
+
         public User CheckClientCredentials(AuthRequestDTO client)
         {
             try
@@ -53,18 +54,18 @@ namespace BankingManagementSystem.DAL
             }
             catch (SqlException ex)
             {
-                throw new Exception("Database error during client validation.", ex);
+                throw new Exception("Database error during client login credentials validation.", ex);
             }
 
-           
+
         }
-        public bool CheckIfClientExists(string aadhaar, string pan)
+        public static bool IsClientExistsByPersonalDetails(string aadhaar, string pan)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(CS))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_CheckClientExists", con);
+                    SqlCommand cmd = new SqlCommand("sp_CheckClientExistsByPersonalDetails", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@AadhaarNumber", aadhaar);
                     cmd.Parameters.AddWithValue("@PANNumber", pan);
@@ -77,9 +78,53 @@ namespace BankingManagementSystem.DAL
             }
             catch (SqlException ex)
             {
-                throw new Exception("Database error during client exists validation.", ex);
+                throw new Exception("Database error during client exists by aadhaar or PAN validation.", ex);
             }
         }
+        public static bool IsClientExistsByClientId(int clientId)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(CS))
+                {
+                    SqlCommand cmd = new SqlCommand("sp_CheckClientExistsByClientId", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ClientId", clientId);
+
+                    con.Open();
+                    object result = cmd.ExecuteScalar();
+
+                    return Convert.ToInt32(result) > 0;
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error during client exists by client-id validation.", ex);
+            }
+        }
+        public static bool IsClientExistsByUsername(string username)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(CS))
+                {
+                    SqlCommand cmd = new SqlCommand("sp_CheckClientExistsByUsername", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Username", username);
+
+                    con.Open();
+                    object result = cmd.ExecuteScalar();
+
+                    return Convert.ToInt32(result) > 0;
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error during client exists by username validation.", ex);
+            }
+        }
+        
+        
 
     }
 }

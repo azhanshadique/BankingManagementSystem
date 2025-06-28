@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/WebForms/MasterPage.Master" AutoEventWireup="true" CodeBehind="ClientSignupCreateAccount.aspx.cs" Inherits="BankingManagementSystem.WebForms.SignUp.ClientSignupCreateAccount" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/WebForms/MasterPage.Master" AutoEventWireup="true" CodeBehind="ClientSignupCreateAccount.aspx.cs" Inherits="BankingManagementSystem.WebForms.SignUp.ClientSignupCreateAccount" Async="true" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
 </asp:Content>
@@ -13,7 +13,7 @@
 
                 <%--<h2 class="mb-4 fw-bold border-bottom pb-2 text-center">Create Your Bank Account</h2>--%>
                 <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
-                    <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back</a>
+                    <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back to Home</a>
 
                     <h2 class="mb-0 mx-auto fw-bold text-center flex-grow-1">Create Your Bank Account</h2>
 
@@ -118,7 +118,7 @@
                     </div>--%>
                     <div class="col-md-3">
                         <label for="CheckBox_isjointacc" class="form-label">Is Joint Account?<span class="text-danger">*</span></label>
-                        <asp:DropDownList ID="ddlIsJointAccount" runat="server" CssClass="form-select">
+                        <asp:DropDownList ID="ddlIsJointAccount" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="DdlIsJoint_SelectedIndexChanged">
                             <asp:ListItem Text="Select" Value="" Disabled="true" Selected="True" />
                             <asp:ListItem Text="Yes" Value="Yes" />
                             <asp:ListItem Text="No" Value="No" />
@@ -167,9 +167,8 @@
                 <hr class="my-4" />
 
                 <div class="d-flex justify-content-between">
-                    <%--<asp:Button ID="Button_back" runat="server" CssClass="btn btn-outline-secondary btn-sm" Text="&laquo; Back to Home" />--%>
-                    <%--<a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-outline-secondary">&laquo; Back to Home</a>--%>
-                    <span style="width: 80px;"></span>
+                    <%--<span style="width: 80px;"></span>--%>
+                    <asp:Button ID="Button_clear" runat="server" CssClass="btn btn-sm btn-light border" Text="Clear Form" OnClick="BtnClear_Click" />
                     <asp:Button ID="Button_submit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm" Text="Submit" OnClick="BtnSubmit_Click" />
                 </div>
 

@@ -46,7 +46,7 @@ function showAlert(message, type = 'success') {
     setTimeout(() => {
         alertBox.classList.remove('show');
         alertBox.classList.add('d-none');
-    }, 3000);
+    }, 4000);
 }
 
 

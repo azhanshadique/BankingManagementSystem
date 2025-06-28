@@ -32,7 +32,7 @@
 
                         <!-- Back & Forgot -->
                         <div class="d-flex justify-content-between align-items-center mt-0">
-                            <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border">&laquo; Back to Home</a>
+                            <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back to Home</a>
                             <%--<a href="#" class="text-decoration-none">Forgot Password?</a>--%>
                         </div>
                     </div>

@@ -33,7 +33,7 @@ namespace BankingManagementSystem
            );
              routes.MapPageRoute(
                "ClientSignupCreateAccountRoute",
-               "client/signup/create",
+               "client/signup/register",
                ConfigurationManager.AppSettings["ClientSignupCreateAccountRedirect"]       
            );
              routes.MapPageRoute(

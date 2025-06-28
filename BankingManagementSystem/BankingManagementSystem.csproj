@@ -204,20 +204,24 @@
     <Compile Include="BLL\AdminBLL.cs" />
     <Compile Include="BLL\AuthBLL.cs" />
     <Compile Include="BLL\ClientBLL.cs" />
-    <Compile Include="BLL\PasswordValidatorBLL.cs" />
+    <Compile Include="BLL\ValidationServiceBLL.cs" />
     <Compile Include="Controllers\API\APIController.cs" />
     <Compile Include="Controllers\API\AuthController.cs" />
+    <Compile Include="Controllers\API\ClientController.cs" />
     <Compile Include="Controllers\API\PageContentController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="DAL\AdminDAL.cs" />
     <Compile Include="DAL\ClientDAL.cs" />
+    <Compile Include="DAL\RequestDAL.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AuthService.cs" />
-    <Compile Include="Helpers\HtmlService.cs" />
     <Compile Include="Helpers\JwtTokenManager.cs" />
     <Compile Include="Helpers\PageRender.cs" />
+    <Compile Include="Helpers\RegistrationService.cs" />
+    <Compile Include="Models\API\ApiErrorMessageWrapper.cs" />
+    <Compile Include="Models\API\ApiResponseMessage.cs" />
     <Compile Include="Models\Constants\DbColumns.cs" />
     <Compile Include="Models\DTOs\AuthRequestDTO.cs" />
     <Compile Include="Models\API\AuthTokenResponse.cs" />

@@ -14,7 +14,7 @@ namespace BankingManagementSystem.DAL
 {
 	public class AdminDAL
 	{
-        private readonly String CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
+        private static readonly String CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
 
         public User CheckAdminCredentials(AuthRequestDTO admin)
         {
@@ -58,5 +58,26 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during admin validation.", ex);
             }
         }
+        
+        //public static bool InsertNewClient(ClientDTO client) // CreateClient and RequestDAL for pendingRequests
+        //{
+        //    try
+        //    {
+        //        using (SqlConnection con = new SqlConnection(CS))
+        //        {
+        //            SqlCommand cmd = new SqlCommand("sp_InsertNewClient", con);
+        //            cmd.CommandType = CommandType.StoredProcedure;
+        //            cmd.Parameters.AddWithValue("@Username", username);
+
+        //            con.Open();
+        //            cmd.ExecuteNonQuery();
+
+        //        }
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        throw new Exception("Database error during insert new client.", ex);
+        //    }
+        //}
     }
 }
