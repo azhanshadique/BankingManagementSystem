@@ -16,7 +16,7 @@
                     <br />
                     and stay connected with your bank from anywhere.
                 </p>
-                <a href='<%# Page.GetRouteUrl("ClientLoginRoute", null) %>' class="btn btn-primary btn-md">Get Started <i class="fas fa-angle-right"></i> </a>
+                <a href='<%# Page.GetRouteUrl("ClientLoginRoute", null) %>' class="btn btn-primary btn-md">Login Now <i class="fas fa-angle-right"></i> </a>
             </section>
 
             <div class="row mt-lg-2">
@@ -32,10 +32,15 @@
                     <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("ClientSignupLinkAccountRoute", null) %>'>Link Account <i class="fas fa-angle-right"></i></a>
                 </section>
 
-                <section class="col-md-4 mb-4 px-4">
+               <%-- <section class="col-md-4 mb-4 px-4">
                     <h2>Login</h2>
                     <p>Access your dashboard to view balance, transaction history, and manage your accounts.</p>
                     <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("ClientLoginRoute", null) %>'>Login Now <i class="fas fa-angle-right"></i></a>
+                </section>--%>
+                <section class="col-md-4 mb-4 px-4">
+                    <h2>Client Requests </h2>
+                    <p>Manage your requests by your request id. View, Update or Delete your requests.</p>
+                    <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("ClientRequestRoute", null) %>'>Client Requests <i class="fas fa-angle-right"></i></a>
                 </section>
             </div>
 
@@ -143,7 +148,7 @@
             <div class="row g-4 justify-content-center">
 
                 <!-- Client Management -->
-                <section class="col-md-5">
+                <section class="col-md-4">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title">Client Management</h5>
@@ -154,7 +159,7 @@
                 </section>
 
                 <!-- View All Accounts -->
-                <section class="col-md-5">
+                <section class="col-md-4">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title">View All Accounts</h5>
@@ -162,8 +167,19 @@
                             <a class="btn btn-outline-dark" href='<%= ResolveUrl("~/WebForms/Admin/ViewAllAccounts.aspx") %>'>View Accounts <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
-                </section>
+                </section> 
 
+                 <!-- Pending Requests -->
+                <section class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Pending Requests</h5>
+                            <p class="card-text">Manage client requests. View, Update, Approve or Reject requests.</p>
+                            <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("AdminPendingRequestRoute", null) %>'>Pending Requests <i class="fas fa-angle-right"></i></a>
+                        </div>
+                    </div>
+                </section>
+                
             </div>
         </div>
     </main>

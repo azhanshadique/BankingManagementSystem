@@ -178,7 +178,10 @@ namespace BankingManagementSystem.WebForms
 
         }
 
-
+        protected void BtnOk_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Page.GetRouteUrl("DashboardRoute", null));
+        }
 
     }
 }

@@ -25,7 +25,7 @@ namespace BankingManagementSystem.Models.DTOs
         public string AccountType { get; set; }
         public bool IsJointAccount { get; set; }
         public int JointClientId { get; set; }
-        public string JointRelationship { get; set; }
+        //public string JointRelationship { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }

@@ -31,7 +31,7 @@ namespace BankingManagementSystem.Helpers
                     return new ApiResponseMessage
                     {
                         MessageType = "success",
-                        MessageContent = "Registration successful!"
+                        MessageContent = responseContent
                     };
                 }
                 else

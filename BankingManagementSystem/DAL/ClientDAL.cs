@@ -59,7 +59,7 @@ namespace BankingManagementSystem.DAL
 
 
         }
-        public static bool IsClientExistsByPersonalDetails(string aadhaar, string pan)
+        public static int IsClientExistsByPersonalDetails(string aadhaar, string pan)
         {
             try
             {
@@ -73,7 +73,10 @@ namespace BankingManagementSystem.DAL
                     con.Open();
                     object result = cmd.ExecuteScalar();
 
-                    return Convert.ToInt32(result) > 0;
+                    return Convert.ToInt32(result);
+
+                    
+
                 }
             }
             catch (SqlException ex)

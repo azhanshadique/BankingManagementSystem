@@ -79,34 +79,14 @@
                         <asp:HyperLink ID="hlClientLogin" runat="server" CssClass="nav-link " NavigateUrl='<%# Page.GetRouteUrl("ClientLoginRoute", null) %>' Text="Client Login" />
 
 
-                        <%--<a class="nav-link" href='<%= ResolveUrl("~/WebForms/Login/ClientLogin.aspx") %>'>Client Login</a>--%>
-
                     </li>
                     <asp:Panel ID="lbtnLogout" runat="server" Visible="false">
                         <li class="nav-item">
-                            <button type="button" class="btn btn-primary py-1 px-3" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#logoutConfirmModal">
-                                Logout
-                            </button>
+                            <button type="button" class="btn btn-primary py-1 px-3" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#logoutConfirmModal">Logout</button>
                         </li>
                     </asp:Panel>
 
 
-                    <%--<li class="nav-item">--%>
-                        <%--<asp:Button CssClass="nav-link" Style="padding: 2px 10px; margin-top: 3px;" ID="lbtnLogout" runat="server" Visible="false"  OnClientClick="" OnClick="BtnLogout_Click" Text="Logout"></asp:Button>--%>
-                        <%--<asp:Button CssClass="nav-link" Style="padding: 2px 10px; margin-top: 3px;" ID="lbtnLogout" runat="server" Visible="false" data-bs-toggle="modal" data-bs-target="#logoutConfirmModal" Text="Logout"></asp:Button>--%>
-                    <!-- Logout Button -->
-                    <%--<button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#logoutConfirmModal">
-                        Logout
-                    </button>--%>
-
-                    <%--</li>--%>
-                    <%--<li class="nav-item">
-                        <asp:DropDownList ID="ddlSignup" runat="server" CssClass="form-select form-select-sm mt-1 ms-2" AutoPostBack="True">
-                            <asp:ListItem Text="-- Sign Up --" Value="" Disabled="true" Selected="True" />
-                            <asp:ListItem Text="Link to Existing Account" Value="link" />
-                            <asp:ListItem Text="Create New Account" Value="create" />
-                        </asp:DropDownList>
-                    </li>--%>
 
                     <li id="ddlSignup" class="nav-item dropdown" runat="server">
                         <a class="nav-link dropdown-toggle" href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' role="button" data-bs-toggle="dropdown" aria-expanded="false">Sign Up
@@ -126,7 +106,7 @@
 
         <!-- Sidebar Toggle Button -->
         <button id="toggleSidebar" class="btn  btn-outline-dark sidebar-toggle-btn mt-3 mx-lg-2" runat="server" visible="true">
-            <i class="fas fa-bars me-1"></i> Menu
+            <i class="fas fa-bars me-1"></i>Menu
         </button>
 
 
@@ -138,7 +118,7 @@
 
             <%--<h5 class="text-white">Client/Admin Panel</h5>--%>
             <%--<button id="closeSidebar" class="btn-close btn-close-grey btn-sm float-end" aria-label="Close" style="font-size: 0.7rem;"></button>--%>
-            <button id="closeSidebar" class="nav-link btn btn-sm float-end" style="font-size: 1.2rem; margin-top:-0.3rem"><i class="fas fa-angle-left"></i></button>
+            <button id="closeSidebar" class="nav-link btn btn-sm float-end" style="font-size: 1.2rem; margin-top: -0.3rem"><i class="fas fa-angle-left"></i></button>
 
             <%--<button id="closeSidebar" class="nav-link btn btn-sm float-end" style="font-size:1.5rem;">&lt;</button>--%>
 
@@ -172,11 +152,31 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.7rem"></button>
         </div>
 
+        <!-- Registration Success Confirmation Modal -->
+        <div class="modal fade" id="registerSuccessMessage" tabindex="-1" aria-labelledby="registerSuccessLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 shadow">
+                    <div class="modal-header bg-success text-white rounded-top-4" style="height: 60px;">
+                        <h5 class="modal-title" id="registerSuccessLabel">Client Registration Successful</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-start" id="registerSuccessContent">
+                        Message here
+                    </div>
+                    <div class="modal-footer justify-content-end border-0">
+                        <%--<button type="button" class="btn btn-success py-1 px-3" data-bs-dismiss="modal">OK</button>--%>
+                        <asp:Button CssClass="btn btn-primary py-1 px-3" Style="padding: 2px 10px;" ID="btnOk" runat="server" Visible="true" OnClick="BtnOk_Click" data-bs-dismiss="modal" Text="OK"></asp:Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <!-- Logout Confirmation Modal -->
         <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content rounded-4 shadow">
-                    <div class="modal-header bg-primary text-white rounded-top-4" style="height:60px; border-top-left-radius: 14px; border-top-right-radius: 14px; ">
+                    <div class="modal-header bg-primary text-white rounded-top-4" style="height: 60px; border-top-left-radius: 14px; border-top-right-radius: 14px;">
                         <h5 class="modal-title" id="logoutConfirmModalLabel">Confirm Logout</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -187,13 +187,14 @@
 
                         <!-- Real Logout Button -->
                         <asp:Button CssClass="btn btn-primary py-1 px-3" Style="padding: 2px 10px;" ID="btnLogout" runat="server" Visible="true" OnClick="BtnLogout_Click" Text="Logout"></asp:Button>
-                        <button type="button" class="btn btn-light border py-1 px-3" Style="padding: 2px 10px;" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-light border py-1 px-3" style="padding: 2px 10px;" data-bs-dismiss="modal">Cancel</button>
 
                         <%--<asp:Button ID="lbtnLogout" runat="server" Text="Yes, Logout" CssClass="btn btn-danger" OnClick="BtnLogout_Click" />--%>
                     </div>
                 </div>
             </div>
         </div>
+
 
 
         <div id="mainContent" class="">

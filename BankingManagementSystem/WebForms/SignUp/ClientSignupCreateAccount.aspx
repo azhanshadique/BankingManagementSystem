@@ -130,10 +130,10 @@
                                 <label for="TextBox_jointaccclient" class="form-label">Co-holder's Client ID<span class="text-danger">*</span></label>
                                 <asp:TextBox ID="TextBox_jointaccclient" runat="server" CssClass="form-control" placeholder="Client ID"></asp:TextBox>
                             </div>
-                            <div class="col-md-6">
+                            <%-- <div class="col-md-6">
                                 <label for="TextBox_relationship" class="form-label">Relationship<span class="text-danger">*</span></label>
                                 <asp:TextBox ID="TextBox_relationship" runat="server" CssClass="form-control" placeholder="Relationship"></asp:TextBox>
-                            </div>
+                            </div>--%>
                         </div>
                     </asp:Panel>
                 </div>
@@ -168,13 +168,61 @@
 
                 <div class="d-flex justify-content-between">
                     <%--<span style="width: 80px;"></span>--%>
-                    <asp:Button ID="Button_clear" runat="server" CssClass="btn btn-sm btn-light border" Text="Clear Form" OnClick="BtnClear_Click" />
-                    <asp:Button ID="Button_submit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm" Text="Submit" OnClick="BtnSubmit_Click" />
+                    <%--                    <asp:Button ID="Button_clear" runat="server" CssClass="btn btn-sm btn-light border" Text="Clear Form" OnClick="BtnClear_Click" />--%>
+                    <button type="button" class="btn btn-sm btn-light border" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#clearConfirmModal">Clear Form</button>
+
+                    <%--<asp:Button ID="Button_submit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm" Text="Submit" OnClick="BtnSubmit_Click" />--%>
+                    <button type="button" class="btn btn-primary btn-sm shadow-sm" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#submitConfirmModal">Submit</button>
                 </div>
 
             </div>
         </div>
     </div>
 
+    <!-- Submit Confirmation Modal -->
+    <div class="modal fade" id="submitConfirmModal" tabindex="-1" aria-labelledby="submitConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow">
+                <div class="modal-header bg-primary text-white rounded-top-4" style="height: 60px; border-top-left-radius: 14px; border-top-right-radius: 14px;">
+                    <h5 class="modal-title" id="submitConfirmModalLabel">Confirm Submit</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-start">
+                    Are you sure you want to submit?
+                </div>
+                <div class="modal-footer justify-content-end border-0">
+
+                    <!-- Real Submit Button -->
+                    <asp:Button ID="Button_submit" runat="server" CssClass="btn btn-primary py-1 px-3" Style="padding: 2px 10px;" Text="Submit" OnClick="BtnSubmit_Click" />
+                    <button type="button" class="btn btn-light border py-1 px-3" style="padding: 2px 10px;" data-bs-dismiss="modal">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear Form Confirmation Modal -->
+    <div class="modal fade" id="clearConfirmModal" tabindex="-1" aria-labelledby="clearConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow">
+                <div class="modal-header bg-secondary text-white rounded-top-4" style="height: 60px; border-top-left-radius: 14px; border-top-right-radius: 14px;">
+                    <h5 class="modal-title" id="clearConfirmModalLabel">Confirm Clear Form</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-start">
+                    Are you sure you want to clear the form?
+                </div>
+                <div class="modal-footer justify-content-end border-0">
+
+                    <!-- Real Clear Form Button -->
+                    <asp:Button ID="Button_clear" runat="server" CssClass="btn btn-secondary py-1 px-3" tyle="padding: 2px 10px;" Text="Clear Form" OnClick="BtnClear_Click" />
+
+                    <button type="button" class="btn btn-light border py-1 px-3" style="padding: 2px 10px;" data-bs-dismiss="modal">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+   
 
 </asp:Content>

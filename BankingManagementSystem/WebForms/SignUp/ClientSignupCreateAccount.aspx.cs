@@ -44,7 +44,6 @@ namespace BankingManagementSystem.WebForms.SignUp
             string accountType = ddl_accounttype.SelectedValue;
             string isJoint = ddlIsJointAccount.SelectedValue;
             string jointClientId = TextBox_jointaccclient.Text.Trim();
-            string jointRelation = TextBox_relationship.Text.Trim();
             string username = TextBox_username.Text.Trim();
             string password = TextBox_password.Text.Trim();
             string confirmPassword = TextBox_confirmpassword.Text.Trim();
@@ -74,7 +73,7 @@ namespace BankingManagementSystem.WebForms.SignUp
                 { "Agree to Terms & Condition and Privacy Policy", termsCondition }
             };
 
-           
+
             // Validate required fields
             if (!ValidateRequiredFields(requiredFields))
                 return;
@@ -86,8 +85,6 @@ namespace BankingManagementSystem.WebForms.SignUp
                 Dictionary<string, string> requiredJointFields = new Dictionary<string, string>
                 {
                     { "Co-holder\\'s Client ID", jointClientId },
-                    { "Relationship", jointRelation }
-
                 };
 
                 if (!ValidateRequiredFields(requiredJointFields))
@@ -96,7 +93,7 @@ namespace BankingManagementSystem.WebForms.SignUp
 
                 }
             }
-      
+
             // Create DTO
             ClientDTO client = new ClientDTO
             {
@@ -117,7 +114,6 @@ namespace BankingManagementSystem.WebForms.SignUp
                 AccountType = accountType,
                 IsJointAccount = isJoint == "Yes",
                 JointClientId = string.IsNullOrWhiteSpace(jointClientId) ? 0 : Convert.ToInt32(jointClientId),
-                JointRelationship = jointRelation,
                 Username = username,
                 Password = password,
                 ConfirmPassword = confirmPassword,
@@ -129,37 +125,36 @@ namespace BankingManagementSystem.WebForms.SignUp
             {
                 ApiResponseMessage result = await RegistrationService.RegisterClientAsync(client);
 
-                string extraMessage = "";
-                if (result.MessageType == "success")
-                {
-                    extraMessage = isJoint == "Yes"
-                       ? " Awaiting Admin & Joint Account Co-holder\\'s approval."
-                       : " Awaiting administration approval.";
-                }
-
-                string errorMessage;
+                string message;
 
                 if (result.MessageContent.StartsWith("{") && result.MessageContent.Contains("Message"))
                 {
                     var parsed = JsonConvert.DeserializeObject<ApiErrorMessageWrapper>(result.MessageContent);
-                    errorMessage = parsed?.Message;
+                    message = parsed?.Message;
                 }
                 else
                 {
-                    errorMessage = result.MessageContent;
+                    message = result.MessageContent;
+                }
+                // Trim quotes if they exist
+                if (message.StartsWith("\"") && message.EndsWith("\""))
+                {
+                    message = message.Trim('"');
                 }
 
-                string fullMessage = $"{errorMessage}\\n{extraMessage}";
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('{fullMessage}', '{result.MessageType}');", true);
+                //var parsed = JsonConvert.DeserializeObject<dynamic>(result.MessageContent);
+                //string message = parsed?.Message;
+
+
+                if (result.MessageType == "success")
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showRegisterSuccessMessage('{message}', '{result.MessageType}'); }}, 200);", true);
+                else
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('{message}', '{result.MessageType}');", true);
             }
             catch (Exception ex)
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('Registration failed due to a technical error.', 'danger');", true);
             }
-
-
-
-
         }
         protected bool ValidateRequiredFields(Dictionary<string, string> requiredFields)
         {
@@ -184,8 +179,7 @@ namespace BankingManagementSystem.WebForms.SignUp
             else
             {
                 TextBox_jointaccclient.Text = string.Empty;
-                TextBox_relationship.Text = string.Empty;
-                fsJointAccount.Visible = false;     
+                fsJointAccount.Visible = false;
 
             }
         }
@@ -209,7 +203,6 @@ namespace BankingManagementSystem.WebForms.SignUp
             TextBox_password.Text = "";
             TextBox_confirmpassword.Text = "";
             TextBox_jointaccclient.Text = "";
-            TextBox_relationship.Text = "";
 
             // Reset dropdowns
             ddl_gender.SelectedIndex = 0;
@@ -224,7 +217,6 @@ namespace BankingManagementSystem.WebForms.SignUp
         }
 
 
-
-
+       
     }
 }

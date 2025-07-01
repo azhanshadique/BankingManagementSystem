@@ -12,6 +12,10 @@ namespace BankingManagementSystem.Models.Constants
         public const string ClientId = "client_id";
         public const string AdminId = "admin_id";
         public const string EmailId = "email_id";
+        public const string RequestId = "request_id";
+        public const string RequestType = "request_type";
+        public const string Payload = "payload";
+        public const string CreatedOn = "created_on";
         
     }
 }

@@ -7,236 +7,308 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BankingManagementSystem.WebForms
+namespace BankingManagementSystem.WebForms.Home
 {
 
 
-    public partial class MasterPage
+    public partial class ClientRequest
     {
 
         /// <summary>
-        /// HeadContent control.
+        /// txtRequestId control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder HeadContent;
+        protected global::System.Web.UI.WebControls.TextBox txtRequestId;
 
         /// <summary>
-        /// form1 control.
+        /// btnSearch control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        protected global::System.Web.UI.WebControls.Button btnSearch;
 
         /// <summary>
-        /// lbtnHomeDashboard control.
+        /// pnlSummary control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton lbtnHomeDashboard;
+        protected global::System.Web.UI.WebControls.Panel pnlSummary;
 
         /// <summary>
-        /// hlAdminLogin control.
+        /// lblSummaryRequestId control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HyperLink hlAdminLogin;
+        protected global::System.Web.UI.WebControls.Label lblSummaryRequestId;
 
         /// <summary>
-        /// iconUser control.
+        /// lblSummaryRequestType control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl iconUser;
+        protected global::System.Web.UI.WebControls.Label lblSummaryRequestType;
 
         /// <summary>
-        /// lblUserName control.
+        /// lblSummaryCreatedOn control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblUserName;
+        protected global::System.Web.UI.WebControls.Label lblSummaryCreatedOn;
 
         /// <summary>
-        /// hlClientLogin control.
+        /// lblSummaryStatus control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HyperLink hlClientLogin;
+        protected global::System.Web.UI.WebControls.Label lblSummaryStatus;
 
         /// <summary>
-        /// lbtnLogout control.
+        /// lblSummaryAdminApproval control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel lbtnLogout;
+        protected global::System.Web.UI.WebControls.Label lblSummaryAdminApproval;
 
         /// <summary>
-        /// ddlSignup control.
+        /// lblSummaryJointApproval control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ddlSignup;
+        protected global::System.Web.UI.WebControls.Label lblSummaryJointApproval;
 
         /// <summary>
-        /// toggleSidebar control.
+        /// pnlRequestDetails control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlButton toggleSidebar;
+        protected global::System.Web.UI.WebControls.Panel pnlRequestDetails;
 
         /// <summary>
-        /// sidebar control.
+        /// txtFullName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl sidebar;
+        protected global::System.Web.UI.WebControls.TextBox txtFullName;
 
         /// <summary>
-        /// lblClientDetails control.
+        /// txtParentName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblClientDetails;
+        protected global::System.Web.UI.WebControls.TextBox txtParentName;
 
         /// <summary>
-        /// lblAdminDetails control.
+        /// txtDOB control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAdminDetails;
+        protected global::System.Web.UI.WebControls.TextBox txtDOB;
 
         /// <summary>
-        /// lblClientId control.
+        /// ddlGender control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblClientId;
+        protected global::System.Web.UI.WebControls.DropDownList ddlGender;
 
         /// <summary>
-        /// lblAdminId control.
+        /// txtNationality control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAdminId;
+        protected global::System.Web.UI.WebControls.TextBox txtNationality;
 
         /// <summary>
-        /// lbtnClientManagement control.
+        /// txtOccupation control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton lbtnClientManagement;
+        protected global::System.Web.UI.WebControls.TextBox txtOccupation;
 
         /// <summary>
-        /// lbtnViewProfile control.
+        /// txtAadhaar control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton lbtnViewProfile;
+        protected global::System.Web.UI.WebControls.TextBox txtAadhaar;
 
         /// <summary>
-        /// lbtnManageAccounts control.
+        /// txtPan control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton lbtnManageAccounts;
+        protected global::System.Web.UI.WebControls.TextBox txtPan;
 
         /// <summary>
-        /// lbtnDeposit control.
+        /// txtMobile control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton lbtnDeposit;
+        protected global::System.Web.UI.WebControls.TextBox txtMobile;
 
         /// <summary>
-        /// lbtnWithdraw control.
+        /// txtEmail control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton lbtnWithdraw;
+        protected global::System.Web.UI.WebControls.TextBox txtEmail;
 
         /// <summary>
-        /// lbtnTransferMoney control.
+        /// txtAddress control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton lbtnTransferMoney;
+        protected global::System.Web.UI.WebControls.TextBox txtAddress;
 
         /// <summary>
-        /// lbtnTransactionHistory control.
+        /// txtState control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton lbtnTransactionHistory;
+        protected global::System.Web.UI.WebControls.TextBox txtState;
 
         /// <summary>
-        /// btnOk control.
+        /// txtCity control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnOk;
+        protected global::System.Web.UI.WebControls.TextBox txtCity;
 
         /// <summary>
-        /// btnLogout control.
+        /// txtPincode control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnLogout;
+        protected global::System.Web.UI.WebControls.TextBox txtPincode;
 
         /// <summary>
-        /// MainContent control.
+        /// ddlAccountType control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder MainContent;
+        protected global::System.Web.UI.WebControls.DropDownList ddlAccountType;
+
+        /// <summary>
+        /// ddlIsJointAccount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlIsJointAccount;
+
+        /// <summary>
+        /// fsJointAccount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel fsJointAccount;
+
+        /// <summary>
+        /// txtJointClientId control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtJointClientId;
+
+        /// <summary>
+        /// txtUsername control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtUsername;
+
+        /// <summary>
+        /// txtPassword control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtPassword;
+
+        /// <summary>
+        /// btnUpdate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnUpdate;
+
+        /// <summary>
+        /// btnDelete control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnDelete;
+
+        /// <summary>
+        /// lblMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblMessage;
     }
 }
