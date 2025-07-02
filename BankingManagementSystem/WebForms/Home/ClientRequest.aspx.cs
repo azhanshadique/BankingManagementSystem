@@ -25,8 +25,8 @@ namespace BankingManagementSystem.WebForms.Home
                         var client = JsonConvert.DeserializeObject<ClientDTO>(request.Payload);
                         if (client != null)
                         {
-                            //pnlRequestDetails.Visible = true;
-                            pnlSummary.Visible = true;
+                            pnlRequestDetails.Visible = true;
+                            //pnlSummary.Visible = true;
 
                             txtFullName.Text = client.FullName;
                             txtParentName.Text = client.ParentName;

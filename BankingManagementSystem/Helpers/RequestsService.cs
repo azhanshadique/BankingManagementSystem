@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web;
 using BankingManagementSystem.Models.Constants;
 using BankingManagementSystem.Models.API;
+using System.Configuration;
 
 namespace BankingManagementSystem.Helpers
 {
@@ -17,7 +18,7 @@ namespace BankingManagementSystem.Helpers
     {
         private static readonly HttpClient httpClient = new HttpClient
         {
-            BaseAddress = new Uri("https://localhost:44366/api/")
+            BaseAddress = new Uri(ConfigurationManager.AppSettings["BaseApiUrl"])
         };
 
         static RequestsService()

@@ -5,13 +5,26 @@ using System.Web.Services.Description;
 
 namespace BankingManagementSystem.Controllers.API
 {
-	public class ClientController : ApiController
+    [RoutePrefix("api/client")]
+    public class ClientController : ApiController
 	{
         [HttpPost]
-        [Route("api/client/register")]
+        [Route("register")]
         public IHttpActionResult RegisterClient(ClientDTO client)
         {
             bool result = new ClientBLL().RegisterNewClient(client, out string message);
+
+            if (result)
+                return Ok(message);
+            else
+                return BadRequest(message);
+        }
+
+        [HttpPost]
+        [Route("create")]
+        public IHttpActionResult CreateClient(ClientDTO client)
+        {
+            bool result = AdminBLL.CreateNewClient(client, out string message);
 
             if (result)
                 return Ok(message);

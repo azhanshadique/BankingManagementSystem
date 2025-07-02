@@ -226,6 +226,7 @@
     <Compile Include="Models\API\ApiResponseMessage.cs" />
     <Compile Include="Models\Constants\DbColumns.cs" />
     <Compile Include="Models\ConstraintTypes\RequestStatus.cs" />
+    <Compile Include="Models\ConstraintTypes\RequestType.cs" />
     <Compile Include="Models\DTOs\AuthRequestDTO.cs" />
     <Compile Include="Models\API\AuthTokenResponse.cs" />
     <Compile Include="Models\ConstraintTypes\UserRoles.cs" />

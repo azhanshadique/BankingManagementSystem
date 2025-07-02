@@ -169,13 +169,13 @@
                     </div>
                 </section> 
 
-                 <!-- Pending Requests -->
+                 <!-- Manage Client Requests -->
                 <section class="col-md-4">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
-                            <h5 class="card-title">Pending Requests</h5>
+                            <h5 class="card-title">Manage Client Requests</h5>
                             <p class="card-text">Manage client requests. View, Update, Approve or Reject requests.</p>
-                            <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("AdminPendingRequestRoute", null) %>'>Pending Requests <i class="fas fa-angle-right"></i></a>
+                            <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("AdminPendingRequestRoute", null) %>'>Client Requests <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
                 </section>

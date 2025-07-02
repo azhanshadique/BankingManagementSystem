@@ -40,8 +40,8 @@ namespace BankingManagementSystem.BLL
                 message = "Invalid Request ID";
                 return false;
             }
-            bool result = new ClientBLL().ValidateClientDetails(client, out string newMessage);
-            message = newMessage;
+            bool result = new ClientBLL().ValidateClientDetails(client, out message);
+            //message = newMessage;
             if (result)
             {
                 string updatedPayload = JsonConvert.SerializeObject(client);
@@ -55,9 +55,10 @@ namespace BankingManagementSystem.BLL
             var isClientRequest = RequestDAL.GetPendingRequestById(requestId);
             if (isClientRequest == null)
                 return false;
-            if (repliedBy != -1 || !AdminDAL.IsAdminExistsByAdminId(repliedBy) || !ClientDAL.IsClientExistsByClientId(repliedBy))
-                return false;
-            return RequestDAL.UpdateRequestStatus(requestId, status, repliedBy);
+            if (repliedBy == -1 || AdminDAL.IsAdminExistsByAdminId(repliedBy) || ClientDAL.IsClientExistsByClientId(repliedBy))
+                return RequestDAL.UpdateRequestStatus(requestId, status, repliedBy);
+            return false;
+            
             //AdminDAL.CreateClient();
         }
 
@@ -65,6 +66,12 @@ namespace BankingManagementSystem.BLL
         {
             return RequestDAL.DeleteRequestByStatus(requestId, status);
         }
+         public static bool CreateNewClient(ClientDTO client, out string message)
+        {
+            return AdminDAL.CreateClient(client, out message);
+        }
+
+
     }
 
 }

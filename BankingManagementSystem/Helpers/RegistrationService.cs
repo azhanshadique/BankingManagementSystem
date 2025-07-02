@@ -44,6 +44,36 @@ namespace BankingManagementSystem.Helpers
                 }
             }
         }
+        public static async Task<bool> CreateClientAsync(ClientDTO client)
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                var json = JsonConvert.SerializeObject(client);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                string apiUrl = ConfigurationManager.AppSettings["CreateClientApiUrl"];
+
+                HttpResponseMessage response = await httpClient.PostAsync(apiUrl, content);
+                string responseContent = await response.Content.ReadAsStringAsync();
+                return response.IsSuccessStatusCode;
+
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    return new ApiResponseMessage
+                //    {
+                //        MessageType = "success",
+                //        MessageContent = responseContent
+                //    };
+                //}
+                //else
+                //{
+                //    return new ApiResponseMessage
+                //    {
+                //        MessageType = "danger",
+                //        MessageContent = !string.IsNullOrEmpty(responseContent) ? responseContent : "Client creation failed."
+                //    };
+                //}
+            }
+        }
     }
 
 }

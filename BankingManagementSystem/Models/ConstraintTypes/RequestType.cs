@@ -5,11 +5,9 @@ using System.Web;
 
 namespace BankingManagementSystem.Models.ConstraintTypes
 {
-    public enum RequestStatus
-    {
-        Approved,
-        Pending,
-        Rejected,
-        Awaiting
-    }
+	public enum RequestType
+	{
+		CreateNewRegistration,
+		UpdateDetails
+	}
 }

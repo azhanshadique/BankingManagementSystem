@@ -35,7 +35,7 @@
 
         <!-- Navbar Start -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light px-4 border-bottom">
-            <a class="navbar-brand font-degular" style="margin-top: -0.5rem" href='<%= Page.GetRouteUrl("DashboardRoute", null) %>'>Online Banking</a>
+            <a class="navbar-brand font-degular fw-normal" style="margin-top: -0.5rem" href='<%= Page.GetRouteUrl("DashboardRoute", null) %>'>Online Banking</a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -124,9 +124,9 @@
 
 
 
-            <asp:Label ID="lblClientDetails" runat="server" Text="Client Details" CssClass="d-block text-black mb-3 fw-bold fs-4 font-degular" Style="margin-top: -0.8rem;" />
+            <asp:Label ID="lblClientDetails" runat="server" Text="Client Details" CssClass="d-block text-black mb-3 fs-4 font-degular" Style="margin-top: -0.8rem;" />
 
-            <asp:Label ID="lblAdminDetails" runat="server" Text="Admin Details" CssClass="d-block text-black mb-3 fw-bold fs-4 font-degular" />
+            <asp:Label ID="lblAdminDetails" runat="server" Text="Admin Details" CssClass="d-block text-black mb-3 fs-4 font-degular" />
 
             <asp:Label ID="lblClientId" runat="server" Text="Client ID: " CssClass="d-block mb-2 fw-bold" Style="color: grey;" />
             <%--<asp:Label ID="Label_account_type" runat="server" Text="Account Type: " CssClass="d-block text-white mb-2" />--%>
@@ -195,6 +195,24 @@
             </div>
         </div>
 
+             <!-- Approved / Rejected Confirmation Modal -->
+        <div class="modal fade" id="approveRejectMessage" tabindex="-1" aria-labelledby="approveRejectLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 shadow">
+                    <div class="modal-header bg-success text-white rounded-top-4" style="height: 60px;">
+                        <h5 class="modal-title" id="approveRejectLabel">Action Successful</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-start" id="approveRejectContent">
+                        Message here
+                    </div>
+                    <div class="modal-footer justify-content-end border-0">
+                        <%--<button type="button" class="btn btn-success py-1 px-3" data-bs-dismiss="modal">OK</button>--%>
+                        <asp:Button CssClass="btn btn-primary py-1 px-3" Style="padding: 2px 10px;" ID="btnOkApproveReject" runat="server" Visible="true" OnClick="BtnOkApproveReject_Click" data-bs-dismiss="modal" Text="OK"></asp:Button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
         <div id="mainContent" class="">

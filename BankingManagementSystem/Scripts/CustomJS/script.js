@@ -68,6 +68,27 @@ function showRegisterSuccessMessage(message, type = 'success') {
     const bsModal = new bootstrap.Modal(modal);
     bsModal.show();
 }
+function showApproveRejectMessage(message, type = 'success') {
+    const modal = document.getElementById('approveRejectMessage');
+    const content = document.getElementById('approveRejectContent');
+    const title = document.getElementById('approveRejectLabel');
+    if (!modal || !content) return;
+
+    content.innerText = message;
+
+    title.innerText = type == 'success' ? 'Client Request Approved' : 'Client Request Rejected'
+    // Change header bg & footer button based on type
+    const header = modal.querySelector('.modal-header');
+    header.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-secondary');
+    header.classList.add('bg-' + type);
+
+    const footerBtn = modal.querySelector('#btnOkApproveReject');
+    footerBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary');
+    footerBtn.classList.add('btn-' + type);
+
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+}
 
 
 window.onload = function () {

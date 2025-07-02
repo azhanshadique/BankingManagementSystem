@@ -137,51 +137,29 @@ namespace BankingManagementSystem.WebForms
         }
         protected void BtnHomeDashboard_Click(object sender, EventArgs e)
         {
-            //string redirectUrl = ConfigurationManager.AppSettings["DashboardRedirect"];
-            //Response.Redirect(redirectUrl);
-
             Response.Redirect(Page.GetRouteUrl("DashboardRoute", null));
-
         }
         protected void BtnAbout_Click(object sender, EventArgs e)
         {
-            //string redirectUrl = ConfigurationManager.AppSettings["AboutRedirect"];
-            //Response.Redirect(redirectUrl); 
             Response.Redirect(Page.GetRouteUrl("AboutRoute", null));
-
         }
         protected void BtnAdminLogin_Click(object sender, EventArgs e)
         {
-            //string redirectUrl = ConfigurationManager.AppSettings["AdminLoginRedirect"];
-            //Response.Redirect(redirectUrl); 
-            Response.Redirect(Page.GetRouteUrl("AdminLoginRoute", null));
 
+            Response.Redirect(Page.GetRouteUrl("AdminLoginRoute", null));
         }
         protected void BtnClientLogin_Click(object sender, EventArgs e)
         {
-            //string redirectUrl = ConfigurationManager.AppSettings["ClientLoginRedirect"];
-            //Response.Redirect(redirectUrl);
             Response.Redirect(Page.GetRouteUrl("ClientLoginRoute", null));
-
-
-            //string htmlContent = AuthService.CallDashboardHtmlApi(); // call API
-            //if (!string.IsNullOrEmpty(htmlContent))
-            //{
-            //    form1.InnerHtml = htmlContent;
-            //}
-
-            //string clientLoginHtml = HtmlService.GetPageHtmlFromApi();
-
-            // You can now display it in a Literal control
-            //LiteralDashboardContent.Text = dashboardHtml;
-            //form1.InnerHtml = clientLoginHtml;
-
         }
 
         protected void BtnOk_Click(object sender, EventArgs e)
         {
             Response.Redirect(Page.GetRouteUrl("DashboardRoute", null));
         }
-
+        protected void BtnOkApproveReject_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Page.GetRouteUrl("AdminPendingRequestRoute", null));
+        }
     }
 }

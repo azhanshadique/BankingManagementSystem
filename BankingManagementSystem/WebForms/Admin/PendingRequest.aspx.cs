@@ -1,19 +1,17 @@
 ﻿using BankingManagementSystem.BLL;
-using BankingManagementSystem.DAL;
 using BankingManagementSystem.Helpers;
 using BankingManagementSystem.Models.API;
 using BankingManagementSystem.Models.Constants;
+using BankingManagementSystem.Models.ConstraintTypes;
 using BankingManagementSystem.Models.DTOs;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
+using System.Net.Http;
 using System.Security.Claims;
-using System.Web;
-using System.Web.Helpers;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web.Http.Results;
-using System.Web.Services.Description;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -21,16 +19,13 @@ namespace BankingManagementSystem.WebForms.Admin
 {
     public partial class PendingRequest : System.Web.UI.Page
     {
-        //private static string sortExpression = DbColumns.RequestId;
-        private static string sortColumn = DbColumns.CreatedOn; 
-        private static string sortDirection = "DESC";  
-
+        private static string sortColumn = DbColumns.CreatedOn;
+        private static string sortColumnDemo = "RepliedOn";
+        private static string sortDirection = "DESC";
+        private static int adminId = -1;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            //Response.Cache.SetCacheability(HttpCacheability.NoCache);
-            //Response.Cache.SetExpires(DateTime.UtcNow.AddHours(-1));
-            //Response.Cache.SetNoStore();
             if (!IsPostBack)
             {
                 try
@@ -43,91 +38,58 @@ namespace BankingManagementSystem.WebForms.Admin
 
                     var principal = JwtTokenManager.ValidateToken(token);
                     string role = principal.FindFirst(ClaimTypes.Role)?.Value;
+                    adminId = Convert.ToInt32(principal.FindFirst("UserID")?.Value);
 
-                    // Show based on role
-                    if (role == Models.ConstraintTypes.UserRoles.CLIENT.ToString())
+                    if (role == UserRoles.CLIENT.ToString())
                     {
                         Response.Redirect(Page.GetRouteUrl("DashboardRoute", null));
                     }
-               
-                    if (ViewState["RequestType"] != null)
-                        LoadRequests("Approved", sortColumn, sortDirection);
-                    else
-                        LoadRequests("Pending", sortColumn, sortDirection);
+
+                    string status = Session["RequestType"]?.ToString() ?? RequestStatus.Pending.ToString();
+                    ddlFilterStatus.SelectedValue = status;
+                    LoadRequests(status, sortColumn, sortDirection);
                 }
                 catch
                 {
-                    // Token invalid or missing
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Token Invalid!', 'danger');", true);
-
                 }
             }
-
         }
-        //protected async void LoadRequests(string status, string sortColumn, string sortDirection)
-        //{
-        //    var requests = await RequestsService.GetRequestsAsync(status, sortColumn, sortDirection);
-        //    gvRequests.DataSource = requests;
-        //    gvRequests.DataBind();
-        //}
+
         protected async void LoadRequests(string status, string sortColumn, string sortDirection)
         {
-            ViewState["RequestType"] = status;
             var requests = await RequestsService.GetRequestsAsync(status, sortColumn, sortDirection);
+
             if (gvRequests.Columns.Count >= 4)
             {
                 var repliedCol = gvRequests.Columns[3] as BoundField;
                 if (repliedCol != null)
                 {
-                    if (status == "Pending")
-                    {
+                    if (status == RequestStatus.Pending.ToString())
                         repliedCol.Visible = false;
-                    }
                     else
                     {
                         repliedCol.Visible = true;
-                        repliedCol.HeaderText = status == "Approved" ? "Approved On" :
-                                                 status == "Rejected" ? "Rejected On" :
-                                                 "Replied On";
+                        repliedCol.HeaderText = status == RequestStatus.Approved.ToString() ? "Approved On" :
+                                                status == RequestStatus.Rejected.ToString() ? "Rejected On" :
+                                                "Replied On";
                     }
                 }
             }
 
-      
-
             gvRequests.DataSource = requests;
             gvRequests.DataBind();
-            
-
-            if (gvRequests.HeaderRow != null)
-            {
-                string headerClass = "";
-
-                switch (status.ToLower())
-                {
-                    case "approved":
-                        headerClass = "table-success";
-                        break;
-                    case "rejected":
-                        headerClass = "table-danger";
-                        break;
-                    case "pending":
-                        headerClass = "table-primary";
-                        break;
-                    default:
-                        headerClass = "table-secondary"; 
-                        break;
-                }
-
-                gvRequests.HeaderRow.CssClass = headerClass;
-            }
         }
 
         protected void DdlFilterStatus_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ViewState["RequestType"] = ddlFilterStatus.SelectedValue;
-            LoadRequests(ddlFilterStatus.SelectedValue, sortColumn, sortDirection);
+            string selectedStatus = ddlFilterStatus.SelectedValue;
+            Session["RequestType"] = selectedStatus;
+            sortColumn = selectedStatus == RequestStatus.Pending.ToString() ? DbColumns.CreatedOn : DbColumns.RepliedOn;
+            sortDirection = "DESC";
+            LoadRequests(selectedStatus, sortColumn, sortDirection);
         }
+
         protected void GvRequests_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             if (e.CommandName == "Show")
@@ -137,123 +99,147 @@ namespace BankingManagementSystem.WebForms.Admin
                 BtnShow_Click(requestId);
             }
         }
+
+        protected void GvRequests_RowCreated(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == DataControlRowType.Header)
+            {
+                string status = Session["RequestType"]?.ToString()?.ToLower() ?? RequestStatus.Pending.ToString().ToLower();
+                switch (status)
+                {
+                    case "approved":
+                        e.Row.CssClass = "table-success";
+                        break;
+                    case "rejected":
+                        e.Row.CssClass = "table-danger";
+                        break;
+                    case "pending":
+                        e.Row.CssClass = "table-warning";
+                        break;
+                    default:
+                        e.Row.CssClass = "table-secondary";
+                        break;
+                }
+
+                e.Row.Style["color"] = "black";
+            }
+        }
+
         protected async void BtnShow_Click(int requestId)
         {
             var request = await RequestsService.GetRequestByIdAsync(requestId);
             if (request != null)
             {
-                //var client = JsonConvert.DeserializeObject<ClientDTO>(request.Payload);
-                //try
-                //{
                 var client = JsonConvert.DeserializeObject<ClientDTO>(request.Payload);
                 if (client == null)
                 {
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", $"showAlert('Error in Get Request By Id.', 'danger');", true);
                     return;
                 }
-                if (request.RequestType == "CreateNewRegistration")
-                {
 
+                if (request.RequestType == RequestType.CreateNewRegistration.ToString())
+                {
                     pnlRequestTable.Visible = false;
                     pnlRequestDetails.Visible = true;
 
-                    lblRequestType.Text = request.RequestType;
+                    lblRequestType.Text = "Create New Registration";
                     lblRequestStatus.Text = request.Status;
-
-                    if (request.Status == "Pending")
-                    {
-                        lblAdminApprovalHeading.Visible = true;
-                        lblCoHolderApprovalHeading.Visible = true;
-                        lblAdminApproval.Text = client.AdminApproved ? "Approved" : "Awaiting";
-                        lblCoHolderApproval.Text = client.CoHolderApproved ? "Approved" : "Awaiting";
-                    
-                    }
-
                     lblRequestId.Text = $"#{requestId.ToString()}";
-                    txtFullName.Text = client.FullName;
-                    txtParentName.Text = client.ParentName;
-                    txtDOB.Text = client.DOB?.ToString();
-                    ddlGender.SelectedValue = client.Gender;
-                    txtNationality.Text = client.Nationality;
-                    txtOccupation.Text = client.Occupation;
-                    txtAadhaar.Text = client.AadhaarNumber;
-                    txtPan.Text = client.PANNumber;
-                    txtEmail.Text = client.EmailId;
-                    txtMobile.Text = client.MobileNumber;
-                    txtAddress.Text = client.Address;
-                    txtCity.Text = client.City;
-                    txtState.Text = client.State;
-                    txtPincode.Text = client.Pincode;
-                    ddlAccountType.SelectedValue = client.AccountType;
-                    ddlIsJointAccount.SelectedValue = client.IsJointAccount ? "Yes" : "No";
-                    if (client.IsJointAccount)
+
+                    if (request.Status == RequestStatus.Pending.ToString())
                     {
-                        fsJointAccount.Visible = true;
+                        if (client.IsJointAccount)
+                        {
+                            lblCoHolderApprovalHeading.Visible = true;
+                            lblCoHolderApproval.Text = client.CoHolderApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
+
+                        }
+                        lblAdminApprovalHeading.Visible = true;
+                        lblAdminApproval.Text = client.AdminApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
+                        SetButtonState(true);
                     }
                     else
                     {
-                        fsJointAccount.Visible = false;
+                        SetButtonState(false);
+                       
                     }
-                    txtJointClientId.Text = client.JointClientId != 0 ? client.JointClientId.ToString() : "";
-                    txtUsername.Text = client.Username;
-                    txtPassword.Attributes["value"] = client.Password;
-                    txtConfirmPassword.Attributes["value"] = client.Password;
 
-                    btnUpdate.Enabled = true;
-                    //btnDelete.Enabled = true;
+                    PopulateClientForm(client);
                 }
-                //else
-                //{
-                //    //lblMessage.Text = "Failed to parse client request payload.";
-                //}
-                //}
-                //catch
-                //{
-                //    //lblMessage.Text = "Invalid payload format.";
-                //}
             }
             else
             {
-                //lblMessage.Text = "No request found with this ID.";
                 pnlRequestDetails.Visible = false;
             }
         }
 
+        private void PopulateClientForm(ClientDTO client)
+        {
+            txtFullName.Text = client.FullName;
+            txtParentName.Text = client.ParentName;
+            txtDOB.Text = client.DOB?.ToString();
+            ddlGender.SelectedValue = client.Gender;
+            txtNationality.Text = client.Nationality;
+            txtOccupation.Text = client.Occupation;
+            txtAadhaar.Text = client.AadhaarNumber;
+            txtPan.Text = client.PANNumber;
+            txtEmail.Text = client.EmailId;
+            txtMobile.Text = client.MobileNumber;
+            txtAddress.Text = client.Address;
+            txtCity.Text = client.City;
+            txtState.Text = client.State;
+            txtPincode.Text = client.Pincode;
+            ddlAccountType.SelectedValue = client.AccountType;
+            ddlIsJointAccount.SelectedValue = client.IsJointAccount ? "Yes" : "No";
+            fsJointAccount.Visible = client.IsJointAccount;
+            txtJointClientId.Text = client.JointClientId != 0 ? client.JointClientId.ToString() : "";
+            txtUsername.Text = client.Username;
+            txtPassword.Attributes["value"] = client.Password;
+            txtConfirmPassword.Attributes["value"] = client.Password;
+        }
+
+        private void SetButtonState(bool enable)
+        {
+            btnUpdate.Enabled = enable;
+            btnEdit.Enabled = enable;
+            btnApprove.Enabled = enable;
+            btnReject.Enabled = enable;
+        }
+
         protected void BtnEdit_Click(object sender, EventArgs e)
         {
-            txtFullName.ReadOnly = false;
-            txtParentName.ReadOnly = false;
-            txtDOB.ReadOnly = false;
-            ddlGender.Enabled = true;
-            txtNationality.ReadOnly = false;
-            txtOccupation.ReadOnly = false;
-            txtAadhaar.ReadOnly = false;
-            txtPan.ReadOnly = false;
-            txtEmail.ReadOnly = false;
-            txtMobile.ReadOnly = false;
-            txtAddress.ReadOnly = false;
-            txtCity.ReadOnly = false;
-            txtState.ReadOnly = false;
-            txtPincode.ReadOnly = false;
-            ddlAccountType.Enabled = true;
-            ddlIsJointAccount.Enabled = true;
-            txtJointClientId.ReadOnly = false;
-            txtUsername.ReadOnly = false;
-            txtPassword.ReadOnly = false;
-            txtConfirmPassword.ReadOnly = false;
+            SetClientFormReadOnly(false);
             btnEdit.Visible = false;
             btnUpdate.Visible = true;
         }
 
-
-
-
-
-        protected async void BtnUpdate_Click(object sender, EventArgs e)
+        private void SetClientFormReadOnly(bool isReadOnly)
         {
-            int requestId = (int)ViewState["SelectedRequestId"];
-
-            ClientDTO updatedClient = new ClientDTO
+            txtFullName.ReadOnly = isReadOnly;
+            txtParentName.ReadOnly = isReadOnly;
+            txtDOB.ReadOnly = isReadOnly;
+            ddlGender.Enabled = !isReadOnly;
+            txtNationality.ReadOnly = isReadOnly;
+            txtOccupation.ReadOnly = isReadOnly;
+            txtAadhaar.ReadOnly = isReadOnly;
+            txtPan.ReadOnly = isReadOnly;
+            txtEmail.ReadOnly = isReadOnly;
+            txtMobile.ReadOnly = isReadOnly;
+            txtAddress.ReadOnly = isReadOnly;
+            txtCity.ReadOnly = isReadOnly;
+            txtState.ReadOnly = isReadOnly;
+            txtPincode.ReadOnly = isReadOnly;
+            ddlAccountType.Enabled = !isReadOnly;
+            ddlIsJointAccount.Enabled = !isReadOnly;
+            txtJointClientId.ReadOnly = isReadOnly;
+            txtUsername.ReadOnly = isReadOnly;
+            //txtPassword.ReadOnly = isReadOnly;
+            //txtConfirmPassword.ReadOnly = isReadOnly;
+        }
+       
+        protected ClientDTO GetClient()
+        {
+            return new ClientDTO
             {
                 FullName = txtFullName.Text.Trim(),
                 ParentName = txtParentName.Text.Trim(),
@@ -273,275 +259,145 @@ namespace BankingManagementSystem.WebForms.Admin
                 IsJointAccount = ddlIsJointAccount.SelectedValue == "Yes",
                 JointClientId = string.IsNullOrWhiteSpace(txtJointClientId.Text.Trim()) ? 0 : Convert.ToInt32(txtJointClientId.Text.Trim()),
                 Username = txtUsername.Text.Trim(),
-                
                 Password = txtPassword.Text,
                 ConfirmPassword = txtConfirmPassword.Text
             };
+       
+        }
+        protected async void BtnUpdate_Click(object sender, EventArgs e)
+        {
+            int requestId = (int)ViewState["SelectedRequestId"];
 
-            //bool result = await RequestsService.UpdatePayloadAsync(requestId, updatedClient);
-            //bool result = AdminBLL.UpdatePayload(requestId, updatedClient, out string message);
+            ClientDTO updatedClient = GetClient();
 
-            //string messageContent = result ? "Request updated successfully." : "Update failed.";
-            //string messageType = result ? "success" : "danger";
+            //ClientDTO updatedClient = new ClientDTO
+            //{
+            //    FullName = txtFullName.Text.Trim(),
+            //    ParentName = txtParentName.Text.Trim(),
+            //    DOB = txtDOB.Text,
+            //    Gender = ddlGender.SelectedValue,
+            //    Nationality = txtNationality.Text.Trim(),
+            //    Occupation = txtOccupation.Text.Trim(),
+            //    AadhaarNumber = txtAadhaar.Text.Trim(),
+            //    PANNumber = txtPan.Text.Trim(),
+            //    EmailId = txtEmail.Text.Trim(),
+            //    MobileNumber = txtMobile.Text.Trim(),
+            //    Address = txtAddress.Text.Trim(),
+            //    City = txtCity.Text.Trim(),
+            //    State = txtState.Text.Trim(),
+            //    Pincode = txtPincode.Text.Trim(),
+            //    AccountType = ddlAccountType.SelectedValue,
+            //    IsJointAccount = ddlIsJointAccount.SelectedValue == "Yes",
+            //    JointClientId = string.IsNullOrWhiteSpace(txtJointClientId.Text.Trim()) ? 0 : Convert.ToInt32(txtJointClientId.Text.Trim()),
+            //    Username = txtUsername.Text.Trim(),
+            //    Password = txtPassword.Text,
+            //    ConfirmPassword = txtConfirmPassword.Text
+            //};
+    
 
-            //ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('{messageContent}', '{messageType}');", true);
             try
             {
                 ApiResponseMessage result = await RequestsService.UpdatePayloadAsync(requestId, updatedClient);
 
-                string message;
+                string message = result.MessageContent;
 
+              
                 if (result.MessageContent.StartsWith("{") && result.MessageContent.Contains("Message"))
                 {
                     var parsed = JsonConvert.DeserializeObject<ApiErrorMessageWrapper>(result.MessageContent);
                     message = parsed?.Message;
                 }
-                else
-                {
-                    message = result.MessageContent;
-                }
-                // Trim quotes if they exist
                 if (message.StartsWith("\"") && message.EndsWith("\""))
                 {
                     message = message.Trim('"');
                 }
-
-                if (result.MessageType == "success")
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showRegisterSuccessMessage('{message}', '{result.MessageType}'); }}, 200);", true);
-                else
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('{message}', '{result.MessageType}');", true);
+                string messageContent = result.MessageType == "success" ? "Request updated successfully." : message;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('{messageContent}', '{result.MessageType}');", true);
+                SetClientFormReadOnly(true);
+                btnEdit.Visible = true;
+                btnUpdate.Visible = false;
             }
-            catch (Exception ex)
+            catch
             {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('Update failed due to a technical error.', 'danger');", true);
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", "showAlert('Update failed due to a technical error.', 'danger');", true);
             }
-
         }
-
-
-
-
-
-        //protected void LoadRequests(string status, string sortColumn, string sortDirection)
-        //{
-        //    var requests = AdminBLL.GetRequestsByStatus(status, sortColumn, sortDirection);
-        //    gvRequests.DataSource = requests;
-        //    gvRequests.DataBind();
-        //}
 
         protected void GvRequests_Sorting(object sender, GridViewSortEventArgs e)
         {
-
-            if (e.SortExpression == "RequestId")
-                sortColumn = DbColumns.RequestId;
-            else if (e.SortExpression == "RequestType")
-                sortColumn = DbColumns.RequestType;
-            else if (e.SortExpression == "RequestedOn")
-                sortColumn = DbColumns.CreatedOn;
-
-            // If same column clicked again → toggle direction
-            if (e.SortExpression == sortColumn)
+            var columnMap = new Dictionary<string, string>
             {
-                sortDirection = sortDirection == "ASC" ? "DESC" : "ASC";
-            }
-            else
-            {
-                //sortColumn = e.SortExpression;
-                sortDirection = "DESC"; // default to DESC when new column clicked
-            }
-            LoadRequests(ddlFilterStatus.SelectedValue, sortColumn, sortDirection);
-        }
-
-
-
-        protected void BtnApprove_Click(object sender, EventArgs e)
-        {
-            int requestId = (int)ViewState["SelectedRequestId"];
-            bool result = RequestDAL.UpdateRequestStatus(requestId, "Approved", -1);
-
-            //pnlDetails.Visible = false;
-            LoadRequests(ddlFilterStatus.SelectedValue, sortColumn, sortDirection);
-        }
-
-        protected void BtnReject_Click(object sender, EventArgs e)
-        {
-            int requestId = (int)ViewState["SelectedRequestId"];
-            bool result = RequestDAL.UpdateRequestStatus(requestId, "Rejected", -1);
-
-            //pnlDetails.Visible = false;
-            LoadRequests(ddlFilterStatus.SelectedValue, sortColumn, sortDirection);
-        }
-
-        protected void btnEdit_Click(object sender, EventArgs e)
-        {
-            // Optional: Redirect to a detailed editor page with ID in querystring
-            Response.Redirect($"~/WebForms/Admin/EditRequest.aspx?RequestId={ViewState["SelectedRequestId"]}");
-        }
-
-        protected void BtnShow2_Click(int requestId)
-        {
-            //if (int.TryParse(txtRequestId.Text.Trim(), out int requestId))
-            //{
-            var request = RequestDAL.GetAllRequestById(requestId);
-            if (request != null)
-            {
-                try
-                {
-                    var client = JsonConvert.DeserializeObject<ClientDTO>(request.Payload);
-                    if (client != null)
-                    {
-
-                        pnlRequestTable.Visible = false;
-                        pnlRequestDetails.Visible = true;
-
-                        lblRequestType.Text = request.RequestType;
-                        lblRequestStatus.Text = request.Status;
-                        if (request.Status == "Pending")
-                        {
-                            lblAdminApproval.Text = client.AdminApproved ? "Approved" : "Awaiting";
-                            lblCoHolderApproval.Text = client.CoHolderApproved ? "Approved" : "Awaiting";
-                        }
-
-                        //pnlSummary.Visible = true;
-                        lblRequestId.Text = $"#{requestId.ToString()}";
-                        txtFullName.Text = client.FullName;
-                        txtParentName.Text = client.ParentName;
-                        txtDOB.Text = client.DOB?.ToString();
-                        ddlGender.SelectedValue = client.Gender;
-                        txtNationality.Text = client.Nationality;
-                        txtOccupation.Text = client.Occupation;
-                        txtAadhaar.Text = client.AadhaarNumber;
-                        txtPan.Text = client.PANNumber;
-                        txtEmail.Text = client.EmailId;
-                        txtMobile.Text = client.MobileNumber;
-                        txtAddress.Text = client.Address;
-                        txtCity.Text = client.City;
-                        txtState.Text = client.State;
-                        txtPincode.Text = client.Pincode;
-                        ddlAccountType.SelectedValue = client.AccountType;
-                        ddlIsJointAccount.SelectedValue = client.IsJointAccount ? "Yes" : "No";
-                        if (client.IsJointAccount)
-                        {
-                            fsJointAccount.Visible = true;
-                        }
-                        else
-                        {
-                            fsJointAccount.Visible = false;
-                        }
-                        txtJointClientId.Text = client.JointClientId != 0 ? client.JointClientId.ToString() : "";
-                        txtUsername.Text = client.Username;
-                        //txtPassword.Attributes["value"] = client.Password;
-
-                        btnUpdate.Enabled = true;
-                        //btnDelete.Enabled = true;
-                    }
-                    else
-                    {
-                        lblMessage.Text = "Failed to parse client request payload.";
-                    }
-                }
-                catch
-                {
-                    lblMessage.Text = "Invalid payload format.";
-                }
-            }
-            else
-            {
-                lblMessage.Text = "No request found with this ID.";
-                pnlRequestDetails.Visible = false;
-            }
-            //}
-            //else
-            //{
-            //    lblMessage.Text = "Enter a valid Request ID.";
-            //}
-        }
-
-        protected void BtnUpdate2_Click(object sender, EventArgs e)
-        {
-            //if (int.TryParse(txtRequestId.Text.Trim(), out int requestId))
-            //{
-            int requestId = (int)ViewState["SelectedRequestId"];
-            ClientDTO updatedClient = new ClientDTO
-            {
-                FullName = txtFullName.Text.Trim(),
-                ParentName = txtParentName.Text.Trim(),
-                DOB = txtDOB.Text,
-                Gender = ddlGender.SelectedValue,
-                Nationality = txtNationality.Text.Trim(),
-                Occupation = txtOccupation.Text.Trim(),
-                EmailId = txtEmail.Text.Trim(),
-                MobileNumber = txtMobile.Text.Trim(),
-                Address = txtAddress.Text.Trim(),
-                City = txtCity.Text.Trim(),
-                State = txtState.Text.Trim(),
-                Pincode = txtPincode.Text.Trim(),
-                AccountType = ddlAccountType.SelectedValue,
-                IsJointAccount = ddlIsJointAccount.SelectedValue == "Yes",
-                JointClientId = string.IsNullOrWhiteSpace(txtJointClientId.Text.Trim()) ? 0 : Convert.ToInt32(txtJointClientId.Text.Trim()),
-                Username = txtUsername.Text.Trim(),
-                //Password = txtPassword.Text.Trim()
+                { "RequestId", DbColumns.RequestId },
+                { "RequestType", DbColumns.RequestType },
+                { "RequestedOn", DbColumns.CreatedOn },
+                { "RepliedOn", DbColumns.RepliedOn }
             };
 
-            string updatedPayload = JsonConvert.SerializeObject(updatedClient);
-            bool success = RequestDAL.UpdateRequestPayload(requestId, updatedPayload);
-            string messageContent = success ? "Request updated successfully." : "Update failed.";
-            string messageType = success ? "success" : "danger";
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('{messageContent}', '{messageType}');", true);
-            //}
+            if (columnMap.TryGetValue(e.SortExpression, out var mappedColumn))
+            {
+                sortColumn = mappedColumn;
+                sortColumnDemo = e.SortExpression;
+            }
+
+            sortDirection = e.SortExpression == sortColumnDemo && sortDirection == "ASC" ? "DESC" : "ASC";
+
+            LoadRequests(ddlFilterStatus.SelectedValue, sortColumn, sortDirection);
         }
 
-        protected void btnDelete_Click(object sender, EventArgs e)
+        protected async void BtnApprove_Click(object sender, EventArgs e)
         {
-            //if (int.TryParse(txtRequestId.Text.Trim(), out int requestId))
-            //{
             int requestId = (int)ViewState["SelectedRequestId"];
-            bool success = RequestDAL.DeleteRequestByStatus(requestId, "Pending");
-            if (success)
+            bool statusUpdated = await RequestsService.UpdateStatusAsync(requestId, RequestStatus.Approved.ToString(), adminId);
+            if (statusUpdated)
             {
-                ClearForm();
-                lblMessage.Text = "Request deleted successfully.";
+                ClientDTO client = GetClient();
+
+                bool result = await RegistrationService.CreateClientAsync(client);
+                if(result)
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showApproveRejectMessage('Client Request ID: #{requestId} Approved Successfully.', 'success'); }}, 200);", true);
+                await ReloadUI(result);
+
             }
             else
             {
-                lblMessage.Text = "Delete failed.";
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "failAlert", "showAlert('Approval failed.', 'danger');", true);
             }
-            //}
+
+        }
+
+
+
+   
+        protected async void BtnReject_Click(object sender, EventArgs e)
+        {
+            int requestId = (int)ViewState["SelectedRequestId"];
+            bool result = await RequestsService.UpdateStatusAsync(requestId, RequestStatus.Rejected.ToString(), adminId);
+            if (result)
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showApproveRejectMessage('Client Request ID: #{requestId} Rejected Successfully.', 'danger'); }}, 200);", true);
+
+            await ReloadUI(result);
+        }
+
+        private async Task ReloadUI(bool success)
+        {
+            if (success)
+            {
+                LoadRequests(ddlFilterStatus.SelectedValue, sortColumn, sortDirection);
+            }
         }
 
         private void ClearForm()
         {
-            txtFullName.Text = "";
-            txtParentName.Text = "";
-            txtDOB.Text = "";
-            ddlGender.SelectedValue = "";
-            txtNationality.Text = "";
-            txtOccupation.Text = "";
-            txtEmail.Text = "";
-            txtMobile.Text = "";
-            txtAddress.Text = "";
-            txtCity.Text = "";
-            txtState.Text = "";
-            txtPincode.Text = "";
-            ddlAccountType.SelectedValue = "";
-            ddlIsJointAccount.SelectedValue = "";
-            txtJointClientId.Text = "";
-            txtUsername.Text = "";
-            //txtPassword.Text = "";
+            txtFullName.Text = txtParentName.Text = txtDOB.Text = txtNationality.Text = txtOccupation.Text = txtAadhaar.Text = txtPan.Text = txtEmail.Text = txtMobile.Text = txtAddress.Text = txtCity.Text = txtState.Text = txtPincode.Text = txtJointClientId.Text = txtUsername.Text = "";
+            ddlGender.SelectedValue = ddlAccountType.SelectedValue = ddlIsJointAccount.SelectedValue = "";
             pnlRequestDetails.Visible = false;
         }
+
         protected void DdlIsJoint_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (ddlIsJointAccount.SelectedValue == "Yes")
-            {
-                fsJointAccount.Visible = true;
-            }
-            else
-            {
-                txtJointClientId.Text = string.Empty;
-                fsJointAccount.Visible = false;
-
-            }
-        }
+            fsJointAccount.Visible = ddlIsJointAccount.SelectedValue == "Yes";
+            if (!fsJointAccount.Visible) txtJointClientId.Text = string.Empty;
+        } 
+      
     }
 }
