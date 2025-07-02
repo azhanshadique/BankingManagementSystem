@@ -59,6 +59,27 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during admin validation.", ex);
             }
         }
+        public static bool IsAdminExistsByAdminId(int adminId)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(CS))
+                {
+                    SqlCommand cmd = new SqlCommand("sp_CheckAdminExistsByAdminId", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@AdminId", adminId);
+
+                    con.Open();
+                    object result = cmd.ExecuteScalar();
+
+                    return Convert.ToInt32(result) > 0;
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error during Check Admin Exists By AdminId.", ex);
+            }
+        }
 
         public static bool CreateClient(ClientDTO client, out string message)
         {

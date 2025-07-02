@@ -26,9 +26,10 @@ namespace BankingManagementSystem.Controllers.API
 
         [HttpGet]
         [Route("{id:int}")]
-        public IHttpActionResult GetRequestById(int id)
+        public IHttpActionResult GetRequestsById(int id)
         {
-            var request = RequestDAL.GetPendingRequestById(id);
+            //var request = RequestDAL.GetPendingRequestById(id);
+            var request = AdminBLL.GetRequestById(id);
             return request != null ? Ok(request) : (IHttpActionResult)NotFound();
         }
 
@@ -52,11 +53,13 @@ namespace BankingManagementSystem.Controllers.API
             return Ok(new { success = result });
         }
 
+
+
         [HttpDelete]
         [Route("{id:int}")]
-        public IHttpActionResult DeleteRequest(int id)
+        public IHttpActionResult DeleteRequest(int id, string status="Pending")
         {
-            bool result = RequestDAL.DeletePendingRequest(id);
+            bool result = AdminBLL.DeleteRequest(id, status);
             return Ok(new { success = result });
         }
     }

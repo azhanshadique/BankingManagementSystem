@@ -17,8 +17,12 @@ namespace BankingManagementSystem.BLL
         public User ValidateAdminLogin(AuthRequestDTO admin)
         {
             return new AdminDAL().CheckAdminCredentials(admin);
-
         }
+        public static bool IsAdminExistsByAdminId(int adminId)
+        {
+            return AdminDAL.IsAdminExistsByAdminId(adminId);
+        }
+
         public static List<PendingRequestDTO> GetRequestsByStatus(string status, string sortBy, string sortDirection)
         {
             return RequestDAL.GetAllRequestsByStatus(status, sortBy, sortDirection);
@@ -26,13 +30,13 @@ namespace BankingManagementSystem.BLL
 
         public static PendingRequestDTO GetRequestById(int requestId)
         {
-            return RequestDAL.GetPendingRequestById(requestId);
+            return RequestDAL.GetAllRequestById(requestId);
         }
 
         public static bool UpdatePayload(int requestId, ClientDTO client, out string message)
         {
-            var isClient = GetRequestById(requestId);
-            if (isClient == null) {
+            var isClientRequest = GetRequestById(requestId);
+            if (isClientRequest == null) {
                 message = "Invalid Request ID";
                 return false;
             }
@@ -48,12 +52,18 @@ namespace BankingManagementSystem.BLL
 
         public static bool UpdateStatus(int requestId, string status, int repliedBy)
         {
+            var isClientRequest = RequestDAL.GetPendingRequestById(requestId);
+            if (isClientRequest == null)
+                return false;
+            if (repliedBy != -1 || !AdminDAL.IsAdminExistsByAdminId(repliedBy) || !ClientDAL.IsClientExistsByClientId(repliedBy))
+                return false;
             return RequestDAL.UpdateRequestStatus(requestId, status, repliedBy);
+            //AdminDAL.CreateClient();
         }
 
-        public static bool DeleteRequest(int requestId)
+        public static bool DeleteRequest(int requestId, string status)
         {
-            return RequestDAL.DeletePendingRequest(requestId);
+            return RequestDAL.DeleteRequestByStatus(requestId, status);
         }
     }
 

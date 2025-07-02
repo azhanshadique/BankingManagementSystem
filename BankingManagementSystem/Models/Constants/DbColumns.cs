@@ -16,6 +16,8 @@ namespace BankingManagementSystem.Models.Constants
         public const string RequestType = "request_type";
         public const string Payload = "payload";
         public const string CreatedOn = "created_on";
+        public const string RepliedOn = "replied_on";
+        public const string Status = "status";
         
     }
 }

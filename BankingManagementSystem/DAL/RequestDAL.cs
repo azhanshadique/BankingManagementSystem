@@ -13,8 +13,8 @@ using BankingManagementSystem.Models;
 
 namespace BankingManagementSystem.DAL
 {
-	public class RequestDAL
-	{
+    public class RequestDAL
+    {
         private static readonly String CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
 
         public static int SendJointAccountPendingRequests(int? clientId, string requestType, int targetClientId, string payload)
@@ -46,7 +46,7 @@ namespace BankingManagementSystem.DAL
             }
             catch (SqlException ex)
             {
-                throw new Exception("Database error during creating joint account pending requests.", ex);
+                throw new Exception("Database error during Create Joint Account Pending Requests.", ex);
             }
         }
         public static int SendAdminPendingRequest(int? clientId, string requestType, string payload)
@@ -78,7 +78,7 @@ namespace BankingManagementSystem.DAL
             }
             catch (SqlException ex)
             {
-                throw new Exception("Database error during creating admin pending request.", ex);
+                throw new Exception("Database error during Create Admin Pending Request.", ex);
             }
         }
         public static bool IsDuplicateNewRegistrationPendingRequest(string aadhaar, string pan)
@@ -101,9 +101,9 @@ namespace BankingManagementSystem.DAL
             }
             catch (SqlException ex)
             {
-                throw new Exception("Database error during checking duplicate pending request.", ex);
+                throw new Exception("Database error during Check Duplicate New Registration Request.", ex);
             }
-            
+
         }
 
 
@@ -130,6 +130,7 @@ namespace BankingManagementSystem.DAL
                             int idxRequestType = reader.GetOrdinal(DbColumns.RequestType);
                             int idxPayload = reader.GetOrdinal(DbColumns.Payload);
                             int idxRequestedOn = reader.GetOrdinal(DbColumns.CreatedOn);
+                            int idxRepliedOn = reader.GetOrdinal(DbColumns.RepliedOn);
 
 
 
@@ -138,7 +139,9 @@ namespace BankingManagementSystem.DAL
                                 RequestId = reader.GetInt32(idxRequestId),
                                 RequestType = reader.IsDBNull(idxRequestType) ? null : reader.GetString(idxRequestType),
                                 Payload = reader.IsDBNull(idxPayload) ? null : reader.GetString(idxPayload),
-                                RequestedOn = reader.GetDateTime(idxRequestedOn)
+                                RequestedOn = reader.GetDateTime(idxRequestedOn),
+                                RepliedOn = reader.IsDBNull(idxRepliedOn) ? (DateTime?)null : reader.GetDateTime(idxRepliedOn)
+
                             });
                         }
                     }
@@ -147,9 +150,9 @@ namespace BankingManagementSystem.DAL
             }
             catch (SqlException ex)
             {
-                throw new Exception("Database error during getting all request by status.", ex);
+                throw new Exception("Database error during Get All Request By Status.", ex);
             }
-           
+
         }
 
         public static PendingRequestDTO GetPendingRequestById(int requestId)
@@ -186,51 +189,73 @@ namespace BankingManagementSystem.DAL
                     return null;
                 }
             }
-            catch
+            catch (SqlException ex)
             {
-                return null;
+                throw new Exception("Database error during Get Pending Requests By Id.", ex);
             }
         }
-        public static PendingRequestDTO GetRequestDetailsForAdmin(int requestId)
+        public static PendingRequestDTO GetAllRequestById(int requestId)
         {
-            using (SqlConnection con = new SqlConnection(CS))
+            try
             {
-                SqlCommand cmd = new SqlCommand("sp_GetRequestDetailsForAdmin", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@RequestId", requestId);
-
-                con.Open();
-                SqlDataReader rdr = cmd.ExecuteReader();
-                if (rdr.Read())
+                using (SqlConnection con = new SqlConnection(CS))
                 {
-                    return new PendingRequestDTO
+                    SqlCommand cmd = new SqlCommand("sp_GetAllRequestById", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@RequestId", requestId);
+
+                    con.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
                     {
-                        RequestId = requestId,
-                        RequestType = rdr["request_type"].ToString(),
-                        Payload = rdr["payload"].ToString(),
-                        //CreatedOn = Convert.ToDateTime(rdr["created_on"]),
-                        //Status = rdr["status"].ToString(),
-                        //AdminApproved = rdr["admin_approved"].ToString(),
-                        //CoHolderApproved = rdr["co_holder_approved"]?.ToString()
-                    };
+                        int idxRequestType = reader.GetOrdinal(DbColumns.RequestType);
+                        int idxPayload = reader.GetOrdinal(DbColumns.Payload);
+                        int idxRequestedOn = reader.GetOrdinal(DbColumns.CreatedOn);
+                        int idxStatus = reader.GetOrdinal(DbColumns.Status);
+
+                        return new PendingRequestDTO
+                        {
+                            RequestId = requestId,
+                            RequestType = reader.IsDBNull(idxRequestType) ? null : reader.GetString(idxRequestType),
+                            Payload = reader.IsDBNull(idxPayload) ? null : reader.GetString(idxPayload),
+                            RequestedOn = reader.IsDBNull(idxRequestedOn) ? (DateTime?)null : reader.GetDateTime(idxRequestedOn),
+                            Status = reader.IsDBNull(idxStatus) ? null : reader.GetString(idxStatus)
+                        };
+                    }
+                    return null;
                 }
             }
-            return null;
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error during Get All Requests By Id.", ex);
+            }
+
         }
 
         public static bool UpdateRequestStatus(int requestId, string newStatus, int repliedBy)
         {
-            using (SqlConnection con = new SqlConnection(CS))
+            try
             {
-                SqlCommand cmd = new SqlCommand("sp_UpdateRequestStatus", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@RequestId", requestId);
-                cmd.Parameters.AddWithValue("@Status", newStatus);
-                cmd.Parameters.AddWithValue("@RepliedBy", repliedBy);
+                using (SqlConnection con = new SqlConnection(CS))
+                {
+                    SqlCommand cmd = new SqlCommand("sp_UpdateRequestStatus", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@RequestId", requestId);
+                    cmd.Parameters.AddWithValue("@Status", newStatus);
+                    cmd.Parameters.AddWithValue("@RepliedBy", repliedBy);
 
-                con.Open();
-                return cmd.ExecuteNonQuery() > 0;
+                    con.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    return rowsAffected > 0;
+                }
             }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error during Update Request Status.", ex);
+            }
+
         }
 
 
@@ -255,30 +280,31 @@ namespace BankingManagementSystem.DAL
                     return rows > 0;
                 }
             }
-            catch
+            catch (SqlException ex)
             {
-                return false;
+                throw new Exception("Database error during Update Request Payload.", ex);
             }
         }
 
-        public static bool DeletePendingRequest(int requestId)
+        public static bool DeleteRequestByStatus(int requestId, string status)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(CS))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_DeletePendingRequest", con);
+                    SqlCommand cmd = new SqlCommand("sp_DeleteRequestByStatus", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@RequestId", requestId);
+                    cmd.Parameters.AddWithValue("@Status", status);
 
                     con.Open();
                     int rows = cmd.ExecuteNonQuery();
                     return rows > 0;
                 }
             }
-            catch
+            catch (SqlException ex)
             {
-                return false;
+                throw new Exception("Database error during Delete Request By Status.", ex);
             }
         }
     }

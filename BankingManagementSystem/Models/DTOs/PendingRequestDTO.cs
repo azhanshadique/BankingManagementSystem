@@ -11,6 +11,8 @@ namespace BankingManagementSystem.Models.DTOs
         public string RequestType { get; set; }
         public string Payload { get; set; }
         public DateTime? RequestedOn { get; set; }
+        public string Status { get; set; }
+        public DateTime? RepliedOn { get; set; }
     }
 
 }

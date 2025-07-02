@@ -116,7 +116,7 @@ namespace BankingManagementSystem.WebForms.Home
         {
             if (int.TryParse(txtRequestId.Text.Trim(), out int requestId))
             {
-                bool success = RequestDAL.DeletePendingRequest(requestId);
+                bool success = RequestDAL.DeleteRequestByStatus(requestId, "Pending");
                 if (success)
                 {
                     ClearForm();
