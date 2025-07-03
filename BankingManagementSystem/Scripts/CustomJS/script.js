@@ -90,6 +90,28 @@ function showApproveRejectMessage(message, type = 'success') {
     bsModal.show();
 }
 
+function showApproveRejectMessageByClient(message, type = 'success') {
+    const modal = document.getElementById('approveRejectMessageByClient');
+    const content = document.getElementById('approveRejectContentByClient');
+    const title = document.getElementById('approveRejectLabelByClient');
+    if (!modal || !content) return;
+
+    content.innerText = message;
+
+    title.innerText = type == 'success' ? 'Joint Account Request Approved' : 'Joint Account Request Rejected'
+    // Change header bg & footer button based on type
+    const header = modal.querySelector('.modal-header');
+    header.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-secondary');
+    header.classList.add('bg-' + type);
+
+    const footerBtn = modal.querySelector('#btnOkApproveRejectByClient');
+    footerBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary');
+    footerBtn.classList.add('btn-' + type);
+
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+}
+
 
 window.onload = function () {
     if (performance.navigation.type === 2) {

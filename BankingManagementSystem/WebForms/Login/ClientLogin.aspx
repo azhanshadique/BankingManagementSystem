@@ -38,10 +38,10 @@
 
                         <!-- Create + Link Account -->
                         <div class="d-grid gap-2 mb-3">
-                            <a href="/signup/personaldetails.aspx" class="btn btn-outline-secondary">Create Account</a>
-                            <a href="/linkexisting.aspx" class="btn btn-outline-secondary">Link Existing Account</a>
+                            <a href='<%= Page.GetRouteUrl("ClientSignupCreateAccountRoute", null) %>' class="btn btn-outline-secondary">Create Account</a>
+                            <a href='<%= Page.GetRouteUrl("ClientSignupLinkAccountRoute", null) %>' class="btn btn-outline-secondary">Link Existing Account</a>
                         </div>
-
+                        
                         <!-- Back & Forgot -->
                         <div class="d-flex justify-content-between align-items-center mt-0">
                             <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back to Home</a>

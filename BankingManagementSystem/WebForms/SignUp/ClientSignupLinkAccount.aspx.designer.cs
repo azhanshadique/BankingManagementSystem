@@ -11,7 +11,7 @@ namespace BankingManagementSystem.WebForms.SignUp
 {
 
 
-    public partial class ClientSignupCreateAccountLinkAccount
+    public partial class ClientSignupLinkAccount
     {
 
         /// <summary>

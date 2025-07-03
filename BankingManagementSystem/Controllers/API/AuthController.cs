@@ -16,7 +16,7 @@ namespace BankingManagementSystem.Controllers.API
         [Route("client")]
         public IHttpActionResult ClientLogin(AuthRequestDTO request)
         {
-            var user = new ClientBLL().ValidateClientLogin(request);
+            var user = ClientBLL.ValidateClientLogin(request);
 
             if (user != null)
             {
@@ -35,7 +35,7 @@ namespace BankingManagementSystem.Controllers.API
         [Route("admin")]
         public IHttpActionResult AdminLogin(AuthRequestDTO request)
         {
-            var user = new AdminBLL().ValidateAdminLogin(request);
+            var user = AdminBLL.ValidateAdminLogin(request);
 
             if (user != null)
             {

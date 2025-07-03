@@ -11,11 +11,11 @@ using System.Diagnostics.Eventing.Reader;
 
 namespace BankingManagementSystem.DAL
 {
-    public class ClientDAL
+    public static class ClientDAL
     {
         private static readonly String CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
 
-        public User CheckClientCredentials(AuthRequestDTO client)
+        public static User CheckClientCredentials(AuthRequestDTO client)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during client exists by aadhaar or PAN validation.", ex);
             }
         }
-        public static bool IsClientExistsByClientId(int clientId)
+        public static bool IsClientExistsByClientId(int? clientId)
         {
             try
             {

@@ -204,11 +204,12 @@
     <Compile Include="BLL\AdminBLL.cs" />
     <Compile Include="BLL\AuthBLL.cs" />
     <Compile Include="BLL\ClientBLL.cs" />
+    <Compile Include="BLL\RequestBLL.cs" />
     <Compile Include="BLL\ValidationServiceBLL.cs" />
     <Compile Include="Controllers\API\AdminRequestsController.cs" />
-    <Compile Include="Controllers\API\APIController.cs" />
     <Compile Include="Controllers\API\AuthController.cs" />
     <Compile Include="Controllers\API\ClientController.cs" />
+    <Compile Include="Controllers\API\ClientRequestController.cs" />
     <Compile Include="Controllers\API\PageContentController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="DAL\AdminDAL.cs" />
@@ -231,8 +232,7 @@
     <Compile Include="Models\API\AuthTokenResponse.cs" />
     <Compile Include="Models\ConstraintTypes\UserRoles.cs" />
     <Compile Include="Models\DTOs\ClientDTO.cs" />
-    <Compile Include="Models\DTOs\date.cs" />
-    <Compile Include="Models\DTOs\PendingRequestDTO.cs" />
+    <Compile Include="Models\DTOs\RequestDTO.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebForms\Admin\PendingRequest.aspx.cs">
@@ -240,6 +240,13 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="WebForms\Admin\PendingRequest.aspx.designer.cs">
+      <DependentUpon>PendingRequest.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="WebForms\Client\PendingRequest.aspx.cs">
+      <DependentUpon>PendingRequest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebForms\Client\PendingRequest.aspx.designer.cs">
       <DependentUpon>PendingRequest.aspx</DependentUpon>
     </Compile>
     <Compile Include="WebForms\Home\About.aspx.cs">
@@ -2433,6 +2440,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\CustomJS\script.js" />
     <Content Include="WebForms\Admin\PendingRequest.aspx" />
+    <Content Include="WebForms\Client\PendingRequest.aspx" />
     <Content Include="WebForms\Home\About.aspx" />
     <Content Include="WebForms\Home\ClientRequest.aspx" />
     <Content Include="WebForms\Home\Dashboard.aspx" />
@@ -2592,7 +2600,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="WebForms\Clients\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

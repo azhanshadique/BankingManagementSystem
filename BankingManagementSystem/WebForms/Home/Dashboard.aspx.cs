@@ -19,7 +19,7 @@ namespace BankingManagementSystem.WebForms
             {
                 try
                 {
-
+                    Session.Remove("RequestType");
                     if (Session["AlertMessage"] != null && Session["AlertType"] != null)
                     {
                         string message = Session["AlertMessage"]?.ToString();
@@ -65,6 +65,7 @@ namespace BankingManagementSystem.WebForms
 
                         lblAdminName.Text = $" {firstName}";
                     }
+                    
                 }
                 catch
                 {

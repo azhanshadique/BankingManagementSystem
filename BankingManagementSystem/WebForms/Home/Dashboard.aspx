@@ -48,14 +48,22 @@
     </main>
 
     <!-- Client Dashboard -->
-    <main id="ClientDashboard" runat="server" visible="true" class="d-flex align-items-center justify-content-center py-5">
+    <main id="ClientDashboard" runat="server" visible="true" class="d-flex align-items-center justify-content-center py-4">
         <div class="container text-center d-flex flex-column gap-5">
 
-            <section class="mb-5">
+            <section class="">
                 <h1 class="display-5">Welcome,
                     <asp:Label ID="lblClientName" runat="server" Text="Client" CssClass="text-black" /></h1>
                 <p class="lead">Manage your banking needs quickly and securely from your personalized dashboard.</p>
             </section>
+
+            <!-- Client Pending Requests Button -->
+            <div class="text-center ">
+                <a class="btn btn-dark  px-4 shadow-sm" href='<%# Page.GetRouteUrl("ClientPendingRequestRoute", null) %>'>
+                    <i class="fas fa-tasks me-2"></i> My Requests
+                </a>
+                <p class="text-muted mt-2">View and manage your pending joint account or update detail requests</p>
+            </div>
 
             <div class="row g-4">
                 <!-- View Profile -->
@@ -128,6 +136,8 @@
                     </div>
                 </section>
             </div>
+
+            
 
         </div>
     </main>

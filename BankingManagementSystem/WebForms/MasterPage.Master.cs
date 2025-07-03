@@ -161,5 +161,9 @@ namespace BankingManagementSystem.WebForms
         {
             Response.Redirect(Page.GetRouteUrl("AdminPendingRequestRoute", null));
         }
+        protected void BtnOkApproveRejectByClient_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Page.GetRouteUrl("ClientPendingRequestRoute", null));
+        }
     }
 }

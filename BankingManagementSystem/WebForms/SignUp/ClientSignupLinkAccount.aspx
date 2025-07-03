@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/WebForms/MasterPage.Master" AutoEventWireup="true" CodeBehind="ClientSignupCreateAccountLinkAccount.aspx.cs" Inherits="BankingManagementSystem.WebForms.SignUp.ClientSignupCreateAccountLinkAccount" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/WebForms/MasterPage.Master" AutoEventWireup="true" CodeBehind="ClientSignupLinkAccount.aspx.cs" Inherits="BankingManagementSystem.WebForms.SignUp.ClientSignupCreateAccountLinkAccount" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
 </asp:Content>
@@ -11,7 +11,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
                     <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back to Home</a>
 
-                    <h2 class="mb-0 mx-auto fw-bold text-center flex-grow-1">Link to Existing Account</h2>
+                    <h2 class="mb-0 mx-auto text-center flex-grow-1">Link to Existing Account</h2>
 
                     <!-- Invisible spacer to balance layout -->
                     <span style="width: 80px;"></span>

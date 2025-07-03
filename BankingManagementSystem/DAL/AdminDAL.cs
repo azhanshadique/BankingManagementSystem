@@ -13,11 +13,11 @@ using BankingManagementSystem.Models.DTOs;
 
 namespace BankingManagementSystem.DAL
 {
-	public class AdminDAL
+	public static class AdminDAL
 	{
         private static readonly String CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
 
-        public User CheckAdminCredentials(AuthRequestDTO admin)
+        public static User CheckAdminCredentials(AuthRequestDTO admin)
         {
             try
             {

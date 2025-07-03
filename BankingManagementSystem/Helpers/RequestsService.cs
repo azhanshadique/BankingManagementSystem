@@ -27,7 +27,7 @@ namespace BankingManagementSystem.Helpers
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public static async Task<List<PendingRequestDTO>> GetRequestsAsync(string status = "Pending", string sortBy = DbColumns.CreatedOn, string sortDirection = "DESC")
+        public static async Task<List<RequestDTO>> GetRequestsForAdminAsync(string status = "Pending", string sortBy = DbColumns.CreatedOn, string sortDirection = "DESC")
         {
             string url = $"requests?status={status}&sortBy={sortBy}&sortDirection={sortDirection}";
             var response = await httpClient.GetAsync(url);
@@ -35,13 +35,14 @@ namespace BankingManagementSystem.Helpers
             if (response.IsSuccessStatusCode)
             {
                 string json = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<List<PendingRequestDTO>>(json);
+                return JsonConvert.DeserializeObject<List<RequestDTO>>(json);
             }
 
-            return new List<PendingRequestDTO>();
+            return new List<RequestDTO>();
         }
+        
 
-        public static async Task<PendingRequestDTO> GetRequestByIdAsync(int id)
+        public static async Task<RequestDTO> GetRequestByIdAsync(int id)
         {
             string url = $"requests/{id}";
             var response = await httpClient.GetAsync(url);
@@ -49,7 +50,7 @@ namespace BankingManagementSystem.Helpers
             if (response.IsSuccessStatusCode)
             {
                 string json = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<PendingRequestDTO>(json);
+                return JsonConvert.DeserializeObject<RequestDTO>(json);
             }
 
             return null;
@@ -100,6 +101,48 @@ namespace BankingManagementSystem.Helpers
             string url = $"requests/{id}?status={status}";
             var response = await httpClient.DeleteAsync(url);
             return response.IsSuccessStatusCode;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public static async Task<List<RequestDTO>> GetReceivedRequestsForClientAsync(int clientId, string sortColumn = DbColumns.CreatedOn, string sortDirection = "DESC")
+        {
+            //string url = $"requests?status={status}&sortBy={sortBy}&sortDirection={sortDirection}";
+            string url = $"client/requests/received?clientId={clientId}&sortColumn={sortColumn}&sortDirection={sortDirection}";
+            var response = await httpClient.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<RequestDTO>>(json);
+            }
+
+            return new List<RequestDTO>();
+        } 
+        public static async Task<List<RequestDTO>> GetSentRequestsByClientAsync(int clientId, string sortColumn = DbColumns.CreatedOn, string sortDirection = "DESC")
+        {
+            //string url = $"requests?status={status}&sortBy={sortBy}&sortDirection={sortDirection}";
+            string url = $"client/requests/sent?clientId={clientId}&sortColumn={sortColumn}&sortDirection={sortDirection}";
+            var response = await httpClient.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<RequestDTO>>(json);
+            }
+
+            return new List<RequestDTO>();
         }
     }
 }

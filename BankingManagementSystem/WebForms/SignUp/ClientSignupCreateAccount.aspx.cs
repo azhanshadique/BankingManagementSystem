@@ -44,7 +44,7 @@ namespace BankingManagementSystem.WebForms.SignUp
             string accountType = ddl_accounttype.SelectedValue;
             string isJoint = ddlIsJointAccount.SelectedValue;
             string jointClientId = TextBox_jointaccclient.Text.Trim();
-            string username = TextBox_username.Text.Trim();
+            string username = TextBox_username.Text.Trim().ToLower();
             string password = TextBox_password.Text.Trim();
             string confirmPassword = TextBox_confirmpassword.Text.Trim();
             string termsCondition = CheckBox_terms.Checked ? "Yes" : "";

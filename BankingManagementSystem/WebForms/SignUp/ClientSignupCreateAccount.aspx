@@ -15,7 +15,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
                     <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back to Home</a>
 
-                    <h2 class="mb-0 mx-auto fw-bold text-center flex-grow-1">Create Your Bank Account</h2>
+                    <h2 class="mb-0 mx-auto text-center flex-grow-1">Create Your Bank Account</h2>
 
                     <!-- Invisible spacer to balance layout -->
                     <span style="width: 80px;"></span>

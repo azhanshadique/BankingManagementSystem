@@ -8,6 +8,8 @@ namespace BankingManagementSystem.Models.ConstraintTypes
 	public enum RequestType
 	{
 		CreateNewRegistration,
-		UpdateDetails
-	}
+		CreateNewAccount,
+		UpdateDetails,
+        JointAccountApproval
+    }
 }

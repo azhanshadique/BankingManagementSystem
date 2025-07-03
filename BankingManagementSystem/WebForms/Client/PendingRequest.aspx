@@ -1,49 +1,46 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/WebForms/MasterPage.Master" AutoEventWireup="true" CodeBehind="PendingRequest.aspx.cs" Inherits="BankingManagementSystem.WebForms.Admin.PendingRequest" Async="true" %>
+﻿<%@ Page Title="" Language="C#" Async="true" MasterPageFile="~/WebForms/MasterPage.Master" AutoEventWireup="true" CodeBehind="PendingRequest.aspx.cs" Inherits="BankingManagementSystem.WebForms.Client.PendingRequest" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
-    <h2 class="mt-4 mx-auto text-center flex-grow-1 ">Manage Client Requests</h2>
+    <%--<h2 class="mt-4 mx-auto text-center flex-grow-1 ">Manage Client Requests</h2>--%>
+    <h1 class="mt-5 mx-auto text-center ">My Requests</h1>
     <asp:Panel ID="pnlRequestTable" runat="server" CssClass="mt-4" class="container mt-5" Visible="true">
         <div class="container py-5">
+            
 
-            <%--<div class="mb-2">Request Status</div>--%>
-
-
-
-            <div class="d-flex align-items-end justify-content-between">
-                <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border mb-3 "><i class="fas fa-angle-left"></i>Back</a>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i>Back</a>
 
                 <div class="d-flex flex-column align-items-end justify-content-center" style="width: 200px;">
-                    <h6 class="text-muted me-2 text-nowrap">Request Status</h6>
-                    <asp:DropDownList ID="ddlFilterStatus" runat="server" AutoPostBack="true" CssClass="form-select mb-3" OnSelectedIndexChanged="DdlFilterStatus_SelectedIndexChanged">
-                        <asp:ListItem Text="Pending" Value="Pending" />
-                        <asp:ListItem Text="Approved" Value="Approved" />
-                        <asp:ListItem Text="Rejected" Value="Rejected" />
+                    <h6 class="text-muted me-2 text-nowrap">Request</h6>
+                    <asp:DropDownList ID="ddlRequestType" runat="server" AutoPostBack="true" CssClass="form-select" OnSelectedIndexChanged="DdlRequestType_SelectedIndexChanged">
+                        <asp:ListItem Text="Received" Value="Received" />
+                        <asp:ListItem Text="Sent" Value="Sent" />
                     </asp:DropDownList>
                 </div>
             </div>
-
-
 
             <asp:GridView ID="gvRequests" runat="server" CssClass="table table-bordered table-hover gridview-header-black" AutoGenerateColumns="false" AllowSorting="true" OnSorting="GvRequests_Sorting" OnRowCommand="GvRequests_RowCommand" OnRowCreated="GvRequests_RowCreated" ShowHeaderWhenEmpty="true" EmptyDataText="No requests found.">
                 <Columns>
                     <asp:BoundField DataField="RequestId" HeaderText="Request ID" SortExpression="RequestId" />
                     <asp:BoundField DataField="RequestType" HeaderText="Request Type" SortExpression="RequestType" />
-                    <asp:BoundField DataField="RequestedOn" HeaderText="Requested On" SortExpression="RequestedOn" />
-                    <asp:BoundField DataField="RepliedOn" HeaderText="Replied On" SortExpression="RepliedOn" DataFormatString="{0:dd-MM-yyyy HH:mm}" HtmlEncode="false" />
-
-                    <asp:TemplateField HeaderText="Action">
+                    <asp:BoundField DataField="RequestedOn" HeaderText="Requested On" SortExpression="RequestedOn" DataFormatString="{0:dd-MM-yyyy HH:mm}" />
+                    <asp:BoundField DataField="Status" HeaderText="Status" SortExpression="RequestedOn" />
+                    <asp:TemplateField HeaderText="Actions">
                         <ItemTemplate>
-                            <asp:Button ID="btnShow" runat="server" Text="Show" CommandName="Show" CommandArgument='<%# Eval("RequestId") %>' CssClass="btn btn-sm btn-primary" />
-                            <%--<asp:Button ID="btnSearch" runat="server" CssClass="btn btn-sm btn-primary" Text="Search" OnClick="btnSearch_Click" />--%>
+                            <asp:Button ID="btnShow" runat="server" Text="Show" CommandName="Show" CommandArgument='<%# Eval("RequestId") %>' CssClass="btn btn-sm btn-primary me-1" />
+                            <%-- <asp:Button ID="btnApprove" runat="server" Text="Approve" CommandName="Approve" CommandArgument='<%# Eval("RequestId") %>' CssClass="btn btn-sm btn-success me-1" Visible='<%# Eval("CanApprove") %>' />
+                        <asp:Button ID="btnReject" runat="server" Text="Reject" CommandName="Reject" CommandArgument='<%# Eval("RequestId") %>' CssClass="btn btn-sm btn-danger me-1" Visible='<%# Eval("CanApprove") %>' />
+                        <asp:Button ID="btnUpdate" runat="server" Text="Update" CommandName="Update" CommandArgument='<%# Eval("RequestId") %>' CssClass="btn btn-sm btn-warning me-1" Visible='<%# Eval("CanEdit") %>' />
+                        <asp:Button ID="btnDelete" runat="server" Text="Delete" CommandName="Delete" CommandArgument='<%# Eval("RequestId") %>' CssClass="btn btn-sm btn-outline-danger" Visible='<%# Eval("CanEdit") %>' />--%>
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>
             </asp:GridView>
-
         </div>
     </asp:Panel>
+
 
     <asp:Panel ID="pnlRequestDetails" runat="server" Visible="false">
         <div class="container py-5">
@@ -53,10 +50,10 @@
 
 
                     <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
-                        <a href='<%= Page.GetRouteUrl("AdminPendingRequestRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i>Back</a>
+                        <a href='<%= Page.GetRouteUrl("ClientPendingRequestRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i>Back</a>
                         <%--<asp:Button ID="Button1" runat="server" CssClass="btn btn-sm btn-light border" Style="padding: 3px 10px;" Text="Back" OnClick="BtnReject_Click" />--%>
 
-                        <h3 class="mb-0 mx-auto text-center flex-grow-1">Client New Registration Request Details</h3>
+                        <h3 class="mb-0 mx-auto text-center flex-grow-1">Joint Account Approval Request Details</h3>
 
                         <!-- Invisible spacer to balance layout -->
                         <%--<span style="width: 80px;"></span>--%>
@@ -87,15 +84,16 @@
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <%--<h6 class="text-muted mb-1">Co-holder Approval</h6>--%>
-                                    <asp:Label ID="lblCoHolderApprovalHeading" runat="server" CssClass="text-muted fw-medium mb-1 d-block" Text="Co-holder Approval" Visible="false"></asp:Label>
+                                    <asp:Label ID="lblCoHolderApprovalHeading" runat="server" CssClass="text-muted fw-medium mb-1 d-block" Text="Your Approval" Visible="false"></asp:Label>
                                     <asp:Label ID="lblCoHolderApproval" runat="server" CssClass="badge bg-primary fw-semibold text-white  fs-6 px-6 py-2"></asp:Label>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-
-
+                    <div class="mx-auto text-center mb-3">
+                        <asp:Label ID="lblMessage" runat="server" CssClass="font-degular text-center text-dark fs-4 mx-auto flex-grow-1 mb-6" Text="Primary Account Holder Details"></asp:Label>
+                    </div>
 
                     <!-- PERSONAL DETAILS -->
                     <h4 class="text-primary mb-3"><i class="fas fa-user-tag me-2 fs-5"></i>Personal Details</h4>
@@ -202,7 +200,7 @@
                         <asp:Panel ID="fsJointAccount" runat="server" CssClass="col-md-6" Visible="false">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label for="txtJointClientId" class="form-label">Co-holder's Client ID<span class="text-danger">*</span></label>
+                                    <label for="txtJointClientId" class="form-label">Your Client ID<span class="text-danger">*</span></label>
                                     <asp:TextBox ID="txtJointClientId" runat="server" CssClass="form-control" placeholder="Client ID" ReadOnly="true"></asp:TextBox>
                                 </div>
                             </div>
@@ -212,7 +210,7 @@
                     <hr class="my-4" />
 
                     <!-- LOGIN CREDENTIALS -->
-                    <h4 class="text-primary mb-3"><i class="fas fa-lock me-2 fs-5"></i>Login Credentials</h4>
+                    <h4 class="text-primary mb-3"><i class="fas fa-lock me-2 fs-5"></i>Other Details</h4>
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label for="txtUsername" class="form-label">Username<span class="text-danger">*</span></label>
@@ -226,15 +224,14 @@
                             <label for="txtConfirmpassword" class="form-label">Confirm Password<span class="text-danger">*</span></label>
                             <asp:TextBox ID="txtConfirmPassword" runat="server" CssClass="form-control" TextMode="Password" placeholder="Repeat password"></asp:TextBox>
                         </div>
+                        <div class="col-md-3" style="display: block">
+                            <label for="txtPrimaryAccHolderClientId" class="form-label">Client ID<span class="text-danger">*</span></label>
+                            <asp:TextBox ID="txtPrimaryAccHolderClientId" runat="server" CssClass="form-control" placeholder="xxxxxx" ReadOnly="true"></asp:TextBox>
+                        </div>
                     </div>
 
 
-                    <%--                <div class="form-check mt-4 d-flex align-items-center" style="margin-left: -1.5rem;">
-                    <asp:CheckBox ID="CheckBox_terms" runat="server" CssClass="me-2" />
-                    <label class="form-check-label" for="CheckBox_terms" style="font-size: 0.9rem;">
-                        I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a><span class="text-danger">*</span>
-                    </label>
-                </div>--%>
+
                     <hr class="my-4" />
 
                     <div class="d-flex justify-content-end gap-3">
@@ -243,27 +240,12 @@
                         <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6" Style="padding: 2px 10px; margin-top: 3px;" Text="Update" OnClick="BtnUpdate_Click" Visible="false" />
                         <button type="button" class="btn btn-success btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#approveConfirmModal">Approve</button>
                         <button type="button" class="btn btn-danger btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#rejectConfirmModal">Reject</button>
-
-                        <%--<span style="width: 80px;"></span>--%>
-                        <%--                    <asp:Button ID="Button_clear" runat="server" CssClass="btn btn-sm btn-light border" Text="Clear Form" OnClick="BtnClear_Click" />--%>
-                        <%--<button type="button" class="btn btn-sm btn-light border" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#clearConfirmModal">Clear Form</button>--%>
-
-                        <%--<asp:Button ID="Button_submit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm" Text="Submit" OnClick="BtnSubmit_Click" />--%>
-                        <%--<button type="button" class="btn btn-primary btn-sm shadow-sm" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#submitConfirmModal">Submit</button>--%>
                     </div>
 
                 </div>
             </div>
         </div>
 
-
-
-
-
-        <%--     <div class="mt-4">
-            <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-success me-2" Text="Update" OnClick="btnUpdate_Click" />
-            <asp:Button ID="btnDelete" runat="server" CssClass="btn btn-danger" Text="Delete Request" OnClick="btnDelete_Click" />
-        </div>--%>
     </asp:Panel>
 
     <!-- Approve Modal -->
@@ -271,7 +253,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 shadow">
                 <div class="modal-header bg-success text-white rounded-top-4" style="height: 60px; border-top-left-radius: 14px; border-top-right-radius: 14px;">
-                    <h5 class="modal-title" id="approveConfirmModalLabel">Approve Pending Request</h5>
+                    <h5 class="modal-title" id="approveConfirmModalLabel">Approve Joint Account Pending Request</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-start">
@@ -293,7 +275,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 shadow">
                 <div class="modal-header bg-danger text-white rounded-top-4" style="height: 60px; border-top-left-radius: 14px; border-top-right-radius: 14px;">
-                    <h5 class="modal-title" id="rejectConfirmModalLabel">Reject Pending Request</h5>
+                    <h5 class="modal-title" id="rejectConfirmModalLabel">Reject Joint Account Pending Request</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-start">
@@ -311,6 +293,4 @@
     </div>
 
 
-
-    <%--<asp:Label ID="lblMessage" runat="server" CssClass="text-danger mt-3 d-block"></asp:Label>--%>
 </asp:Content>

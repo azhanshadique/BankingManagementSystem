@@ -10,6 +10,9 @@ using BankingManagementSystem.Models.Constants;
 using System.Runtime.Remoting.Messaging;
 using BankingManagementSystem.Models.ConstraintTypes;
 using BankingManagementSystem.Models;
+using System.Threading.Tasks;
+using System.Web.Razor.Tokenizer;
+using System.Globalization;
 
 namespace BankingManagementSystem.DAL
 {
@@ -17,7 +20,7 @@ namespace BankingManagementSystem.DAL
     {
         private static readonly String CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
 
-        public static int SendJointAccountPendingRequests(int? clientId, string requestType, int targetClientId, string payload)
+        public async static Task<int> SendJointAccountPendingRequests(int? clientId, string requestType, int targetClientId, string payload)
         {
             try
             {
@@ -38,10 +41,15 @@ namespace BankingManagementSystem.DAL
                     cmd.Parameters.Add(outputParam);
 
 
-                    con.Open();
-                    cmd.ExecuteNonQuery();
+                    //con.Open();
+                    //cmd.ExecuteNonQuery();
 
-                    return (int)outputParam.Value;
+                    //return (Task<int>)outputParam.Value;
+
+                    await con.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    return (int)(outputParam.Value ?? 0);
                 }
             }
             catch (SqlException ex)
@@ -49,38 +57,73 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during Create Joint Account Pending Requests.", ex);
             }
         }
-        public static int SendAdminPendingRequest(int? clientId, string requestType, string payload)
+        //public static Task<int> SendAdminPendingRequest(int? clientId, string requestType, string payload)
+        //{
+        //    try
+        //    {
+        //        using (SqlConnection con = new SqlConnection(CS))
+        //        {
+        //            SqlCommand cmd = new SqlCommand("sp_CreateAdminPendingRequest", con);
+        //            cmd.CommandType = CommandType.StoredProcedure;
+
+        //            cmd.Parameters.AddWithValue("@ClientId", clientId ?? (object)DBNull.Value);
+        //            cmd.Parameters.AddWithValue("@RequestType", requestType);
+        //            cmd.Parameters.AddWithValue("@Payload", payload);
+
+        //            // Output parameter for AdminRequestId as RegistrationRequestId
+        //            SqlParameter outputParam = new SqlParameter("@AdminRequestId", SqlDbType.Int)
+        //            {
+        //                Direction = ParameterDirection.Output
+        //            };
+        //            cmd.Parameters.Add(outputParam);
+
+
+        //            con.Open();
+        //            cmd.ExecuteNonQueryAsync();
+
+        //            return (Task<int>)outputParam.Value;
+        //        }
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        throw new Exception("Database error during Create Admin Pending Request.", ex);
+        //    }
+        //}
+
+        public static async Task<int> SendAdminPendingRequest(int? clientId, string requestType, string payload)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(CS))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_CreateAdminPendingRequest", con);
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.AddWithValue("@ClientId", clientId ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@RequestType", requestType);
-                    cmd.Parameters.AddWithValue("@Payload", payload);
-
-                    // Output parameter for AdminRequestId as RegistrationRequestId
-                    SqlParameter outputParam = new SqlParameter("@AdminRequestId", SqlDbType.Int)
+                    using (SqlCommand cmd = new SqlCommand("sp_CreateAdminPendingRequest", con))
                     {
-                        Direction = ParameterDirection.Output
-                    };
-                    cmd.Parameters.Add(outputParam);
+                        cmd.CommandType = CommandType.StoredProcedure;
 
+                        cmd.Parameters.AddWithValue("@ClientId", clientId ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@RequestType", requestType);
+                        cmd.Parameters.AddWithValue("@Payload", payload);
 
-                    con.Open();
-                    cmd.ExecuteNonQuery();
+                        // Output parameter
+                        SqlParameter outputParam = new SqlParameter("@AdminRequestId", SqlDbType.Int)
+                        {
+                            Direction = ParameterDirection.Output
+                        };
+                        cmd.Parameters.Add(outputParam);
 
-                    return (int)outputParam.Value;
+                        await con.OpenAsync();
+                        await cmd.ExecuteNonQueryAsync();
+
+                        return (int)(outputParam.Value ?? 0);
+                    }
                 }
             }
-            catch (SqlException ex)
+            catch (SqlException ex) 
             {
                 throw new Exception("Database error during Create Admin Pending Request.", ex);
             }
         }
+
         public static bool IsDuplicateNewRegistrationPendingRequest(string aadhaar, string pan)
         {
             try
@@ -108,17 +151,17 @@ namespace BankingManagementSystem.DAL
 
 
 
-        public static List<PendingRequestDTO> GetAllRequestsByStatus(string status, string sortBy, string sortDirection)
+        public static List<RequestDTO> GetAllRequestsByStatus(string status, string sortColumn, string sortDirection)
         {
             try
             {
-                var requests = new List<PendingRequestDTO>();
+                var requests = new List<RequestDTO>();
                 using (SqlConnection con = new SqlConnection(CS))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_GetAllRequestsByStatus", con);
+                    SqlCommand cmd = new SqlCommand("sp_GetRequestsByStatusForAdmin", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Status", string.IsNullOrEmpty(status) ? DBNull.Value : (object)status);
-                    cmd.Parameters.AddWithValue("@SortBy", sortBy);
+                    cmd.Parameters.AddWithValue("@SortBy", sortColumn);
                     cmd.Parameters.AddWithValue("@SortDirection", sortDirection);
 
                     con.Open();
@@ -134,7 +177,7 @@ namespace BankingManagementSystem.DAL
 
 
 
-                            requests.Add(new PendingRequestDTO
+                            requests.Add(new RequestDTO
                             {
                                 RequestId = reader.GetInt32(idxRequestId),
                                 RequestType = reader.IsDBNull(idxRequestType) ? null : reader.GetString(idxRequestType),
@@ -150,16 +193,16 @@ namespace BankingManagementSystem.DAL
             }
             catch (SqlException ex)
             {
-                throw new Exception("Database error during Get All Request By Status.", ex);
+                throw new Exception("Database error during Get Request By Status For Admin.", ex);
             }
 
         }
 
-        public static PendingRequestDTO GetPendingRequestById(int requestId)
+        public static RequestDTO GetPendingRequestById(int requestId)
         {
             try
             {
-                var requests = new List<PendingRequestDTO>();
+                var requests = new List<RequestDTO>();
                 using (SqlConnection con = new SqlConnection(CS))
                 {
                     SqlCommand cmd = new SqlCommand("sp_GetPendingRequestById", con);
@@ -175,7 +218,7 @@ namespace BankingManagementSystem.DAL
                         int idxPayload = reader.GetOrdinal(DbColumns.Payload);
                         int idxRequestedOn = reader.GetOrdinal(DbColumns.CreatedOn);
 
-                        return new PendingRequestDTO
+                        return new RequestDTO
                         {
 
                             RequestId = requestId,
@@ -194,7 +237,7 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during Get Pending Requests By Id.", ex);
             }
         }
-        public static PendingRequestDTO GetAllRequestById(int requestId)
+        public static RequestDTO GetAllRequestById(int requestId)
         {
             try
             {
@@ -214,7 +257,7 @@ namespace BankingManagementSystem.DAL
                         int idxRequestedOn = reader.GetOrdinal(DbColumns.CreatedOn);
                         int idxStatus = reader.GetOrdinal(DbColumns.Status);
 
-                        return new PendingRequestDTO
+                        return new RequestDTO
                         {
                             RequestId = requestId,
                             RequestType = reader.IsDBNull(idxRequestType) ? null : reader.GetString(idxRequestType),
@@ -307,5 +350,120 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during Delete Request By Status.", ex);
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Client Pending Requests
+
+
+        public static async Task<List<RequestDTO>> GetReceivedRequestsForClient(int clientId, string sortColumn, string sortDirection)
+        {
+            try
+            {
+                var requests = new List<RequestDTO>();
+                using (SqlConnection con = new SqlConnection(CS))
+                {
+                    SqlCommand cmd = new SqlCommand("sp_GetReceivedPendingRequestsForClient", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    //cmd.Parameters.AddWithValue("@Status", string.IsNullOrEmpty(status) ? DBNull.Value : (object)status);
+                    cmd.Parameters.AddWithValue("@ClientId", clientId);
+                    cmd.Parameters.AddWithValue("@SortBy", sortColumn);
+                    cmd.Parameters.AddWithValue("@SortDirection", sortDirection);
+
+                    con.Open();
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            int idxRequestId = reader.GetOrdinal(DbColumns.RequestId);
+                            int idxRequestType = reader.GetOrdinal(DbColumns.RequestType);
+                            int idxPayload = reader.GetOrdinal(DbColumns.Payload);
+                            int idxRequestedOn = reader.GetOrdinal(DbColumns.CreatedOn);
+                            //int idxRepliedOn = reader.GetOrdinal(DbColumns.RepliedOn);
+
+
+
+                            requests.Add(new RequestDTO
+                            {
+                                RequestId = reader.GetInt32(idxRequestId),
+                                RequestType = reader.IsDBNull(idxRequestType) ? null : reader.GetString(idxRequestType),
+                                Payload = reader.IsDBNull(idxPayload) ? null : reader.GetString(idxPayload),
+                                RequestedOn = reader.GetDateTime(idxRequestedOn),
+                                //RepliedOn = reader.IsDBNull(idxRepliedOn) ? (DateTime?)null : reader.GetDateTime(idxRepliedOn)
+
+                            });
+                        }
+                    }
+                    return requests;
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error during Get Received Requests For Client.", ex);
+            }
+        }
+         public static async Task<List<RequestDTO>> GetSentRequestsByClient(int clientId, string sortColumn, string sortDirection)
+        {
+            try
+            {
+                var requests = new List<RequestDTO>();
+                using (SqlConnection con = new SqlConnection(CS))
+                {
+                    SqlCommand cmd = new SqlCommand("sp_GetSentRequestsByClient", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    //cmd.Parameters.AddWithValue("@Status", string.IsNullOrEmpty(status) ? DBNull.Value : (object)status);
+                    cmd.Parameters.AddWithValue("@ClientId", clientId);
+                    cmd.Parameters.AddWithValue("@SortBy", sortColumn);
+                    cmd.Parameters.AddWithValue("@SortDirection", sortDirection);
+
+                    con.Open();
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            int idxRequestId = reader.GetOrdinal(DbColumns.RequestId);
+                            int idxRequestType = reader.GetOrdinal(DbColumns.RequestType);
+                            int idxPayload = reader.GetOrdinal(DbColumns.Payload);
+                            int idxRequestedOn = reader.GetOrdinal(DbColumns.CreatedOn);
+                            int idxRepliedOn = reader.GetOrdinal(DbColumns.RepliedOn);
+                            int idxStatus = reader.GetOrdinal(DbColumns.Status);
+
+
+
+                            requests.Add(new RequestDTO
+                            {
+                                RequestId = reader.GetInt32(idxRequestId),
+                                RequestType = reader.IsDBNull(idxRequestType) ? null : reader.GetString(idxRequestType),
+                                Payload = reader.IsDBNull(idxPayload) ? null : reader.GetString(idxPayload),
+                                RequestedOn = reader.GetDateTime(idxRequestedOn),
+                                RepliedOn = reader.IsDBNull(idxRepliedOn) ? (DateTime?)null : reader.GetDateTime(idxRepliedOn),
+                                Status = reader.IsDBNull(idxStatus) ? null : reader.GetString(idxStatus)
+
+                            });
+                        }
+                    }
+                    return requests;
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error during Get Received Requests For Client.", ex);
+            }
+        }
+
     }
 }

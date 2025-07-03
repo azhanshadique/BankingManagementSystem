@@ -5,7 +5,7 @@ using System.Web;
 
 namespace BankingManagementSystem.Models.DTOs
 {
-    public class PendingRequestDTO
+    public class RequestDTO
     {
         public int RequestId { get; set; }
         public string RequestType { get; set; }

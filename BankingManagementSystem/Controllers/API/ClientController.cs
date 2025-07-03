@@ -1,5 +1,6 @@
 ﻿using BankingManagementSystem.BLL;
 using BankingManagementSystem.Models.DTOs;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Services.Description;
 
@@ -10,14 +11,14 @@ namespace BankingManagementSystem.Controllers.API
 	{
         [HttpPost]
         [Route("register")]
-        public IHttpActionResult RegisterClient(ClientDTO client)
+        public async Task<IHttpActionResult> RegisterClient(ClientDTO client)
         {
-            bool result = new ClientBLL().RegisterNewClient(client, out string message);
+            var result = await ClientBLL.RegisterNewClient(client);
 
-            if (result)
-                return Ok(message);
+            if (result.IsSuccess)
+                return Ok(result.Message);
             else
-                return BadRequest(message);
+                return BadRequest(result.Message);
         }
 
         [HttpPost]

@@ -12,23 +12,23 @@ using Microsoft.Owin.Security.Provider;
 
 namespace BankingManagementSystem.BLL
 {
-    public class AdminBLL
+    public static class AdminBLL
     {
-        public User ValidateAdminLogin(AuthRequestDTO admin)
+        public static User ValidateAdminLogin(AuthRequestDTO admin)
         {
-            return new AdminDAL().CheckAdminCredentials(admin);
+            return AdminDAL.CheckAdminCredentials(admin);
         }
         public static bool IsAdminExistsByAdminId(int adminId)
         {
             return AdminDAL.IsAdminExistsByAdminId(adminId);
         }
 
-        public static List<PendingRequestDTO> GetRequestsByStatus(string status, string sortBy, string sortDirection)
+        public static List<RequestDTO> GetRequestsByStatus(string status, string sortBy, string sortDirection)
         {
             return RequestDAL.GetAllRequestsByStatus(status, sortBy, sortDirection);
         }
 
-        public static PendingRequestDTO GetRequestById(int requestId)
+        public static RequestDTO GetRequestById(int requestId)
         {
             return RequestDAL.GetAllRequestById(requestId);
         }
@@ -40,8 +40,7 @@ namespace BankingManagementSystem.BLL
                 message = "Invalid Request ID";
                 return false;
             }
-            bool result = new ClientBLL().ValidateClientDetails(client, out message);
-            //message = newMessage;
+            bool result = ClientBLL.ValidateClientDetails(client, out message);
             if (result)
             {
                 string updatedPayload = JsonConvert.SerializeObject(client);
@@ -59,7 +58,6 @@ namespace BankingManagementSystem.BLL
                 return RequestDAL.UpdateRequestStatus(requestId, status, repliedBy);
             return false;
             
-            //AdminDAL.CreateClient();
         }
 
         public static bool DeleteRequest(int requestId, string status)

@@ -5,37 +5,38 @@ using BankingManagementSystem.Models.DTOs;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BankingManagementSystem.BLL
 {
-	public class ClientBLL
+	public static class ClientBLL
 	{
-        public User ValidateClientLogin(AuthRequestDTO client)
+        public static User ValidateClientLogin(AuthRequestDTO client)
         {
-            return new ClientDAL().CheckClientCredentials(client);
+            return ClientDAL.CheckClientCredentials(client);
 
         }
 
-        public bool RegisterNewClient(ClientDTO client, out string message)
+        public static async Task<(bool IsSuccess, string Message)> RegisterNewClient(ClientDTO client)
         {
-            message = "";
+            string message = "";
             if (!ValidateClientDetails(client, out message))
             {
-                return false;
+                return (false, message);
             }
            
 
             // If admin approval is given directly or through Json
             if (client.AdminApproved)
             {
-                return AdminDAL.CreateClient(client, out message);
+                return (AdminDAL.CreateClient(client, out message), message);
             }
 
             // Prevent Duplicate Requests
             if (RequestDAL.IsDuplicateNewRegistrationPendingRequest(aadhaar: client.AadhaarNumber, pan: client.PANNumber))
             {
                 message = "A pending registration request already exists. \\nPlease wait for admin approval or delete the request before submitting a new one.";
-                return false;
+                return (false, message);
             }
 
             string newRequestType = "CreateNewRegistration";
@@ -47,14 +48,14 @@ namespace BankingManagementSystem.BLL
                 {
                     string payloadJson = JsonConvert.SerializeObject(client);
                     
-                    int requestIdCreated = RequestDAL.SendJointAccountPendingRequests(
+                    int requestIdCreated = await RequestDAL.SendJointAccountPendingRequests(
                         clientId: null,
                         requestType: newRequestType,
                         targetClientId: client.JointClientId,
                         payload: payloadJson
                     );
                     message = $"Client registration successful. Awaiting administration and joint account co-holder approval. \nYour Request ID is: #{requestIdCreated}";
-                    return true;
+                    return (true, message);
                 }
                 catch (Exception ex)
                 {
@@ -69,13 +70,13 @@ namespace BankingManagementSystem.BLL
                 {
                     string payloadJson = JsonConvert.SerializeObject(client);
 
-                    int requestIdCreated = RequestDAL.SendAdminPendingRequest(
+                    int requestIdCreated = await RequestDAL.SendAdminPendingRequest(
                         clientId: null,
                         requestType: newRequestType,
                         payload: payloadJson
                     );
                     message = $"Client registration successful. Awaiting administration approval. \nYour Request ID is: #{requestIdCreated}";
-                    return true;
+                    return (true, message);
                 }
                 catch (Exception ex)
                 {
@@ -84,10 +85,10 @@ namespace BankingManagementSystem.BLL
             }
 
             
-            return true;
+            return (true, message);
         }
 
-        public bool ValidateClientDetails(ClientDTO client, out string message)
+        public static bool ValidateClientDetails(ClientDTO client, out string message)
         {
             // Validate DOB
             if (!ValidationServiceBLL.IsValidDOB(dobInput: client.DOB, out message))

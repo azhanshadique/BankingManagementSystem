@@ -43,13 +43,18 @@ namespace BankingManagementSystem
            );
              routes.MapPageRoute(
                "ClientRequestRoute",
-               "client/request",
+               "dashboard/requests",
                ConfigurationManager.AppSettings["ClientRequestRedirect"]       
            );
             routes.MapPageRoute(
                 "AdminPendingRequestRoute",
-               "admin/request",
+               "admin/requests",
                ConfigurationManager.AppSettings["AdminPendingRequestRedirect"]       
+           );
+              routes.MapPageRoute(
+                "ClientPendingRequestRoute",
+               "client/requests",
+               ConfigurationManager.AppSettings["ClientPendingRequestRedirect"]       
            );
 
 
