@@ -2,8 +2,11 @@
 using BankingManagementSystem.Helpers;
 using BankingManagementSystem.Models.API;
 using BankingManagementSystem.Models.ConstraintTypes;
+using BankingManagementSystem.Models.DTOs;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Net;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace BankingManagementSystem.Controllers.API
@@ -14,47 +17,46 @@ namespace BankingManagementSystem.Controllers.API
 
         [HttpPost]
         [Route("client")]
-        public IHttpActionResult ClientLogin(AuthRequestDTO request)
+        public async Task<IHttpActionResult> ClientLoginAsync(AuthRequestDTO request)
         {
-            var user = ClientBLL.ValidateClientLogin(request);
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid login request.");
 
-            if (user != null)
+            var clientUser = await ClientBLL.ValidateClientLoginAsync(request);
+
+            if (clientUser != null)
             {
-                string token = JwtTokenManager.GenerateToken(user);
-
-                return Ok(new
-                {
-                    token
-                });
+                string token = JwtTokenManager.GenerateToken(clientUser);
+                return Ok(new { token });
             }
 
-            return Unauthorized();
+            return Content(HttpStatusCode.Unauthorized, "Invalid username or password.");
         }
+
 
         [HttpPost]
         [Route("admin")]
-        public IHttpActionResult AdminLogin(AuthRequestDTO request)
+        public async Task<IHttpActionResult> AdminLoginAsync(AuthRequestDTO request)
         {
-            var user = AdminBLL.ValidateAdminLogin(request);
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid login request.");
 
-            if (user != null)
+            var adminUser = await AdminBLL.ValidateAdminLoginAsync(request);
+
+            if (adminUser != null)
             {
-                string token = JwtTokenManager.GenerateToken(user);
-
-                return Ok(new
-                {
-                    token
-                });
+                string token = JwtTokenManager.GenerateToken(adminUser);
+                return Ok(new { token });
             }
 
-            return Unauthorized();
+            return Content(HttpStatusCode.Unauthorized, "Invalid username or password.");
         }
 
 
 
         [HttpGet]
         [Route("test")]
-        public IHttpActionResult Test()
+        public async Task<IHttpActionResult> TestAsync()
         {
             return Ok("API is working!");
         }

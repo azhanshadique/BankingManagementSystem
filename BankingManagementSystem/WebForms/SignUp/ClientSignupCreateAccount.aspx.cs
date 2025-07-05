@@ -29,7 +29,9 @@ namespace BankingManagementSystem.WebForms.SignUp
             // Extract all input values into variables
             string fullName = TextBox_fullname.Text.Trim();
             string parentName = TextBox_parentname.Text.Trim();
-            string dob = TextBox_dob.Text.Trim();
+            string txtDOB = TextBox_dob.Text.Trim();
+            DateTime dob = DateTime.MinValue;
+            bool isDobValid = DateTime.TryParse(txtDOB, out dob);
             string gender = ddl_gender.SelectedValue;
             string nationality = TextBox_nationality.Text.Trim();
             string occupation = TextBox_occupation.Text.Trim();
@@ -54,7 +56,7 @@ namespace BankingManagementSystem.WebForms.SignUp
             {
                 { "Full Name", fullName },
                 { "Parent\\'s Name", parentName },
-                { "DOB", dob },
+                { "DOB", dob.ToString() },
                 { "Gender", gender },
                 { "Nationality", nationality },
                 { "Occupation", occupation },

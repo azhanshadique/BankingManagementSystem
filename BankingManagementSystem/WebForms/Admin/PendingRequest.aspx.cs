@@ -28,33 +28,38 @@ namespace BankingManagementSystem.WebForms.Admin
         {
             if (!IsPostBack)
             {
-                try
-                {
-                    string token = Request.Cookies["auth_token"]?.Value;
-                    if (string.IsNullOrEmpty(token))
-                    {
-                        Response.Redirect(Page.GetRouteUrl("AdminLoginRedirect", null));
-                    }
-
-                    var principal = JwtTokenManager.ValidateToken(token);
-                    string role = principal.FindFirst(ClaimTypes.Role)?.Value;
-                    adminId = Convert.ToInt32(principal.FindFirst("UserID")?.Value);
-
-                    if (role != UserRoles.ADMIN.ToString())
-                        Response.Redirect(Page.GetRouteUrl("AdminLoginRedirect", null));
-
-                    string status = Session["RequestType"]?.ToString() ?? RequestStatus.Pending.ToString();
-                    ddlFilterStatus.SelectedValue = status;
-                    LoadRequests(status, sortColumn, sortDirection);
-                }
-                catch
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Token Invalid!', 'danger');", true);
-                }
+                Page.RegisterAsyncTask(new PageAsyncTask(LoadDataAsync));
             }
         }
+        private async Task LoadDataAsync()
+        {
+            try
+            {
+                string token = Request.Cookies["auth_token"]?.Value;
+                if (string.IsNullOrEmpty(token))
+                {
+                    Response.Redirect(Page.GetRouteUrl("AdminLoginRoute", null));
+                }
 
-        protected async void LoadRequests(string status, string sortColumn, string sortDirection)
+                var principal = JwtTokenManager.ValidateToken(token);
+                string role = principal.FindFirst(ClaimTypes.Role)?.Value;
+                adminId = Convert.ToInt32(principal.FindFirst("UserID")?.Value);
+
+                if (role != UserRoles.ADMIN.ToString())
+                    Response.Redirect(Page.GetRouteUrl("AdminLoginRoute", null));
+
+                string status = Session["RequestType"]?.ToString() ?? RequestStatus.Pending.ToString();
+                ddlFilterStatus.SelectedValue = status;
+                await LoadRequests(status, sortColumn, sortDirection);
+            }
+            catch
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Token Invalid!', 'danger');", true);
+                Response.Redirect(Page.GetRouteUrl("AdminLoginRoute", null));
+
+            }
+        }
+        protected async Task LoadRequests(string status, string sortColumn, string sortDirection)
         {
             var requests = await RequestsService.GetRequestsForAdminAsync(status, sortColumn, sortDirection);
 
@@ -79,13 +84,13 @@ namespace BankingManagementSystem.WebForms.Admin
             gvRequests.DataBind();
         }
 
-        protected void DdlFilterStatus_SelectedIndexChanged(object sender, EventArgs e)
+        protected async void DdlFilterStatus_SelectedIndexChanged(object sender, EventArgs e)
         {
             string selectedStatus = ddlFilterStatus.SelectedValue;
             Session["RequestType"] = selectedStatus;
             sortColumn = selectedStatus == RequestStatus.Pending.ToString() ? DbColumns.CreatedOn : DbColumns.RepliedOn;
             sortDirection = "DESC";
-            LoadRequests(selectedStatus, sortColumn, sortDirection);
+            await LoadRequests(selectedStatus, sortColumn, sortDirection);
         }
 
         protected void GvRequests_RowCommand(object sender, GridViewCommandEventArgs e)
@@ -122,7 +127,7 @@ namespace BankingManagementSystem.WebForms.Admin
                 e.Row.Style["color"] = "black";
             }
         }
-        protected void GvRequests_Sorting(object sender, GridViewSortEventArgs e)
+        protected async void GvRequests_Sorting(object sender, GridViewSortEventArgs e)
         {
             var columnMap = new Dictionary<string, string>
             {
@@ -140,7 +145,7 @@ namespace BankingManagementSystem.WebForms.Admin
 
             sortDirection = e.SortExpression == sortColumnDemo && sortDirection == "ASC" ? "DESC" : "ASC";
 
-            LoadRequests(ddlFilterStatus.SelectedValue, sortColumn, sortDirection);
+            await LoadRequests(ddlFilterStatus.SelectedValue, sortColumn, sortDirection);
         }
 
         protected async void ShowRequestDetails(int requestId)
@@ -195,7 +200,7 @@ namespace BankingManagementSystem.WebForms.Admin
         {
             txtFullName.Text = client.FullName;
             txtParentName.Text = client.ParentName;
-            txtDOB.Text = client.DOB?.ToString();
+            txtDOB.Text = client.DOB.ToString();
             ddlGender.SelectedValue = client.Gender;
             txtNationality.Text = client.Nationality;
             txtOccupation.Text = client.Occupation;
@@ -254,14 +259,17 @@ namespace BankingManagementSystem.WebForms.Admin
             //txtPassword.ReadOnly = isReadOnly;
             //txtConfirmPassword.ReadOnly = isReadOnly;
         }
-       
+
         protected ClientDTO GetClient()
         {
+            DateTime dob = DateTime.MinValue;
+            bool isDobValid = DateTime.TryParse(txtDOB.Text, out dob);
+
             return new ClientDTO
             {
                 FullName = txtFullName.Text.Trim(),
                 ParentName = txtParentName.Text.Trim(),
-                DOB = txtDOB.Text,
+                DOB = isDobValid ? dob : (DateTime?)null, 
                 Gender = ddlGender.SelectedValue,
                 Nationality = txtNationality.Text.Trim(),
                 Occupation = txtOccupation.Text.Trim(),
@@ -280,8 +288,8 @@ namespace BankingManagementSystem.WebForms.Admin
                 Password = txtPassword.Text,
                 ConfirmPassword = txtConfirmPassword.Text
             };
-       
         }
+
         protected async void BtnUpdate_Click(object sender, EventArgs e)
         {
             int requestId = (int)ViewState["SelectedRequestId"];
@@ -315,7 +323,7 @@ namespace BankingManagementSystem.WebForms.Admin
 
             try
             {
-                ApiResponseMessage result = await RequestsService.UpdatePayloadAsync(requestId, updatedClient);
+                ApiResponseMessage result = await RequestsService.UpdateRequestAsync(requestId, updatedClient);
 
                 string message = result.MessageContent;
 
@@ -334,6 +342,7 @@ namespace BankingManagementSystem.WebForms.Admin
                 SetClientFormReadOnly(true);
                 btnEdit.Visible = true;
                 btnUpdate.Visible = false;
+                ShowRequestDetails(requestId);
             }
             catch
             {
@@ -346,7 +355,7 @@ namespace BankingManagementSystem.WebForms.Admin
         protected async void BtnApprove_Click(object sender, EventArgs e)
         {
             int requestId = (int)ViewState["SelectedRequestId"];
-            bool statusUpdated = await RequestsService.UpdateStatusAsync(requestId, RequestStatus.Approved.ToString(), adminId);
+            bool statusUpdated = await RequestsService.ApproveRequestAsync(requestId, adminId);
             if (statusUpdated)
             {
                 ClientDTO client = GetClient();
@@ -370,7 +379,7 @@ namespace BankingManagementSystem.WebForms.Admin
         protected async void BtnReject_Click(object sender, EventArgs e)
         {
             int requestId = (int)ViewState["SelectedRequestId"];
-            bool result = await RequestsService.UpdateStatusAsync(requestId, RequestStatus.Rejected.ToString(), adminId);
+            bool result = await RequestsService.RejectRequestAsync(requestId, adminId);
             if (result)
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showApproveRejectMessage('Client Request ID: #{requestId} Rejected Successfully.', 'danger'); }}, 200);", true);
 
@@ -381,7 +390,7 @@ namespace BankingManagementSystem.WebForms.Admin
         {
             if (success)
             {
-                LoadRequests(ddlFilterStatus.SelectedValue, sortColumn, sortDirection);
+                await LoadRequests(ddlFilterStatus.SelectedValue, sortColumn, sortDirection);
             }
         }
 

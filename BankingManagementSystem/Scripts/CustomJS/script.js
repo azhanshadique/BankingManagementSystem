@@ -68,6 +68,11 @@ function showRegisterSuccessMessage(message, type = 'success') {
     const bsModal = new bootstrap.Modal(modal);
     bsModal.show();
 }
+function showDeleteConfirmModal() {
+    const modal = document.getElementById('deleteConfirmModal');
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+}
 function showApproveRejectMessage(message, type = 'success') {
     const modal = document.getElementById('approveRejectMessage');
     const content = document.getElementById('approveRejectContent');
@@ -105,6 +110,27 @@ function showApproveRejectMessageByClient(message, type = 'success') {
     header.classList.add('bg-' + type);
 
     const footerBtn = modal.querySelector('#btnOkApproveRejectByClient');
+    footerBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary');
+    footerBtn.classList.add('btn-' + type);
+
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+}
+function showDeleteMessageByClientOnDashboard(message, type = 'success') {
+    const modal = document.getElementById('deleteMessageByClientOnDashboard');
+    const content = document.getElementById('deleteContentByClientOnDashboard');
+    const title = document.getElementById('deleteLabelByClientOnDashboard');
+    if (!modal || !content) return;
+
+    content.innerText = message;
+
+    title.innerText = type == 'success' ? 'Request Approved' : 'Request Deleted'
+    // Change header bg & footer button based on type
+    const header = modal.querySelector('.modal-header');
+    header.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-secondary');
+    header.classList.add('bg-' + type);
+
+    const footerBtn = modal.querySelector('#btnOkDeleteByClientOnDashboard');
     footerBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary');
     footerBtn.classList.add('btn-' + type);
 

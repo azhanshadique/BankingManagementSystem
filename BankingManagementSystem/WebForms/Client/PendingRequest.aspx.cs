@@ -25,34 +25,43 @@ namespace BankingManagementSystem.WebForms.Client
         private static readonly string typeReceived = "Received";
         private static readonly string typeSent = "Sent";
 
-        protected async void Page_Load(object sender, EventArgs e)
+        protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                try
-                {
-                    string token = Request.Cookies["auth_token"]?.Value;
-                    if (string.IsNullOrEmpty(token))
-                        Response.Redirect(Page.GetRouteUrl("ClientLoginRoute", null));
-
-                    var principal = JwtTokenManager.ValidateToken(token);
-                    string role = principal.FindFirst(ClaimTypes.Role)?.Value;
-                    clientId = Convert.ToInt32(principal.FindFirst("UserID")?.Value);
-
-                    if (role != UserRoles.CLIENT.ToString())
-                        Response.Redirect(Page.GetRouteUrl("ClientLoginRoute", null));
-
-                    string type = Session["RequestType"]?.ToString() ?? typeReceived;
-                    ddlRequestType.SelectedValue = type;
-                    await LoadRequests(typeReceived, sortColumn, sortDirection);
-                }
-                catch
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Invalid Token!', 'danger');", true);
-                }
+                Page.RegisterAsyncTask(new PageAsyncTask(LoadDataAsync));
             }
         }
+        private async Task LoadDataAsync()
+        {
+            try
+            {
+                string token = Request.Cookies["auth_token"]?.Value;
+                if (string.IsNullOrEmpty(token))
+                {
+                    Response.Redirect(Page.GetRouteUrl("ClientLoginRoute", null));
+                    return;
+                }
 
+                var principal = JwtTokenManager.ValidateToken(token);
+                string role = principal.FindFirst(ClaimTypes.Role)?.Value;
+                clientId = Convert.ToInt32(principal.FindFirst("UserID")?.Value);
+
+                if (role != UserRoles.CLIENT.ToString())
+                {
+                    Response.Redirect(Page.GetRouteUrl("ClientLoginRoute", null));
+                    return;
+                }
+
+                string type = Session["RequestType"]?.ToString() ?? typeReceived;
+                ddlRequestType.SelectedValue = type;
+                await LoadRequests(typeReceived, sortColumn, sortDirection);
+            }
+            catch
+            {
+                Response.Redirect(Page.GetRouteUrl("ClientLoginRoute", null));
+            }
+        }
         protected async Task LoadRequests(string type, string sortColumn, string sortDirection)
         {
             var requests = type == typeReceived
@@ -143,23 +152,7 @@ namespace BankingManagementSystem.WebForms.Client
 
             await LoadRequests(ddlRequestType.SelectedValue, sortColumn, sortDirection);
         }
-        protected async void ShowRequestDetails2(int requestId)
-        {
-            var request = await RequestsService.GetRequestByIdAsync(requestId);
-            if (request != null)
-            {
-                var client = JsonConvert.DeserializeObject<ClientDTO>(request.Payload);
-                PopulateClientForm(client);
-
-                //pnlClientRequestList.Visible = false;
-                //pnlClientRequestDetails.Visible = true;
-
-                btnApprove.Visible = request.Status == RequestStatus.Pending.ToString();
-                btnReject.Visible = request.Status == RequestStatus.Pending.ToString();
-                //btnDelete.Visible = request.Status == RequestStatus.Pending.ToString();
-                btnUpdate.Visible = request.Status == RequestStatus.Pending.ToString();
-            }
-        }
+       
 
        
 
@@ -300,11 +293,14 @@ namespace BankingManagementSystem.WebForms.Client
         }
         protected ClientDTO GetClient()
         {
+            DateTime dob = DateTime.MinValue;
+            bool isDobValid = DateTime.TryParse(txtDOB.Text, out dob);
+
             return new ClientDTO
             {
                 FullName = txtFullName.Text.Trim(),
                 ParentName = txtParentName.Text.Trim(),
-                DOB = txtDOB.Text,
+                DOB = isDobValid ? dob : (DateTime?)null, 
                 Gender = ddlGender.SelectedValue,
                 Nationality = txtNationality.Text.Trim(),
                 Occupation = txtOccupation.Text.Trim(),
@@ -323,8 +319,8 @@ namespace BankingManagementSystem.WebForms.Client
                 Password = txtPassword.Text,
                 ConfirmPassword = txtConfirmPassword.Text
             };
-
         }
+
 
         protected async void BtnUpdate_Click(object sender, EventArgs e)
         {
@@ -334,7 +330,7 @@ namespace BankingManagementSystem.WebForms.Client
 
             try
             {
-                ApiResponseMessage result = await RequestsService.UpdatePayloadAsync(requestId, updatedClient);
+                ApiResponseMessage result = await RequestsService.UpdateRequestAsync(requestId, updatedClient);
 
                 string message = result.MessageContent;
 
@@ -374,7 +370,7 @@ namespace BankingManagementSystem.WebForms.Client
         protected async void BtnApprove_Click(object sender, EventArgs e)
         {
             int requestId = (int)ViewState["SelectedRequestId"];
-            bool statusUpdated = await RequestsService.UpdateStatusAsync(requestId, RequestStatus.Approved.ToString(), clientId);
+            bool statusUpdated = await RequestsService.ApproveRequestAsync(requestId, clientId);
             if (statusUpdated)
             {
                 //ClientDTO client = GetClient();
@@ -396,7 +392,7 @@ namespace BankingManagementSystem.WebForms.Client
         protected async void BtnReject_Click(object sender, EventArgs e)
         {
             int requestId = (int)ViewState["SelectedRequestId"];
-            bool result = await RequestsService.UpdateStatusAsync(requestId, RequestStatus.Rejected.ToString(), clientId);
+            bool result = await RequestsService.RejectRequestAsync(requestId,  clientId);
             if (result)
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showApproveRejectMessageByClient('Client Request ID: #{requestId} for Joint Account Rejected Successfully.', 'danger'); }}, 200);", true);
 

@@ -230,7 +230,23 @@
                 </div>
             </div>
         </div>
-
+         <div class="modal fade" id="deleteMessageByClientOnDashboard" tabindex="-1" aria-labelledby="deleteLabelByClientOnDashboard" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 shadow">
+                    <div class="modal-header bg-success text-white rounded-top-4" style="height: 60px;">
+                        <h5 class="modal-title" id="deleteLabelByClientOnDashboard">Resquest Deleted</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-start" id="deleteContentByClientOnDashboard">
+                        Message here
+                    </div>
+                    <div class="modal-footer justify-content-end border-0">
+                        <%--<button type="button" class="btn btn-success py-1 px-3" data-bs-dismiss="modal">OK</button>--%>
+                        <asp:Button CssClass="btn btn-primary py-1 px-3" Style="padding: 2px 10px;" ID="btnOkDeleteByClientOnDashboard" runat="server" Visible="true" OnClick="BtnOkDeleteByClient_Click" data-bs-dismiss="modal" Text="OK"></asp:Button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div id="mainContent" class="">
             <asp:ContentPlaceHolder ID="MainContent" runat="server" />

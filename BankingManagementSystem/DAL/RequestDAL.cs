@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Data;
-using System.Linq;
-using System.Web;
-using System.Configuration;
+﻿using BankingManagementSystem.Models.Constants;
 using BankingManagementSystem.Models.DTOs;
-using BankingManagementSystem.Models.Constants;
-using System.Runtime.Remoting.Messaging;
-using BankingManagementSystem.Models.ConstraintTypes;
-using BankingManagementSystem.Models;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
-using System.Web.Razor.Tokenizer;
-using System.Globalization;
 
 namespace BankingManagementSystem.DAL
 {
@@ -20,7 +13,7 @@ namespace BankingManagementSystem.DAL
     {
         private static readonly String CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
 
-        public async static Task<int> SendJointAccountPendingRequests(int? clientId, string requestType, int targetClientId, string payload)
+        public async static Task<int> SendJointAccountPendingRequestsAsync(int? clientId, string requestType, int? targetClientId, string payload)
         {
             try
             {
@@ -41,11 +34,6 @@ namespace BankingManagementSystem.DAL
                     cmd.Parameters.Add(outputParam);
 
 
-                    //con.Open();
-                    //cmd.ExecuteNonQuery();
-
-                    //return (Task<int>)outputParam.Value;
-
                     await con.OpenAsync();
                     await cmd.ExecuteNonQueryAsync();
 
@@ -57,40 +45,8 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during Create Joint Account Pending Requests.", ex);
             }
         }
-        //public static Task<int> SendAdminPendingRequest(int? clientId, string requestType, string payload)
-        //{
-        //    try
-        //    {
-        //        using (SqlConnection con = new SqlConnection(CS))
-        //        {
-        //            SqlCommand cmd = new SqlCommand("sp_CreateAdminPendingRequest", con);
-        //            cmd.CommandType = CommandType.StoredProcedure;
 
-        //            cmd.Parameters.AddWithValue("@ClientId", clientId ?? (object)DBNull.Value);
-        //            cmd.Parameters.AddWithValue("@RequestType", requestType);
-        //            cmd.Parameters.AddWithValue("@Payload", payload);
-
-        //            // Output parameter for AdminRequestId as RegistrationRequestId
-        //            SqlParameter outputParam = new SqlParameter("@AdminRequestId", SqlDbType.Int)
-        //            {
-        //                Direction = ParameterDirection.Output
-        //            };
-        //            cmd.Parameters.Add(outputParam);
-
-
-        //            con.Open();
-        //            cmd.ExecuteNonQueryAsync();
-
-        //            return (Task<int>)outputParam.Value;
-        //        }
-        //    }
-        //    catch (SqlException ex)
-        //    {
-        //        throw new Exception("Database error during Create Admin Pending Request.", ex);
-        //    }
-        //}
-
-        public static async Task<int> SendAdminPendingRequest(int? clientId, string requestType, string payload)
+        public static async Task<int> SendAdminPendingRequestAsync(int? clientId, string requestType, string payload)
         {
             try
             {
@@ -118,13 +74,13 @@ namespace BankingManagementSystem.DAL
                     }
                 }
             }
-            catch (SqlException ex) 
+            catch (SqlException ex)
             {
                 throw new Exception("Database error during Create Admin Pending Request.", ex);
             }
         }
 
-        public static bool IsDuplicateNewRegistrationPendingRequest(string aadhaar, string pan)
+        public static async Task<bool> IsDuplicateNewRegistrationPendingRequestAsync(string aadhaar, string pan)
         {
             try
             {
@@ -132,12 +88,11 @@ namespace BankingManagementSystem.DAL
                 {
                     SqlCommand cmd = new SqlCommand("sp_CheckDuplicateNewRegistrationRequest", con);
                     cmd.CommandType = CommandType.StoredProcedure;
-
                     cmd.Parameters.AddWithValue("@AadhaarNumber", aadhaar);
                     cmd.Parameters.AddWithValue("@PANNumber", pan);
 
-                    con.Open();
-                    object result = cmd.ExecuteScalar();
+                    await con.OpenAsync();
+                    object result = await cmd.ExecuteScalarAsync();
 
                     return Convert.ToInt32(result) > 0;
                 }
@@ -146,36 +101,32 @@ namespace BankingManagementSystem.DAL
             {
                 throw new Exception("Database error during Check Duplicate New Registration Request.", ex);
             }
-
         }
 
 
-
-        public static List<RequestDTO> GetAllRequestsByStatus(string status, string sortColumn, string sortDirection)
+        public static async Task<List<RequestDTO>> GetAllRequestsByStatusAsync(string status, string sortColumn, string sortDirection)
         {
             try
             {
                 var requests = new List<RequestDTO>();
                 using (SqlConnection con = new SqlConnection(CS))
+                using (SqlCommand cmd = new SqlCommand("sp_GetRequestsByStatusForAdmin", con))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_GetRequestsByStatusForAdmin", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Status", string.IsNullOrEmpty(status) ? DBNull.Value : (object)status);
                     cmd.Parameters.AddWithValue("@SortBy", sortColumn);
                     cmd.Parameters.AddWithValue("@SortDirection", sortDirection);
 
-                    con.Open();
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    await con.OpenAsync();
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
                             int idxRequestId = reader.GetOrdinal(DbColumns.RequestId);
                             int idxRequestType = reader.GetOrdinal(DbColumns.RequestType);
                             int idxPayload = reader.GetOrdinal(DbColumns.Payload);
                             int idxRequestedOn = reader.GetOrdinal(DbColumns.CreatedOn);
                             int idxRepliedOn = reader.GetOrdinal(DbColumns.RepliedOn);
-
-
 
                             requests.Add(new RequestDTO
                             {
@@ -184,35 +135,32 @@ namespace BankingManagementSystem.DAL
                                 Payload = reader.IsDBNull(idxPayload) ? null : reader.GetString(idxPayload),
                                 RequestedOn = reader.GetDateTime(idxRequestedOn),
                                 RepliedOn = reader.IsDBNull(idxRepliedOn) ? (DateTime?)null : reader.GetDateTime(idxRepliedOn)
-
                             });
                         }
                     }
-                    return requests;
                 }
+                return requests;
             }
             catch (SqlException ex)
             {
                 throw new Exception("Database error during Get Request By Status For Admin.", ex);
             }
-
         }
 
-        public static RequestDTO GetPendingRequestById(int requestId)
+        public static async Task<RequestDTO> GetPendingRequestByIdAsync(int requestId)
         {
             try
             {
-                var requests = new List<RequestDTO>();
                 using (SqlConnection con = new SqlConnection(CS))
                 {
                     SqlCommand cmd = new SqlCommand("sp_GetPendingRequestById", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@RequestId", requestId);
 
-                    con.Open();
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    await con.OpenAsync();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
-                    if (reader.Read())
+                    if (await reader.ReadAsync())
                     {
                         int idxRequestType = reader.GetOrdinal(DbColumns.RequestType);
                         int idxPayload = reader.GetOrdinal(DbColumns.Payload);
@@ -220,7 +168,6 @@ namespace BankingManagementSystem.DAL
 
                         return new RequestDTO
                         {
-
                             RequestId = requestId,
                             RequestType = reader.IsDBNull(idxRequestType) ? null : reader.GetString(idxRequestType),
                             Payload = reader.IsDBNull(idxPayload) ? null : reader.GetString(idxPayload),
@@ -228,7 +175,6 @@ namespace BankingManagementSystem.DAL
 
                         };
                     }
-
                     return null;
                 }
             }
@@ -237,7 +183,8 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during Get Pending Requests By Id.", ex);
             }
         }
-        public static RequestDTO GetAllRequestById(int requestId)
+
+        public static async Task<RequestDTO> GetAllRequestByIdAsync(int requestId)
         {
             try
             {
@@ -247,10 +194,10 @@ namespace BankingManagementSystem.DAL
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@RequestId", requestId);
 
-                    con.Open();
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    await con.OpenAsync();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
-                    if (reader.Read())
+                    if (await reader.ReadAsync())
                     {
                         int idxRequestType = reader.GetOrdinal(DbColumns.RequestType);
                         int idxPayload = reader.GetOrdinal(DbColumns.Payload);
@@ -273,10 +220,10 @@ namespace BankingManagementSystem.DAL
             {
                 throw new Exception("Database error during Get All Requests By Id.", ex);
             }
-
         }
 
-        public static bool UpdateRequestStatus(int requestId, string newStatus, int repliedBy)
+
+        public static async Task<bool> UpdateRequestStatusAsync(int requestId, string newStatus, int repliedBy)
         {
             try
             {
@@ -288,8 +235,8 @@ namespace BankingManagementSystem.DAL
                     cmd.Parameters.AddWithValue("@Status", newStatus);
                     cmd.Parameters.AddWithValue("@RepliedBy", repliedBy);
 
-                    con.Open();
-                    int rowsAffected = cmd.ExecuteNonQuery();
+                    await con.OpenAsync();
+                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
                     return rowsAffected > 0;
                 }
@@ -298,16 +245,10 @@ namespace BankingManagementSystem.DAL
             {
                 throw new Exception("Database error during Update Request Status.", ex);
             }
-
         }
 
 
-
-
-
-
-
-        public static bool UpdateRequestPayload(int requestId, string newPayload)
+        public static async Task<bool> UpdateRequestPayloadAsync(int requestId, string newPayload)
         {
             try
             {
@@ -318,8 +259,8 @@ namespace BankingManagementSystem.DAL
                     cmd.Parameters.AddWithValue("@RequestId", requestId);
                     cmd.Parameters.AddWithValue("@Payload", newPayload);
 
-                    con.Open();
-                    int rows = cmd.ExecuteNonQuery();
+                    await con.OpenAsync();
+                    int rows = await cmd.ExecuteNonQueryAsync();
                     return rows > 0;
                 }
             }
@@ -329,7 +270,8 @@ namespace BankingManagementSystem.DAL
             }
         }
 
-        public static bool DeleteRequestByStatus(int requestId, string status)
+
+        public static async Task<bool> DeleteRequestByStatusAsync(int requestId, string status)
         {
             try
             {
@@ -340,8 +282,8 @@ namespace BankingManagementSystem.DAL
                     cmd.Parameters.AddWithValue("@RequestId", requestId);
                     cmd.Parameters.AddWithValue("@Status", status);
 
-                    con.Open();
-                    int rows = cmd.ExecuteNonQuery();
+                    await con.OpenAsync();
+                    int rows = await cmd.ExecuteNonQueryAsync();
                     return rows > 0;
                 }
             }
@@ -352,25 +294,9 @@ namespace BankingManagementSystem.DAL
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         // Client Pending Requests
 
-
-        public static async Task<List<RequestDTO>> GetReceivedRequestsForClient(int clientId, string sortColumn, string sortDirection)
+        public static async Task<List<RequestDTO>> GetReceivedRequestsForClientAsync(int clientId, string sortColumn, string sortDirection)
         {
             try
             {
@@ -393,9 +319,6 @@ namespace BankingManagementSystem.DAL
                             int idxRequestType = reader.GetOrdinal(DbColumns.RequestType);
                             int idxPayload = reader.GetOrdinal(DbColumns.Payload);
                             int idxRequestedOn = reader.GetOrdinal(DbColumns.CreatedOn);
-                            //int idxRepliedOn = reader.GetOrdinal(DbColumns.RepliedOn);
-
-
 
                             requests.Add(new RequestDTO
                             {
@@ -403,8 +326,6 @@ namespace BankingManagementSystem.DAL
                                 RequestType = reader.IsDBNull(idxRequestType) ? null : reader.GetString(idxRequestType),
                                 Payload = reader.IsDBNull(idxPayload) ? null : reader.GetString(idxPayload),
                                 RequestedOn = reader.GetDateTime(idxRequestedOn),
-                                //RepliedOn = reader.IsDBNull(idxRepliedOn) ? (DateTime?)null : reader.GetDateTime(idxRepliedOn)
-
                             });
                         }
                     }
@@ -416,7 +337,7 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during Get Received Requests For Client.", ex);
             }
         }
-         public static async Task<List<RequestDTO>> GetSentRequestsByClient(int clientId, string sortColumn, string sortDirection)
+        public static async Task<List<RequestDTO>> GetSentRequestsByClientAsync(int clientId, string sortColumn, string sortDirection)
         {
             try
             {
@@ -442,8 +363,6 @@ namespace BankingManagementSystem.DAL
                             int idxRepliedOn = reader.GetOrdinal(DbColumns.RepliedOn);
                             int idxStatus = reader.GetOrdinal(DbColumns.Status);
 
-
-
                             requests.Add(new RequestDTO
                             {
                                 RequestId = reader.GetInt32(idxRequestId),
@@ -452,7 +371,6 @@ namespace BankingManagementSystem.DAL
                                 RequestedOn = reader.GetDateTime(idxRequestedOn),
                                 RepliedOn = reader.IsDBNull(idxRepliedOn) ? (DateTime?)null : reader.GetDateTime(idxRepliedOn),
                                 Status = reader.IsDBNull(idxStatus) ? null : reader.GetString(idxStatus)
-
                             });
                         }
                     }

@@ -2,36 +2,34 @@
 using BankingManagementSystem.Models.ConstraintTypes;
 using BankingManagementSystem.Models;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Data;
-using System.Linq;
-using System.Web;
+using System.Threading.Tasks;
 using BankingManagementSystem.Models.Constants;
 using BankingManagementSystem.Models.DTOs;
 
 namespace BankingManagementSystem.DAL
 {
-	public static class AdminDAL
-	{
-        private static readonly String CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
+    public static class AdminDAL
+    {
+        private static readonly string CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
 
-        public static User CheckAdminCredentials(AuthRequestDTO admin)
+        public static async Task<User> CheckAdminCredentialsAsync(AuthRequestDTO admin)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(CS))
+                using (SqlCommand cmd = new SqlCommand("sp_ValidateAdmin", con))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_ValidateAdmin", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Username", admin.Username);
                     cmd.Parameters.AddWithValue("@Password", admin.Password);
 
-                    con.Open();
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    await con.OpenAsync();
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
-                        if (reader.Read())
+                        if (await reader.ReadAsync())
                         {
                             int idxAdminId = reader.GetOrdinal(DbColumns.AdminId);
                             int idxFullName = reader.GetOrdinal(DbColumns.FullName);
@@ -47,11 +45,10 @@ namespace BankingManagementSystem.DAL
                                 Username = username,
                                 Role = UserRoles.ADMIN,
                                 FullName = fullName
-
                             };
                         }
                     }
-                    return null; // Not found or invalid
+                    return null;
                 }
             }
             catch (SqlException ex)
@@ -59,18 +56,19 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during admin validation.", ex);
             }
         }
-        public static bool IsAdminExistsByAdminId(int adminId)
+
+        public static async Task<bool> IsAdminExistsByAdminIdAsync(int adminId)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(CS))
+                using (SqlCommand cmd = new SqlCommand("sp_CheckAdminExistsByAdminId", con))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_CheckAdminExistsByAdminId", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@AdminId", adminId);
 
-                    con.Open();
-                    object result = cmd.ExecuteScalar();
+                    await con.OpenAsync();
+                    object result = await cmd.ExecuteScalarAsync();
 
                     return Convert.ToInt32(result) > 0;
                 }
@@ -81,24 +79,20 @@ namespace BankingManagementSystem.DAL
             }
         }
 
-        public static bool CreateClient(ClientDTO client, out string message)
+        public static async Task<(bool IsSuccess, string Message)> CreateClientAsync(ClientDTO client)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(CS))
+                using (SqlCommand cmd = new SqlCommand("sp_CreateClient", con))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_CreateClient", con);
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    
-
-
-                    // Add all client parameters from ClientDTO
                     cmd.Parameters.AddWithValue("@FullName", client.FullName);
                     cmd.Parameters.AddWithValue("@ParentName", client.ParentName);
 
-                    DateTime.TryParse(client.DOB, out DateTime parsedDOB);
-                    cmd.Parameters.AddWithValue("@DOB", parsedDOB);
+                    //DateTime.TryParse(client.DOB, out DateTime parsedDOB);
+                    cmd.Parameters.AddWithValue("@DOB", client.DOB);
 
                     cmd.Parameters.AddWithValue("@Gender", client.Gender);
                     cmd.Parameters.AddWithValue("@Nationality", client.Nationality);
@@ -115,24 +109,19 @@ namespace BankingManagementSystem.DAL
                     cmd.Parameters.AddWithValue("@AccountStatus", "Active");
                     cmd.Parameters.AddWithValue("@IsJointAccount", client.IsJointAccount ? "Yes" : "No");
                     cmd.Parameters.AddWithValue("@JointClientId", client.JointClientId == 0 ? (object)DBNull.Value : client.JointClientId);
-                    //cmd.Parameters.AddWithValue("@JointRelationship", string.IsNullOrEmpty(client.JointRelationship) ? (object)DBNull.Value : client.JointRelationship);
                     cmd.Parameters.AddWithValue("@Username", client.Username);
                     cmd.Parameters.AddWithValue("@Password", client.Password);
 
-                    con.Open();
-                    cmd.ExecuteNonQuery();
+                    await con.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
 
-                    message = "Client created successfully.";
-                    return true;
+                    return (true, "Client created successfully.");
                 }
             }
             catch (SqlException ex)
             {
-                message = $"Database error during client creation. {ex.Message}";
-                return false;
-                //throw new Exception("Database error during client creation.", ex);
+                return (false, $"Database error during client creation. {ex.Message}");
             }
         }
-
     }
 }

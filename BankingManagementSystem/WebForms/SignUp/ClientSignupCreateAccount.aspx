@@ -73,7 +73,7 @@
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label for="TextBox_mobilenumber" class="form-label">Mobile Number<span class="text-danger">*</span></label>
-                        <asp:TextBox ID="TextBox_mobilenumber" runat="server" CssClass="form-control" placeholder="+91 9876543210" TextMode="Phone"></asp:TextBox>
+                        <asp:TextBox ID="TextBox_mobilenumber" runat="server" CssClass="form-control" placeholder="9876543210" TextMode="Phone"></asp:TextBox>
                     </div>
                     <div class="col-md-3">
                         <label for="TextBox_emailid" class="form-label">Email ID<span class="text-danger">*</span></label>

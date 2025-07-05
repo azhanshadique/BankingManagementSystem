@@ -45,7 +45,7 @@ namespace BankingManagementSystem.WebForms.Login
                 Password = txtPassword.Text.Trim(),
             };
             //AuthTokenResponse result = await AuthService.AuthenticateClientAsync(request);
-            AuthTokenResponse result = await new AuthBLL().LoginClientAsync(request);
+            AuthTokenResponse result = await AuthBLL.LoginClientAsync(request);
 
 
             if (result != null && !string.IsNullOrEmpty(result.Token))

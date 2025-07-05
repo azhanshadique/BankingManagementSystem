@@ -7,96 +7,87 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Diagnostics.Eventing.Reader;
+using System.Threading.Tasks;
 
 namespace BankingManagementSystem.DAL
 {
     public static class ClientDAL
     {
-        private static readonly String CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
+        private static readonly string CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
 
-        public static User CheckClientCredentials(AuthRequestDTO client)
+        public static async Task<User> CheckClientCredentialsAsync(AuthRequestDTO client)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(CS))
+                using (SqlCommand cmd = new SqlCommand("sp_ValidateClient", con))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_ValidateClient", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Username", client.Username);
                     cmd.Parameters.AddWithValue("@Password", client.Password);
 
-                    con.Open();
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    await con.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
-                        if (reader.Read())
+                        if (await reader.ReadAsync())
                         {
                             int idxClientId = reader.GetOrdinal(DbColumns.ClientId);
                             int idxFullName = reader.GetOrdinal(DbColumns.FullName);
                             int idxUsername = reader.GetOrdinal(DbColumns.Username);
 
-                            int clientId = reader.GetInt32(idxClientId);
-                            string fullName = reader.IsDBNull(idxFullName) ? null : reader.GetString(idxFullName);
-                            string username = reader.IsDBNull(idxUsername) ? null : reader.GetString(idxUsername);
-
                             return new User
                             {
-                                UserID = clientId,
-                                Username = username,
-                                Role = UserRoles.CLIENT,
-                                FullName = fullName
-
+                                UserID = reader.GetInt32(idxClientId),
+                                FullName = reader.IsDBNull(idxFullName) ? null : reader.GetString(idxFullName),
+                                Username = reader.IsDBNull(idxUsername) ? null : reader.GetString(idxUsername),
+                                Role = UserRoles.CLIENT
                             };
                         }
                     }
-                    return null; // Not found or invalid
+                    return null;
                 }
             }
             catch (SqlException ex)
             {
                 throw new Exception("Database error during client login credentials validation.", ex);
             }
-
-
         }
-        public static int IsClientExistsByPersonalDetails(string aadhaar, string pan)
+
+        public static async Task<int> IsClientExistsByPersonalDetailsAsync(string aadhaar, string pan)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(CS))
+                using (SqlCommand cmd = new SqlCommand("sp_CheckClientExistsByPersonalDetails", con))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_CheckClientExistsByPersonalDetails", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@AadhaarNumber", aadhaar);
                     cmd.Parameters.AddWithValue("@PANNumber", pan);
 
-                    con.Open();
-                    object result = cmd.ExecuteScalar();
-
+                    await con.OpenAsync();
+                    object result = await cmd.ExecuteScalarAsync();
                     return Convert.ToInt32(result);
-
-                    
-
                 }
             }
             catch (SqlException ex)
             {
-                throw new Exception("Database error during client exists by aadhaar or PAN validation.", ex);
+                throw new Exception("Database error during client exists by Aadhaar or PAN validation.", ex);
             }
         }
-        public static bool IsClientExistsByClientId(int? clientId)
+
+        public static async Task<bool> IsClientExistsByClientIdAsync(int? clientId)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(CS))
+                using (SqlCommand cmd = new SqlCommand("sp_CheckClientExistsByClientId", con))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_CheckClientExistsByClientId", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ClientId", clientId);
 
-                    con.Open();
-                    object result = cmd.ExecuteScalar();
-
+                    await con.OpenAsync();
+                    object result = await cmd.ExecuteScalarAsync();
                     return Convert.ToInt32(result) > 0;
                 }
             }
@@ -105,19 +96,19 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during client exists by client-id validation.", ex);
             }
         }
-        public static bool IsClientExistsByUsername(string username)
+
+        public static async Task<bool> IsClientExistsByUsernameAsync(string username)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(CS))
+                using (SqlCommand cmd = new SqlCommand("sp_CheckClientExistsByUsername", con))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_CheckClientExistsByUsername", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Username", username);
 
-                    con.Open();
-                    object result = cmd.ExecuteScalar();
-
+                    await con.OpenAsync();
+                    object result = await cmd.ExecuteScalarAsync();
                     return Convert.ToInt32(result) > 0;
                 }
             }
@@ -126,8 +117,5 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during client exists by username validation.", ex);
             }
         }
-        
-        
-
     }
 }

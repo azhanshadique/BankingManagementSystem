@@ -165,5 +165,9 @@ namespace BankingManagementSystem.WebForms
         {
             Response.Redirect(Page.GetRouteUrl("ClientPendingRequestRoute", null));
         }
+        protected void BtnOkDeleteByClient_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Page.GetRouteUrl("ClientRequestRoute", null));
+        }
     }
 }

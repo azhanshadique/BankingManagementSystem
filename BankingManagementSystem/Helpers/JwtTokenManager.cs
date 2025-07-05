@@ -23,7 +23,7 @@ namespace BankingManagementSystem.Helpers
             {
                 Subject = new ClaimsIdentity(new[] {
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role.ToString()),
+                new Claim(ClaimTypes.Role, user.Role.ToString()), 
                 new Claim("FullName", user.FullName),
                 new Claim("UserID", user.UserID.ToString())
             }),

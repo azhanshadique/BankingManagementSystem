@@ -1,75 +1,26 @@
 ﻿using BankingManagementSystem.DAL;
-using BankingManagementSystem.Models.API;
 using BankingManagementSystem.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using BankingManagementSystem.Models.API;
 using BankingManagementSystem.Models.DTOs;
-using Newtonsoft.Json;
-using System.Web.Services.Description;
-using Microsoft.Owin.Security.Provider;
+using System.Threading.Tasks;
 
 namespace BankingManagementSystem.BLL
 {
     public static class AdminBLL
     {
-        public static User ValidateAdminLogin(AuthRequestDTO admin)
+        public static async Task<User> ValidateAdminLoginAsync(AuthRequestDTO admin)
         {
-            return AdminDAL.CheckAdminCredentials(admin);
-        }
-        public static bool IsAdminExistsByAdminId(int adminId)
-        {
-            return AdminDAL.IsAdminExistsByAdminId(adminId);
+            return await AdminDAL.CheckAdminCredentialsAsync(admin);
         }
 
-        public static List<RequestDTO> GetRequestsByStatus(string status, string sortBy, string sortDirection)
+        public static async Task<bool> IsAdminExistsByAdminIdAsync(int adminId)
         {
-            return RequestDAL.GetAllRequestsByStatus(status, sortBy, sortDirection);
+            return await AdminDAL.IsAdminExistsByAdminIdAsync(adminId);
         }
 
-        public static RequestDTO GetRequestById(int requestId)
+        public static async Task<(bool IsSuccess, string Message)> CreateNewClientAsync(ClientDTO client)
         {
-            return RequestDAL.GetAllRequestById(requestId);
+            return await AdminDAL.CreateClientAsync(client);
         }
-
-        public static bool UpdatePayload(int requestId, ClientDTO client, out string message)
-        {
-            var isClientRequest = GetRequestById(requestId);
-            if (isClientRequest == null) {
-                message = "Invalid Request ID";
-                return false;
-            }
-            bool result = ClientBLL.ValidateClientDetails(client, out message);
-            if (result)
-            {
-                string updatedPayload = JsonConvert.SerializeObject(client);
-                return RequestDAL.UpdateRequestPayload(requestId, updatedPayload);
-            }
-            return false;
-        }
-
-        public static bool UpdateStatus(int requestId, string status, int repliedBy)
-        {
-            var isClientRequest = RequestDAL.GetPendingRequestById(requestId);
-            if (isClientRequest == null)
-                return false;
-            if (repliedBy == -1 || AdminDAL.IsAdminExistsByAdminId(repliedBy) || ClientDAL.IsClientExistsByClientId(repliedBy))
-                return RequestDAL.UpdateRequestStatus(requestId, status, repliedBy);
-            return false;
-            
-        }
-
-        public static bool DeleteRequest(int requestId, string status)
-        {
-            return RequestDAL.DeleteRequestByStatus(requestId, status);
-        }
-         public static bool CreateNewClient(ClientDTO client, out string message)
-        {
-            return AdminDAL.CreateClient(client, out message);
-        }
-
-
     }
-
 }
