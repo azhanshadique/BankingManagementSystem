@@ -6,12 +6,12 @@ using System.Web.Http;
 
 namespace BankingManagementSystem.Controllers.API
 {
-    [RoutePrefix("api/client")]
-    public class ClientController : ApiController
+    [AllowAnonymous]
+    [RoutePrefix("api/public")]
+    public class PublicController : ApiController
     {
         [HttpPost]
-        [AllowAnonymous]
-        [Route("register")]
+        [Route("register-client")]
         public async Task<IHttpActionResult> Register([FromBody] ClientDTO client)
         {
             if (!ModelState.IsValid)
@@ -26,9 +26,8 @@ namespace BankingManagementSystem.Controllers.API
 
 
         [HttpGet]
-        [AllowAnonymous]
         [Route("register/request/{id:int}")]
-        public async Task<IHttpActionResult> GetPublicRegistrationRequestByIdAsync(int id)
+        public async Task<IHttpActionResult> GetPublicRegistrationRequestByIdAsync([FromUri] int id)
         {
             var (isValid, message, request) = await RequestBLL.GetPublicRequestByIdAsync(id);
 
@@ -41,6 +40,28 @@ namespace BankingManagementSystem.Controllers.API
             return Ok(request);
         }
 
+        
+        [HttpPut]
+        [Route("update/register-request/{id:int}")]
+        public async Task<IHttpActionResult> UpdatePublicRegisterRequest([FromUri] int id, [FromBody] ClientDTO client)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid client data.");
+            var (success, message) = await RequestBLL.UpdateRegisterRequestPublicAsync(id, client);
+            return success ? Ok(new { success }) : (IHttpActionResult)BadRequest(message);
+        }
+
+        [HttpPut]
+        [Route("delete/request/{id:int}")]
+        public async Task<IHttpActionResult> DeletePublicRegisterRequest([FromUri] int id)
+        {
+            var (success, message) = await RequestBLL.DeleteRegisterRequestPublicAsync(id, id);
+
+            if (!success)
+                return BadRequest(message);
+
+            return Ok(new { success = true, message = "Request deleted successfully." });
+        }
 
     }
 }

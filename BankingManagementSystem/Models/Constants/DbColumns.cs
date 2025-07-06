@@ -18,6 +18,7 @@ namespace BankingManagementSystem.Models.Constants
         public const string CreatedOn = "created_on";
         public const string RepliedOn = "replied_on";
         public const string Status = "status";
+        public const string RepliedBy = "replied_by";
         
     }
 }

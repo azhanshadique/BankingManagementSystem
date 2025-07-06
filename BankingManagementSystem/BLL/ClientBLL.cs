@@ -27,7 +27,8 @@ namespace BankingManagementSystem.BLL
 
 
             // If admin approval is given directly or through Json
-            if (client.AdminApproved)
+            bool adminApproved = client.AdminApproved == RequestStatus.Approved.ToString();
+            if (adminApproved)
             {
                 var (isSuccess, msg) = await AdminDAL.CreateClientAsync(client);
                 return (isSuccess, msg);
@@ -44,7 +45,9 @@ namespace BankingManagementSystem.BLL
             string newRequestType = RequestType.CreateNewRegistration.ToString();
 
             // If joint account then create and send request to Co-Holder and Admin
-            if (client.IsJointAccount && !client.CoHolderApproved)
+            bool coApproved = client.CoHolderApproved == RequestStatus.Approved.ToString();
+
+            if (client.IsJointAccount && !coApproved)
             {
                 try
                 {
@@ -67,7 +70,7 @@ namespace BankingManagementSystem.BLL
             }
 
             // If not joint account then create and send request only to Admin
-            if (!client.AdminApproved)
+            if (!adminApproved)
             {
                 try
                 {

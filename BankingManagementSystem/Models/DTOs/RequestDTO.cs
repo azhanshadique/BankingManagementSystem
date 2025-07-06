@@ -39,5 +39,6 @@ namespace BankingManagementSystem.Models.DTOs
         public string Status { get; set; }
 
         public DateTime? RepliedOn { get; set; }
+        public int? RepliedBy { get; set; }
     }
 }

@@ -183,9 +183,11 @@ namespace BankingManagementSystem.WebForms.Client
 
 
                     lblCoHolderApprovalHeading.Visible = true;
-                    lblCoHolderApproval.Text = client.CoHolderApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
+                    //lblCoHolderApproval.Text = client.CoHolderApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
+                    lblCoHolderApproval.Text = client.CoHolderApproved;
                     lblAdminApprovalHeading.Visible = true;
-                    lblAdminApproval.Text = client.AdminApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
+                    //lblAdminApproval.Text = client.AdminApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
+                    lblAdminApproval.Text = client.AdminApproved;
 
                     SetButtonState(true);
                     btnEdit.Visible = false;
@@ -232,7 +234,7 @@ namespace BankingManagementSystem.WebForms.Client
         {
             txtFullName.Text = client.FullName;
             txtParentName.Text = client.ParentName;
-            txtDOB.Text = client.DOB?.ToString();
+            txtDOB.Text = client.DOB?.ToString("yyyy-MM-dd");
             ddlGender.SelectedValue = client.Gender;
             txtNationality.Text = client.Nationality;
             txtOccupation.Text = client.Occupation;
@@ -377,7 +379,7 @@ namespace BankingManagementSystem.WebForms.Client
 
                 //bool result = await RegistrationService.CreateClientAsync(client);
                 //if (result)
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showApproveRejectMessageByClient('Client Request ID: #{requestId} for Joint Account Approved Successfully.', 'success'); }}, 200);", true);
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showApproveRejectMessageByClient('Client Request ID: #{requestId} for Joint Account Approved Successfully. Awaiting admin approval.', 'success'); }}, 200);", true);
                 await ReloadUI(statusUpdated);
 
             }

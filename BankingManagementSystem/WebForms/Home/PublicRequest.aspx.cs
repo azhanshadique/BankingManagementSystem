@@ -7,10 +7,12 @@ using BankingManagementSystem.Models.ConstraintTypes;
 using BankingManagementSystem.Helpers;
 using BankingManagementSystem.Models.API;
 using System.Threading.Tasks;
+using BankingManagementSystem.BLL;
+using System.Web.UI.WebControls;
 
 namespace BankingManagementSystem.WebForms.Home
 {
-    public partial class ClientRequest : System.Web.UI.Page
+    public partial class PublicRequest : System.Web.UI.Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -29,62 +31,149 @@ namespace BankingManagementSystem.WebForms.Home
         }
         protected async void ShowRequestDetails(int requestId)
         {
-            var request = await RequestsService.GetRegisterRequestByIdAsync(requestId);
-            if (request != null)
-            {
-                var client = JsonConvert.DeserializeObject<ClientDTO>(request.Payload);
-                if (client == null)
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", $"showAlert('Error in Get Request By Id.', 'danger');", true);
-                    return;
-                }
+            var (request, errorMessage) = await RequestsService.GetPublicRegisterRequestByIdAsync(requestId);
 
-                if (request.RequestType == RequestType.CreateNewRegistration.ToString())
-                {
-                    //pnlRequestTable.Visible = false;
-                    pnlRequestDetails.Visible = true;
-
-                    lblRequestType.Text = "Create New Registration";
-                    lblRequestStatus.Text = request.Status;
-                    lblRequestId.Text = $"#{requestId.ToString()}";
-
-                    if (request.Status == RequestStatus.Pending.ToString())
-                    {
-                        if (client.IsJointAccount)
-                        {
-                            lblCoHolderApprovalHeading.Visible = true;
-                            lblCoHolderApproval.Text = client.CoHolderApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
-
-                        }
-                        lblAdminApprovalHeading.Visible = true;
-                        lblAdminApproval.Text = client.AdminApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
-                        SetButtonState(true);
-                    }
-                    else
-                    {
-                        SetButtonState(false);
-
-                    }
-
-                    PopulateClientForm(client);
-                }
-                else
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", $"showAlert('Request is not of type Create New Registration.', 'danger');", true);
-                    //Response.Redirect(Page.GetRouteUrl("ClientRequestRoute", null));
-                }
-            }
-            else
+            // Case: API error or request not found
+            if (request == null)
             {
                 pnlRequestDetails.Visible = false;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", $"showAlert('{errorMessage}', 'danger');", true);
+                return;
+            }
+
+            // Case: Payload is null or invalid
+            var client = JsonConvert.DeserializeObject<ClientDTO>(request.Payload);
+            if (client == null)
+            {
+                pnlRequestDetails.Visible = false;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Invalid client data.', 'danger');", true);
+                return;
+            }
+
+            // Case: Wrong request type (shouldn’t happen if API filters properly)
+            //if (request.RequestType != RequestType.CreateNewRegistration.ToString())
+            //{
+            //    pnlRequestDetails.Visible = false;
+            //    ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Request is not of type Create New Registration.', 'danger');", true);
+            //    return;
+            //}
+
+
+            // Valid Request
+            pnlRequestDetails.Visible = true;
+            lblRequestType.Text = "Create New Registration";
+            //lblRequestStatus.Text = request.Status;
+            SetStatusBadge(lblRequestStatus, request.Status?.Trim());
+
+
+            lblRequestId.Text = $"#{requestId}";
+
+            bool isPending = request.Status == RequestStatus.Pending.ToString(); 
+            SetButtonState(client, isPending);
+            SetApprovalLabels(client, isPending);
+
+            if (!isPending)
+            {
+                switch (request.Status)
+                {
+                    case nameof(RequestStatus.Approved):
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Request is approved. Please login to view more details.', 'success');", true);
+                        break;
+
+                    case nameof(RequestStatus.Rejected):
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Request is rejected by the admin.', 'danger');", true);
+                        break;
+
+                    default:
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Request is no longer pending. Please login to view more details.', 'info');", true);
+                        break;
+                }
+            }
+
+            PopulateClientForm(client);
+        }
+
+        private void SetApprovalLabels(ClientDTO client, bool isPending)
+        {
+            // Co-holder
+            lblCoHolderApprovalHeading.Visible = client.IsJointAccount && isPending;
+            lblCoHolderApproval.Visible = client.IsJointAccount && isPending;
+
+            if (client.IsJointAccount)
+            {
+                string coHolderStatus = (client.CoHolderApproved ?? "").Trim();
+                SetStatusBadge(lblCoHolderApproval, coHolderStatus);
+            }
+
+            
+
+
+            // Admin
+            lblAdminApprovalHeading.Visible = isPending;
+            lblAdminApproval.Visible = isPending;
+
+            string adminStatus = (client.AdminApproved ?? "").Trim();
+            SetStatusBadge(lblAdminApproval, adminStatus);
+            //string adminStatus = (client.AdminApproved ?? "").Trim();
+            //lblAdminApproval.Text = adminStatus;
+
+            //switch (adminStatus)
+            //{
+            //    case "Approved":
+            //        lblAdminApproval.CssClass = "badge bg-success fw-semibold text-white fs-6 px-6 py-2";
+            //        break;
+            //    case "Rejected":
+            //        lblAdminApproval.CssClass = "badge bg-danger fw-semibold text-white fs-6 px-6 py-2";
+            //        break;
+            //    case "Awaiting":
+            //        lblAdminApproval.CssClass = "badge bg-warning text-dark fw-semibold fs-6 px-6 py-2";
+            //        break;
+            //    default:
+            //        lblAdminApproval.CssClass = "badge bg-secondary text-white fw-semibold fs-6 px-6 py-2";
+            //        break;
+            //}
+        }
+
+
+        private void SetStatusBadge(Label label, string status)
+        {
+            label.Text = status;
+
+            switch (status)
+            {
+                case "Approved":
+                    label.CssClass = "badge bg-success fw-semibold text-white fs-6 px-6 py-2";
+                    break;
+                case "Rejected":
+                    label.CssClass = "badge bg-danger fw-semibold text-white fs-6 px-6 py-2";
+                    break;
+                case "Pending":
+                    label.CssClass = "badge bg-primary fw-semibold text-white fs-6 px-6 py-2";
+                    break;
+                case "Awaiting":
+                    label.CssClass = "badge bg-warning text-dark fw-semibold fs-6 px-6 py-2";
+                    break;
+                default:
+                    label.CssClass = "badge bg-secondary text-white fw-semibold fs-6 px-6 py-2";
+                    break;
             }
         }
 
+
+        private void SetButtonState(ClientDTO client, bool isPending)
+        {
+            //btnUpdate.Enabled = enable;
+            //btnEdit.Enabled = enable;
+            //btnDelete.Enabled = enable;
+            bool coApproved = client.CoHolderApproved == RequestStatus.Awaiting.ToString();
+            pnlButtons.Visible = coApproved && isPending;    
+        }
         private void PopulateClientForm(ClientDTO client)
         {
             txtFullName.Text = client.FullName;
             txtParentName.Text = client.ParentName;
-            txtDOB.Text = client.DOB.ToString();
+            //txtDOB.Text = client.DOB.ToString();
+            txtDOB.Text = client.DOB?.ToString("yyyy-MM-dd");
             ddlGender.SelectedValue = client.Gender;
             txtNationality.Text = client.Nationality;
             txtOccupation.Text = client.Occupation;
@@ -105,13 +194,7 @@ namespace BankingManagementSystem.WebForms.Home
             txtConfirmPassword.Attributes["value"] = client.Password;
         }
 
-        private void SetButtonState(bool enable)
-        {
-            btnUpdate.Enabled = enable;
-            btnEdit.Enabled = enable;
-            //btnApprove.Enabled = enable;
-            btnReject.Enabled = enable;
-        }
+
 
         protected void BtnEdit_Click(object sender, EventArgs e)
         {
@@ -181,7 +264,7 @@ namespace BankingManagementSystem.WebForms.Home
 
             try
             {
-                ApiResponseMessage result = await RequestsService.UpdateRequestAsync(requestId, updatedClient);
+                ApiResponseMessage result = await RequestsService.UpdatePublicRegisterRequestAsync(requestId, updatedClient);
 
                 string message = result.MessageContent;
 
@@ -227,30 +310,28 @@ namespace BankingManagementSystem.WebForms.Home
             }
         }
 
-        protected void BtnDelete_Click(object sender, EventArgs e)
+        protected async void BtnDelete_Click(object sender, EventArgs e)
         {
-            ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showDeleteConfirmModal(); }}, 200);", true);
+            if (int.TryParse(txtRequestId.Text.Trim(), out int requestId))
+            {
+                ApiResponseMessage response = await RequestsService.DeletePublicRegisterRequestAsync(requestId);
 
-            //if (int.TryParse(txtRequestId.Text.Trim(), out int requestId))
-            //{
-            //    bool success = RequestDAL.DeleteRequestByStatus(requestId, "Pending");
-            //    if (success)
-            //    {
-            //        ClearForm();
-            //        //lblMessage.Text = "Request deleted successfully.";
-            //    }
-            //    else
-            //    {
-            //        //lblMessage.Text = "Delete failed.";
-            //    }
-            //}
+                if (response.MessageType == "success")
+                {
+                    pnlRequestDetails.Visible = false;
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showDeleteConfirmModal('Client Request ID: #{requestId} Deleted Successfully.', 'danger'); }}, 200);", true);
+                }
+                else
+                {
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "showDanger", $"showAlert('{response.MessageContent}', 'danger');", true);
+                }
+            }
+            else
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", $"showAlert('Invalid Request ID.', 'danger');", true);
+            }
         }
-        //protected void BtnEdit_Click(object sender, EventArgs e)
-        //{
-        //    //SetClientFormReadOnly(false);
-        //    //btnEdit.Visible = false;
-        //    //btnUpdate.Visible = true;
-        //}
+
         private void ClearForm()
         {
             txtFullName.Text = "";

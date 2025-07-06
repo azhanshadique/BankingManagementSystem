@@ -174,11 +174,13 @@ namespace BankingManagementSystem.WebForms.Admin
                         if (client.IsJointAccount)
                         {
                             lblCoHolderApprovalHeading.Visible = true;
-                            lblCoHolderApproval.Text = client.CoHolderApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
+                            //lblCoHolderApproval.Text = client.CoHolderApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
+                            lblCoHolderApproval.Text = client.CoHolderApproved;
 
                         }
                         lblAdminApprovalHeading.Visible = true;
-                        lblAdminApproval.Text = client.AdminApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
+                        //lblAdminApproval.Text = client.AdminApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
+                        lblAdminApproval.Text = client.AdminApproved;
                         SetButtonState(true);
                     }
                     else
@@ -200,7 +202,7 @@ namespace BankingManagementSystem.WebForms.Admin
         {
             txtFullName.Text = client.FullName;
             txtParentName.Text = client.ParentName;
-            txtDOB.Text = client.DOB.ToString();
+            txtDOB.Text = client.DOB?.ToString("yyyy-MM-dd");
             ddlGender.SelectedValue = client.Gender;
             txtNationality.Text = client.Nationality;
             txtOccupation.Text = client.Occupation;

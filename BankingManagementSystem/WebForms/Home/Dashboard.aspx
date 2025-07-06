@@ -40,7 +40,7 @@
                 <section class="col-md-4 mb-4 px-4">
                     <h2>Client Requests </h2>
                     <p>Manage your requests by your request id. View, Update or Delete your requests.</p>
-                    <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("ClientRequestRoute", null) %>'>Client Requests <i class="fas fa-angle-right"></i></a>
+                    <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("PublicRequestRoute", null) %>'>Client Requests <i class="fas fa-angle-right"></i></a>
                 </section>
             </div>
 

@@ -57,25 +57,32 @@ namespace BankingManagementSystem.Helpers
 
             return null;
         }
-        public static async Task<RequestDTO> GetRegisterRequestByIdAsync(int id)
+        public static async Task<(RequestDTO Request, string ErrorMessage)> GetPublicRegisterRequestByIdAsync(int id)
         {
-            string url = $"api/client/register/request/{id}";
+            string url = $"api/public/register/request/{id}";
             var response = await httpClient.GetAsync(url);
+            string content = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
             {
-                string json = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<RequestDTO>(json);
+                var request = JsonConvert.DeserializeObject<RequestDTO>(content);
+                return (request, null);
             }
+            else
+            {
+                try
+                {
+                    var errorObj = JsonConvert.DeserializeObject<ApiErrorMessageWrapper>(content);
+                    return (null, errorObj?.Message ?? "Something went wrong.");
+                }
 
-            return null;
+                catch
+                {
+                    return (null, "Something went wrong.");
+                }
+            }
         }
-        //public static async Task<bool> UpdateStatusAsync(int id, string status, int repliedBy)
-        //{
-        //    string url = $"api/requests/{id}/update/status?status={status}&repliedBy={repliedBy}";
-        //    var response = await httpClient.PutAsync(url, null);
-        //    return response.IsSuccessStatusCode;
-        //}
+
         public static async Task<bool> ApproveRequestAsync(int id, int repliedBy)
         {
             string url = $"api/requests/{id}/approve?repliedBy={repliedBy}";
@@ -87,6 +94,57 @@ namespace BankingManagementSystem.Helpers
             string url = $"api/requests/{id}/reject?repliedBy={repliedBy}";
             var response = await httpClient.PutAsync(url, null);
             return response.IsSuccessStatusCode;
+        }
+
+        public static async Task<ApiResponseMessage> UpdatePublicRegisterRequestAsync(int id, ClientDTO clientDTO)
+        {
+            var json = JsonConvert.SerializeObject(clientDTO);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            string url = $"api/public/update/register-request/{id}";
+
+            var response = await httpClient.PutAsync(url, content);
+            string responseContent = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                return new ApiResponseMessage
+                {
+                    MessageType = "success",
+                    MessageContent = responseContent
+                };
+            }
+            else
+            {
+                return new ApiResponseMessage
+                {
+                    MessageType = "danger",
+                    MessageContent = !string.IsNullOrEmpty(responseContent) ? responseContent : "Update failed."
+                };
+            }
+        }
+        public static async Task<ApiResponseMessage> DeletePublicRegisterRequestAsync(int id)
+        {
+            string url = $"api/public/delete/request/{id}";
+
+            var response = await httpClient.PutAsync(url, null); 
+            string responseContent = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                return new ApiResponseMessage
+                {
+                    MessageType = "success",
+                    MessageContent = responseContent
+                };
+            }
+            else
+            {
+                return new ApiResponseMessage
+                {
+                    MessageType = "danger",
+                    MessageContent = !string.IsNullOrEmpty(responseContent) ? responseContent : "Delete failed."
+                };
+            }
         }
 
         public static async Task<ApiResponseMessage> UpdateRequestAsync(int id, ClientDTO clientDTO)

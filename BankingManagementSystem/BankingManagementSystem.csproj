@@ -254,7 +254,7 @@
     <Compile Include="Controllers\API\AdminController.cs" />
     <Compile Include="Controllers\API\AdminRequestsController.cs" />
     <Compile Include="Controllers\API\AuthController.cs" />
-    <Compile Include="Controllers\API\ClientController.cs" />
+    <Compile Include="Controllers\API\PublicController.cs" />
     <Compile Include="Controllers\API\ClientRequestController.cs" />
     <Compile Include="Controllers\API\PageContentController.cs" />
     <Compile Include="Controllers\API\RequestsController.cs" />
@@ -307,12 +307,12 @@
     <Compile Include="WebForms\Home\About.aspx.designer.cs">
       <DependentUpon>About.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Home\ClientRequest.aspx.cs">
-      <DependentUpon>ClientRequest.aspx</DependentUpon>
+    <Compile Include="WebForms\Home\PublicRequest.aspx.cs">
+      <DependentUpon>PublicRequest.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Home\ClientRequest.aspx.designer.cs">
-      <DependentUpon>ClientRequest.aspx</DependentUpon>
+    <Compile Include="WebForms\Home\PublicRequest.aspx.designer.cs">
+      <DependentUpon>PublicRequest.aspx</DependentUpon>
     </Compile>
     <Compile Include="WebForms\Home\Dashboard.aspx.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
@@ -2493,7 +2493,7 @@
     <Content Include="WebForms\Admin\PendingRequest.aspx" />
     <Content Include="WebForms\Client\PendingRequest.aspx" />
     <Content Include="WebForms\Home\About.aspx" />
-    <Content Include="WebForms\Home\ClientRequest.aspx" />
+    <Content Include="WebForms\Home\PublicRequest.aspx" />
     <Content Include="WebForms\Home\Dashboard.aspx" />
     <Content Include="WebForms\Login\AdminLogin.aspx" />
     <Content Include="WebForms\Login\ClientLogin.aspx" />

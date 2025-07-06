@@ -36,6 +36,7 @@
 //}
 
 
+using BankingManagementSystem.Models.ConstraintTypes;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -43,7 +44,7 @@ namespace BankingManagementSystem.Models.DTOs
 {
     public class ClientDTO
     {
-        public int ClientId { get; set; }
+        //public int ClientId { get; set; }
 
         // Personal Details
         [Required]
@@ -135,9 +136,9 @@ namespace BankingManagementSystem.Models.DTOs
         public string ConfirmPassword { get; set; }
 
         // Approval Flags
-        public bool CoHolderApproved { get; set; } = false;
+        public string CoHolderApproved { get; set; } = RequestStatus.Awaiting.ToString();
 
-        public bool AdminApproved { get; set; } = false;
+        public string AdminApproved { get; set; } = RequestStatus.Awaiting.ToString();
 
         // Extra (optional)
         //public string Status { get; set; } // e.g., Active / Inactive 

@@ -203,6 +203,7 @@ namespace BankingManagementSystem.DAL
                         int idxPayload = reader.GetOrdinal(DbColumns.Payload);
                         int idxRequestedOn = reader.GetOrdinal(DbColumns.CreatedOn);
                         int idxStatus = reader.GetOrdinal(DbColumns.Status);
+                        int idxRepliedBy = reader.GetOrdinal(DbColumns.RepliedBy);
 
                         return new RequestDTO
                         {
@@ -210,7 +211,8 @@ namespace BankingManagementSystem.DAL
                             RequestType = reader.IsDBNull(idxRequestType) ? null : reader.GetString(idxRequestType),
                             Payload = reader.IsDBNull(idxPayload) ? null : reader.GetString(idxPayload),
                             RequestedOn = reader.IsDBNull(idxRequestedOn) ? (DateTime?)null : reader.GetDateTime(idxRequestedOn),
-                            Status = reader.IsDBNull(idxStatus) ? null : reader.GetString(idxStatus)
+                            Status = reader.IsDBNull(idxStatus) ? null : reader.GetString(idxStatus),
+                            RepliedBy = reader.IsDBNull(idxRepliedBy) ? (int?)null : reader.GetInt32(idxRepliedBy)
                         };
                     }
                     return null;
@@ -303,7 +305,7 @@ namespace BankingManagementSystem.DAL
                 var requests = new List<RequestDTO>();
                 using (SqlConnection con = new SqlConnection(CS))
                 {
-                    SqlCommand cmd = new SqlCommand("sp_GetReceivedPendingRequestsForClient", con);
+                    SqlCommand cmd = new SqlCommand("sp_GetReceivedRequestsForClient", con);
                     cmd.CommandType = CommandType.StoredProcedure;
                     //cmd.Parameters.AddWithValue("@Status", string.IsNullOrEmpty(status) ? DBNull.Value : (object)status);
                     cmd.Parameters.AddWithValue("@ClientId", clientId);

@@ -11,7 +11,7 @@ namespace BankingManagementSystem.WebForms.Home
 {
 
 
-    public partial class ClientRequest
+    public partial class PublicRequest
     {
 
         /// <summary>
@@ -41,6 +41,7 @@ namespace BankingManagementSystem.WebForms.Home
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel pnlSummary;
+        protected global::System.Web.UI.WebControls.Panel pnlButtons;
 
         /// <summary>
         /// lblSummaryRequestId control.
@@ -358,15 +359,6 @@ namespace BankingManagementSystem.WebForms.Home
         protected global::System.Web.UI.WebControls.TextBox txtConfirmPassword;
 
         /// <summary>
-        /// txtPrimaryAccHolderClientId control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPrimaryAccHolderClientId;
-
-        /// <summary>
         /// btnEdit control.
         /// </summary>
         /// <remarks>
@@ -383,15 +375,6 @@ namespace BankingManagementSystem.WebForms.Home
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnUpdate;
-
-        /// <summary>
-        /// btnApprove control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnApprove;
 
         /// <summary>
         /// btnReject control.

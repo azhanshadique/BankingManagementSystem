@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" Async="true" MasterPageFile="~/WebForms/MasterPage.Master" AutoEventWireup="true" CodeBehind="ClientRequest.aspx.cs" Inherits="BankingManagementSystem.WebForms.Home.ClientRequest" %>
+﻿<%@ Page Title="" Language="C#" Async="true" MasterPageFile="~/WebForms/MasterPage.Master" AutoEventWireup="true" CodeBehind="PublicRequest.aspx.cs" Inherits="BankingManagementSystem.WebForms.Home.PublicRequest" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
 </asp:Content>
@@ -99,7 +99,7 @@
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <%--<h6 class="text-muted mb-1">Co-holder Approval</h6>--%>
-                                    <asp:Label ID="lblCoHolderApprovalHeading" runat="server" CssClass="text-muted fw-medium mb-1 d-block" Text="Your Approval" Visible="false"></asp:Label>
+                                    <asp:Label ID="lblCoHolderApprovalHeading" runat="server" CssClass="text-muted fw-medium mb-1 d-block" Text="Co-holder Approval" Visible="false"></asp:Label>
                                     <asp:Label ID="lblCoHolderApproval" runat="server" CssClass="badge bg-primary fw-semibold text-white  fs-6 px-6 py-2"></asp:Label>
                                 </div>
                             </div>
@@ -250,11 +250,13 @@
                     <hr class="my-4" />
 
                     <div class="d-flex justify-content-end gap-3">
-
-                        <asp:Button ID="btnEdit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6" Style="padding: 2px 10px; margin-top: 3px;" Text=" Edit " OnClick="BtnEdit_Click" />
-                        <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6" Style="padding: 2px 10px; margin-top: 3px;" Text="Update" OnClick="BtnUpdate_Click" Visible="false" />
-                        <%--<button type="button" class="btn btn-success btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#approveConfirmModal">Approve</button>--%>
-                        <button type="button" class="btn btn-danger btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#rejectConfirmModal">Delete</button>
+                        <asp:Panel ID="pnlButtons" runat="server" Visible="true">
+                             <asp:Button ID="btnEdit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6" Style="padding: 2px 10px; margin-top: 3px;" Text=" Edit " OnClick="BtnEdit_Click" />
+                            <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6" Style="padding: 2px 10px; margin-top: 3px;" Text="Update" OnClick="BtnUpdate_Click" Visible="false" />
+                            <%--<button type="button" class="btn btn-success btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#approveConfirmModal">Approve</button>--%>
+                            <button type="button" class="btn btn-danger btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#rejectConfirmModal">Delete</button>
+                        </asp:Panel>
+                       
                     </div>
 
                 </div>
@@ -299,7 +301,7 @@
                 <div class="modal-footer justify-content-end border-0">
 
                     <!-- Real Reject Button -->
-                    <asp:Button ID="btnReject" runat="server" CssClass="btn btn-danger btn-sm shadow-sm  fs-6" Style="padding: 3px 10px;" Text="Delete" OnClick="BtnReject_Click"  />
+                    <asp:Button ID="btnDelete" runat="server" CssClass="btn btn-danger btn-sm shadow-sm  fs-6" Style="padding: 3px 10px;" Text="Delete" OnClick="BtnDelete_Click"  />
                     <button type="button" class="btn btn-light border py-1 px-3" style="padding: 2px 10px;" data-bs-dismiss="modal">Cancel</button>
 
                 </div>

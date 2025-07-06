@@ -35,33 +35,69 @@ namespace BankingManagementSystem.BLL
             if (request == null)
                 return (false, "Request not found.", null);
 
-            if (request.RequestType != RequestType.CreateNewRegistration.ToString())
-                return (false, "Request is not of type 'Create New Registration'. Please login to view the request.", null);
+            if (request.RequestId == request.RepliedBy)
+                return (false, "Request not found.", null);
 
-            if (request.Status != RequestStatus.Pending.ToString())
-                return (false, "Request is no longer pending. Please login to view more details.", null);
+            if (request.RequestType != RequestType.CreateNewRegistration.ToString())
+                return (false, "Request is not a New Registration Request. Please login to view the request.", null);
+
+            //if (request.Status != RequestStatus.Pending.ToString())
+            //    return (false, "Request is no longer pending. Please login to view more details.", null);
+            //if (request.Status == RequestStatus.Rejected.ToString())
+            //    return (false, "Your New Registration Request has been rejected by the admin.", null);
 
             return (true, null, request);
         }
 
         public static async Task<(bool success, string message)> UpdateRequestAsync(int requestId, ClientDTO client)
         {
-            var IsClientRequest = await GetRequestByIdAsync(requestId);
-            if (IsClientRequest == null)
-            {
+            var request = await GetRequestByIdAsync(requestId);
+            if (request == null)
                 return (false, "Invalid Request ID");
-            }
+
+            if (request.Status != RequestStatus.Pending.ToString())
+                return (false, "Request is no longer pending.");
 
             var (IsValid, Message) = await ClientBLL.ValidateClientDetailsAsync(client);
             if (IsValid)
             {
                 string updatedPayload = JsonConvert.SerializeObject(client);
                 bool IsUpdated = await RequestDAL.UpdateRequestPayloadAsync(requestId, updatedPayload);
-                return (IsUpdated, IsUpdated ? "Payload updated successfully." : "Failed to update payload.");
+                return (IsUpdated, IsUpdated ? "Request updated successfully." : "Failed to update request.");
             }
 
             return (false, Message);
         }
+        public static async Task<(bool success, string message)> UpdateRegisterRequestPublicAsync(int requestId, ClientDTO client)
+        {
+            var request = await GetRequestByIdAsync(requestId);
+            if (request == null)
+                return (false, "Request not found.");
+
+            if (request.RequestType != RequestType.CreateNewRegistration.ToString())
+                return (false, "Not a registration request.");
+
+            if (request.Status != RequestStatus.Pending.ToString())
+                return (false, "Request is no longer pending.");
+
+            return await UpdateRequestAsync(requestId, client);
+        }
+        public static async Task<(bool success, string message)> DeleteRegisterRequestPublicAsync(int requestId, int repliedBy)
+        {
+            var request = await GetRequestByIdAsync(requestId);
+            if (request == null)
+                return (false, "Request not found.");
+
+            if (request.RequestType != RequestType.CreateNewRegistration.ToString())
+                return (false, "Not a registration request.");
+
+            if (request.Status != RequestStatus.Pending.ToString())
+                return (false, "Request is no longer pending.");
+
+            bool isDeleted = await UpdateStatusAsync(requestId, "Rejected", repliedBy);
+            return (isDeleted, isDeleted ? "" : "Failed to delete request.");
+        }
+
 
         public static async Task<bool> UpdateStatusAsync(int requestId, string status, int repliedBy)
         {

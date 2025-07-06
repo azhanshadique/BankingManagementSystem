@@ -42,9 +42,9 @@ namespace BankingManagementSystem
                ConfigurationManager.AppSettings["ClientSignupLinkAccountRedirect"]       
            );
              routes.MapPageRoute(
-               "ClientRequestRoute",
+               "PublicRequestRoute",
                "dashboard/requests",
-               ConfigurationManager.AppSettings["ClientRequestRedirect"]       
+               ConfigurationManager.AppSettings["PublicRequestRedirect"]       
            );
             routes.MapPageRoute(
                 "AdminPendingRequestRoute",

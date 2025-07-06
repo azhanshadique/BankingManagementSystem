@@ -2,6 +2,7 @@
 using BankingManagementSystem.DAL;
 using BankingManagementSystem.Helpers;
 using BankingManagementSystem.Models.API;
+using BankingManagementSystem.Models.ConstraintTypes;
 using BankingManagementSystem.Models.DTOs;
 using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
@@ -101,7 +102,7 @@ namespace BankingManagementSystem.WebForms.SignUp
             {
                 FullName = fullName,
                 ParentName = parentName,
-                DOB = dob,
+                DOB = dob.Date,
                 Gender = gender,
                 Nationality = nationality,
                 Occupation = occupation,
@@ -119,8 +120,8 @@ namespace BankingManagementSystem.WebForms.SignUp
                 Username = username,
                 Password = password,
                 ConfirmPassword = confirmPassword,
-                CoHolderApproved = false,
-                AdminApproved = false
+                CoHolderApproved = RequestStatus.Awaiting.ToString(),
+                AdminApproved = RequestStatus.Awaiting.ToString()
             };
 
             try
