@@ -1,7 +1,9 @@
 ﻿using BankingManagementSystem.DAL;
 using BankingManagementSystem.Models;
 using BankingManagementSystem.Models.API;
+using BankingManagementSystem.Models.ConstraintTypes;
 using BankingManagementSystem.Models.DTOs;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace BankingManagementSystem.BLL
@@ -21,6 +23,23 @@ namespace BankingManagementSystem.BLL
         public static async Task<(bool IsSuccess, string Message)> CreateNewClientAsync(ClientDTO client)
         {
             return await AdminDAL.CreateClientAsync(client);
+        }
+        //public static async Task<(bool IsSuccess, string Message)> UpdateClientDetailsAsync(int clientId, ClientDTO client)
+        //{
+        //    return await AdminDAL.UpdateClientDetailsAsync(clientId, client);
+        //}
+        public static async Task<(bool IsSuccess, string Message)> UpdateClientDetailsAsync(int clientId, ClientDTO client)
+        {
+            if (!await ClientDAL.IsClientExistsByClientIdAsync(clientId))
+                return (false, "Client does not exists.");
+
+            var (IsValid, Message) = ClientBLL.ValidateClientProfileDetails(client);
+            if (IsValid)
+            {
+                return await AdminDAL.UpdateClientProfileDetailsAsync(clientId, client);
+            }
+            return (false, Message);
+            //return (IsUpdated, IsUpdated ? "Request updated successfully." : "Failed to update request.");
         }
     }
 }

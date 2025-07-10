@@ -12,12 +12,26 @@ namespace BankingManagementSystem.Controllers.API
     {
         [HttpPost]
         [Route("create-client")]
-        public async Task<IHttpActionResult> CreateClient([FromBody] ClientDTO client)
+        public async Task<IHttpActionResult> CreateClientAsync([FromBody] ClientDTO client)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Invalid client data.");
 
             var (isSuccess, message) = await AdminBLL.CreateNewClientAsync(client);
+
+            return isSuccess
+                ? Ok(new { message })
+                : (IHttpActionResult)BadRequest(message);
+        }
+
+        [HttpPut]
+        [Route("update-client")]
+        public async Task<IHttpActionResult> UpdateClientAsync([FromUri] int clientId, [FromBody] ClientDTO client)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid client data.");
+
+            var (isSuccess, message) = await AdminBLL.UpdateClientDetailsAsync(clientId, client);
 
             return isSuccess
                 ? Ok(new { message })

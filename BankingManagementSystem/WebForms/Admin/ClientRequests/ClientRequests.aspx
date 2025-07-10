@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" Async="true" MasterPageFile="~/WebForms/MasterPage.Master" AutoEventWireup="true" CodeBehind="PendingRequest.aspx.cs" Inherits="BankingManagementSystem.WebForms.Admin.PendingRequest"  %>
+﻿<%@ Page Title="" Language="C#" Async="true" MasterPageFile="~/WebForms/MasterPage.Master" AutoEventWireup="true" CodeBehind="ClientRequests.aspx.cs" Inherits="BankingManagementSystem.WebForms.Admin.ClientRequests.ClientRequests" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
 </asp:Content>
@@ -12,7 +12,7 @@
 
 
             <div class="d-flex align-items-end justify-content-between">
-                <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border mb-3 "><i class="fas fa-angle-left"></i>Back</a>
+                <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border mb-3 "><i class="fas fa-angle-left"></i> Back</a>
 
                 <div class="d-flex flex-column align-items-end justify-content-center" style="width: 200px;">
                     <h6 class="text-muted me-2 text-nowrap">Request Status</h6>
@@ -26,12 +26,26 @@
 
 
 
-            <asp:GridView ID="gvRequests" runat="server" CssClass="table table-bordered table-hover gridview-header-black" AutoGenerateColumns="false" AllowSorting="true" OnSorting="GvRequests_Sorting" OnRowCommand="GvRequests_RowCommand" OnRowCreated="GvRequests_RowCreated" ShowHeaderWhenEmpty="true" EmptyDataText="No requests found.">
+            <asp:GridView ID="gvRequests" 
+                runat="server" 
+                CssClass="table table-bordered table-hover gridview-header-black" 
+                AutoGenerateColumns="false" 
+                AllowSorting="true" 
+                OnSorting="GvRequests_Sorting" 
+                OnRowCommand="GvRequests_RowCommand" 
+                OnRowCreated="GvRequests_RowCreated" 
+                ShowHeaderWhenEmpty="true" 
+                EmptyDataText="No requests found."
+                AllowPaging="true" PageSize="5" 
+                OnPageIndexChanging="GvRequests_PageIndexChanging" 
+                PagerStyle-CssClass="grid-pager"  
+                PagerSettings-PageButtonCount="5">
+
                 <Columns>
                     <asp:BoundField DataField="RequestId" HeaderText="Request ID" SortExpression="RequestId" />
                     <asp:BoundField DataField="RequestType" HeaderText="Request Type" SortExpression="RequestType" />
-                    <asp:BoundField DataField="RequestedOn" HeaderText="Requested On" SortExpression="RequestedOn" />
-                    <asp:BoundField DataField="RepliedOn" HeaderText="Replied On" SortExpression="RepliedOn" DataFormatString="{0:dd-MM-yyyy HH:mm}" HtmlEncode="false" />
+                    <asp:BoundField DataField="RequestedOn" HeaderText="Requested On" SortExpression="RequestedOn" DataFormatString="{0:dd-MM-yyyy hh:mm tt}"/>
+                    <asp:BoundField DataField="RepliedOn" HeaderText="Replied On" SortExpression="RepliedOn" DataFormatString="{0:dd-MM-yyyy hh:mm tt}"  HtmlEncode="false" />
 
                     <asp:TemplateField HeaderText="Action">
                         <ItemTemplate>
@@ -53,10 +67,10 @@
 
 
                     <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
-                        <a href='<%= Page.GetRouteUrl("AdminPendingRequestRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i>Back</a>
+                        <a href='<%= Page.GetRouteUrl("AdminClientRequestRedirect", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back</a>
                         <%--<asp:Button ID="Button1" runat="server" CssClass="btn btn-sm btn-light border" Style="padding: 3px 10px;" Text="Back" OnClick="BtnReject_Click" />--%>
 
-                        <h3 class="mb-0 mx-auto text-center flex-grow-1">Client New Registration Request Details</h3>
+                        <h3 class="mb-0 mx-auto text-center flex-grow-1">Client Request Details</h3>
 
                         <!-- Invisible spacer to balance layout -->
                         <%--<span style="width: 80px;"></span>--%>
@@ -158,7 +172,7 @@
                         </div>
                         <div class="row g-3">
                             <div class="col-3">
-                                <label for="txtAddress" class="form-label">Address</label>
+                                <label for="txtAddress" class="form-label">Address<span class="text-danger">*</span></label>
                                 <asp:TextBox ID="txtAddress" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="1" placeholder="Your complete address..." ReadOnly="true"></asp:TextBox>
                             </div>
                             <div class="col-md-3">
@@ -180,44 +194,47 @@
 
 
                     <!-- ACCOUNT DETAILS -->
-                    <h4 class="text-primary mb-3"><i class="fas fa-id-card me-2 fs-5"></i>Account Details</h4>
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label for="ddlAccountType" class="form-label">Account Type<span class="text-danger">*</span></label>
-                            <asp:DropDownList ID="ddlAccountType" runat="server" CssClass="form-select" Enabled="false">
-                                <asp:ListItem Text="Select" Value="" Disabled="true" Selected="True" />
-                                <asp:ListItem Text="Savings" Value="Savings" />
-                                <asp:ListItem Text="Current" Value="Current" />
-                            </asp:DropDownList>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label for="ddlIsJointAccount" class="form-label">Is Joint Account?<span class="text-danger">*</span></label>
-                            <asp:DropDownList ID="ddlIsJointAccount" runat="server" CssClass="form-select" AutoPostBack="true" Enabled="false" OnSelectedIndexChanged="DdlIsJoint_SelectedIndexChanged">
-                                <asp:ListItem Text="Select" Value="" Disabled="true" Selected="True" />
-                                <asp:ListItem Text="Yes" Value="Yes" />
-                                <asp:ListItem Text="No" Value="No" />
-                            </asp:DropDownList>
-                        </div>
-                        <asp:Panel ID="fsJointAccount" runat="server" CssClass="col-md-6" Visible="false">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="txtJointClientId" class="form-label">Co-holder's Client ID<span class="text-danger">*</span></label>
-                                    <asp:TextBox ID="txtJointClientId" runat="server" CssClass="form-control" placeholder="Client ID" ReadOnly="true"></asp:TextBox>
-                                </div>
+                    <asp:Panel ID="pnlAccountDetails" runat="server" Visible="true">
+                        <h4 class="text-primary mb-3"><i class="fas fa-id-card me-2 fs-5"></i>Account Details</h4>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="ddlAccountType" class="form-label">Account Type<span class="text-danger">*</span></label>
+                                <asp:DropDownList ID="ddlAccountType" runat="server" CssClass="form-select" Enabled="false">
+                                    <asp:ListItem Text="Select" Value="" Disabled="true" Selected="True" />
+                                    <asp:ListItem Text="Savings" Value="Savings" />
+                                    <asp:ListItem Text="Current" Value="Current" />
+                                </asp:DropDownList>
                             </div>
-                        </asp:Panel>
-                    </div>
+
+                            <div class="col-md-3">
+                                <label for="ddlIsJointAccount" class="form-label">Is Joint Account?<span class="text-danger">*</span></label>
+                                <asp:DropDownList ID="ddlIsJointAccount" runat="server" CssClass="form-select" AutoPostBack="true" Enabled="false" OnSelectedIndexChanged="DdlIsJoint_SelectedIndexChanged">
+                                    <asp:ListItem Text="Select" Value="" Disabled="true" Selected="True" />
+                                    <asp:ListItem Text="Yes" Value="Yes" />
+                                    <asp:ListItem Text="No" Value="No" />
+                                </asp:DropDownList>
+                            </div>
+                            <asp:Panel ID="fsJointAccount" runat="server" CssClass="col-md-6" Visible="false">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="txtJointClientId" class="form-label">Co-holder's Client ID<span class="text-danger">*</span></label>
+                                        <asp:TextBox ID="txtJointClientId" runat="server" CssClass="form-control" placeholder="Client ID" ReadOnly="true"></asp:TextBox>
+                                    </div>
+                                </div>
+                            </asp:Panel>
+                        </div>
 
                     <hr class="my-4" />
-
+                    </asp:Panel>
                     <!-- LOGIN CREDENTIALS -->
-                    <h4 class="text-primary mb-3"><i class="fas fa-lock me-2 fs-5"></i>Login Credentials</h4>
+                    <h4 class="text-primary mb-3"><i class="fas fa-lock me-2 fs-5"></i>Other Details</h4>
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label for="txtUsername" class="form-label">Username<span class="text-danger">*</span></label>
                             <asp:TextBox ID="txtUsername" runat="server" CssClass="form-control" placeholder="Choose a username" ReadOnly="true"></asp:TextBox>
+
                         </div>
+                        <asp:Panel ID="pnlPasswords" runat="server" Visible="true">
                         <div class="col-md-3" style="display: none">
                             <label for="txtPassword" class="form-label">Password<span class="text-danger">*</span></label>
                             <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control" TextMode="Password" placeholder="Create a password"></asp:TextBox>
@@ -226,6 +243,17 @@
                             <label for="txtConfirmpassword" class="form-label">Confirm Password<span class="text-danger">*</span></label>
                             <asp:TextBox ID="txtConfirmPassword" runat="server" CssClass="form-control" TextMode="Password" placeholder="Repeat password"></asp:TextBox>
                         </div>
+                        </asp:Panel>
+
+                         
+                           <div class="col-md-3" style="display: block">
+                               <asp:Panel ID="pnlClientId" runat="server" Visible="false">
+                            <label for="txtClientId" class="form-label">Client ID<span class="text-danger">*</span></label>
+                            <asp:TextBox ID="txtClientId" runat="server" CssClass="form-control" placeholder="xxxxxx" ReadOnly="true"></asp:TextBox>
+                        </asp:Panel>
+
+                           </div>
+                        
                     </div>
 
 
@@ -238,11 +266,14 @@
                     <hr class="my-4" />
 
                     <div class="d-flex justify-content-end gap-3">
+                        <asp:Panel ID="pnlButtons" runat="server" Visible="true">
+                            <asp:Button ID="btnEdit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6 me-2" Style="padding: 2px 10px; margin-top: 3px;" Text=" Edit " OnClick="BtnEdit_Click" />
+                            <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6 me-2" Style="padding: 2px 10px; margin-top: 3px;" Text="Update" OnClick="BtnUpdate_Click" Visible="false" />
+                            <button type="button" class="btn btn-success btn-sm shadow-sm  fs-6 me-2" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#approveConfirmModal">Approve</button>
+                            <button type="button" class="btn btn-danger btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#rejectConfirmModal">Reject</button>
+                        </asp:Panel>
 
-                        <asp:Button ID="btnEdit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6" Style="padding: 2px 10px; margin-top: 3px;" Text=" Edit " OnClick="BtnEdit_Click" />
-                        <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6" Style="padding: 2px 10px; margin-top: 3px;" Text="Update" OnClick="BtnUpdate_Click" Visible="false" />
-                        <button type="button" class="btn btn-success btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#approveConfirmModal">Approve</button>
-                        <button type="button" class="btn btn-danger btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#rejectConfirmModal">Reject</button>
+                       <asp:Button ID="btnDelete" runat="server" CssClass="btn btn-danger btn-sm shadow-sm  fs-6" Style="padding: 2px 10px; margin-top: 3px;" Text="Delete" OnClick="BtnDelete_Click" />
 
                         <%--<span style="width: 80px;"></span>--%>
                         <%--                    <asp:Button ID="Button_clear" runat="server" CssClass="btn btn-sm btn-light border" Text="Clear Form" OnClick="BtnClear_Click" />--%>

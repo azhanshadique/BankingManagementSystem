@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Web.Services.Description;
 
 namespace BankingManagementSystem.BLL
 {
@@ -58,7 +59,7 @@ namespace BankingManagementSystem.BLL
             if (request.Status != RequestStatus.Pending.ToString())
                 return (false, "Request is no longer pending.");
 
-            var (IsValid, Message) = await ClientBLL.ValidateClientDetailsAsync(client);
+            var (IsValid, Message) = ClientBLL.ValidateClientProfileDetails(client);
             if (IsValid)
             {
                 string updatedPayload = JsonConvert.SerializeObject(client);
@@ -126,31 +127,44 @@ namespace BankingManagementSystem.BLL
             return await RequestDAL.GetSentRequestsByClientAsync(clientId, sortColumn, sortDirection);
         }
 
-        public static async Task<int> SendRequestsByClientAsync(int? clientId, string requestType, ClientDTO client)
+        public static async Task<(int requestId, string Message)> SendRequestsByClientAsync(int? clientId, string requestType, ClientDTO client)
         {
             if (!await ClientDAL.IsClientExistsByClientIdAsync(clientId))
-                return 0;
+                return (0,"Client does not exists.");
+
+
+            // Prevent Duplicate Requests
+            var IsDuplicate = await RequestDAL.IsDuplicateUpdateProfileDetailsPendingRequestAsync(aadhaar: client.AadhaarNumber, pan: client.PANNumber);
+            if (IsDuplicate)
+            {
+                string message = "A pending update profile request already exists. \nPlease wait for admin approval or delete the request before submitting a new one.";
+                return (0, message);
+            }
+
+            var (IsValid, Message) = ClientBLL.ValidateClientProfileDetails(client);
+            if (!IsValid)
+                return (0, Message);
 
             string payloadJson = JsonConvert.SerializeObject(client);
 
-            if (requestType.Equals(RequestType.UpdateDetails.ToString(), StringComparison.OrdinalIgnoreCase))
+            if (requestType.Equals(RequestType.UpdateProfileDetails.ToString(), StringComparison.OrdinalIgnoreCase))
             {
-                return await RequestDAL.SendAdminPendingRequestAsync(clientId, requestType, payloadJson);
+                return (await RequestDAL.SendAdminPendingRequestAsync(clientId, requestType, payloadJson),"");
             }
             else if (requestType.Equals(RequestType.CreateNewAccount.ToString(), StringComparison.OrdinalIgnoreCase))
             {
                 if (client.IsJointAccount)
                 {
                     if (clientId == client.JointClientId)
-                        return 0;
+                        return (0, "Joint client id cannot be same as of your client id.");
 
-                    return await RequestDAL.SendJointAccountPendingRequestsAsync(clientId, requestType, client.JointClientId, payloadJson);
+                    return (await RequestDAL.SendJointAccountPendingRequestsAsync(clientId, requestType, client.JointClientId, payloadJson),"");
                 }
 
-                return await RequestDAL.SendAdminPendingRequestAsync(clientId, requestType, payloadJson);
+                return (await RequestDAL.SendAdminPendingRequestAsync(clientId, requestType, payloadJson),"");
             }
 
-            return 0;
+            return (0, "Request not sent. Invalid details.");
         }
 
         public static async Task<List<RequestDTO>> SendCreateJointAccountRequestsByClientAsync(int clientId, string sortColumn, string sortDirection)

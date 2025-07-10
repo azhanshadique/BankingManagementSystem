@@ -47,14 +47,49 @@ namespace BankingManagementSystem
                ConfigurationManager.AppSettings["PublicRequestRedirect"]       
            );
             routes.MapPageRoute(
-                "AdminPendingRequestRoute",
+                "AdminClientRequestRedirect",
                "admin/requests",
-               ConfigurationManager.AppSettings["AdminPendingRequestRedirect"]       
+               ConfigurationManager.AppSettings["AdminClientRequestRedirect"]       
            );
               routes.MapPageRoute(
                 "ClientPendingRequestRoute",
                "client/requests",
                ConfigurationManager.AppSettings["ClientPendingRequestRedirect"]       
+           );
+              routes.MapPageRoute(
+                "ClientProfileRoute",
+               "client/profile",
+               ConfigurationManager.AppSettings["ClientProfileRedirect"]       
+           );
+            routes.MapPageRoute(
+                "ClientAccountsRoute",
+               "client/accounts",
+               ConfigurationManager.AppSettings["ClientAccountsRedirect"]       
+           );
+            routes.MapPageRoute(
+                "DepositAmountRoute",
+               "client/deposit",
+               ConfigurationManager.AppSettings["DepositAmountRedirect"]       
+           );
+             routes.MapPageRoute(
+                "WithdrawAmountRoute",
+               "client/withdraw",
+               ConfigurationManager.AppSettings["WithdrawAmountRedirect"]       
+           );
+             routes.MapPageRoute(
+                "TransferAmountRoute",
+               "client/transfer",
+               ConfigurationManager.AppSettings["TransferAmountRedirect"]       
+           );
+             routes.MapPageRoute(
+                "TransactionHistoryRoute",
+               "client/transactions",
+               ConfigurationManager.AppSettings["TransactionHistoryRedirect"]       
+           );
+            routes.MapPageRoute(
+                "ClientManagementRoute",
+               "admin/client-management",
+               ConfigurationManager.AppSettings["ClientManagementRedirect"]       
            );
 
 

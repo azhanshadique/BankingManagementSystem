@@ -3,6 +3,7 @@ using BankingManagementSystem.Models.Constants;
 using BankingManagementSystem.Models.DTOs;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Results;
 
 namespace BankingManagementSystem.Controllers.API
 {
@@ -33,14 +34,27 @@ namespace BankingManagementSystem.Controllers.API
         public async Task<IHttpActionResult> SendRequestAsync([FromUri] int clientId, [FromUri] string requestType, [FromBody] ClientDTO client)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Invalid client data.");
+                return BadRequest("Invalid client details.");
 
-            var requestId = await RequestBLL.SendRequestsByClientAsync(clientId, requestType, client);
+            var (requestId, Message) = await RequestBLL.SendRequestsByClientAsync(clientId, requestType, client);
             if (requestId != 0)
                 return Ok(new { RequestID = requestId });
             else 
-                return BadRequest("Request not sent. Invalid details.");
+                return BadRequest(Message);
             //return requestId != 0 ? Ok(new { RequestID = requestId }) : BadRequest("Request not sent. Invalid details.");
+        }
+        [HttpPut]
+        [Route("{id:int}/delete")]
+        public async Task<IHttpActionResult> DeleteClientRequestByClientAsync([FromUri] int id, [FromUri] int repliedBy)
+        {
+            //bool result = await RequestBLL.UpdateStatusAsync(id, "Rejected", repliedBy);
+            //return Ok(new { success = result });
+            bool result = await RequestBLL.UpdateStatusAsync(id, "Rejected", repliedBy);
+            return Ok(new { success = result });
+            //if (!success)
+            //    return BadRequest();
+
+            //return Ok(new { success = true, message = "Request deleted successfully." });
         }
     }
 

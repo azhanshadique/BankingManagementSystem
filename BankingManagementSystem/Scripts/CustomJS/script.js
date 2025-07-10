@@ -48,95 +48,169 @@ function showAlert(message, type = 'success') {
         alertBox.classList.add('d-none');
     }, 4000);
 }
-function showRegisterSuccessMessage(message, type = 'success') {
-    const modal = document.getElementById('registerSuccessMessage');
-    const content = document.getElementById('registerSuccessContent');
-    if (!modal || !content) return;
-
-    content.innerText = message;
 
 
-    // Change header bg & footer button based on type
+
+
+
+
+
+
+
+
+
+
+function showDynamicModal({
+    titleText,
+    messageText,
+    type = 'primary',           
+    redirectUrl,       
+    modalId = 'generalModal',
+    btnId = 'btnGeneralModalOk',         
+    btnText = 'OK',
+
+}) {
+    const modal = document.getElementById(modalId);
     const header = modal.querySelector('.modal-header');
-    header.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-secondary');
-    header.classList.add('bg-' + type);
+    const content = modal.querySelector('.modal-body');
+    const title = modal.querySelector('.modal-title');
+    const btn = btnId ? document.getElementById(btnId) : null;
 
-    const footerBtn = modal.querySelector('#btnOk');
-    footerBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary');
-    footerBtn.classList.add('btn-' + type);
+    if (!modal || !header || !content || !title) return;
 
+    // Set content
+    title.innerText = titleText;
+    content.innerText = messageText;
+
+    // Reset and set Bootstrap color
+    const colors = ['bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-secondary'];
+    header.classList.remove(...colors);
+    header.classList.add(`bg-${type}`);
+
+    if (btn) {
+        const btnColors = ['btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary'];
+        btn.classList.remove(...btnColors);
+        btn.classList.add(`btn-${type}`);
+        btn.innerText = btnText;
+
+        if (redirectUrl) {
+            //btn.onclick = () => { window.location.href = redirectUrl; };
+            btn.addEventListener('click', function handleRedirect() {
+                window.location.href = redirectUrl;
+            });
+
+
+        }
+    }
+
+    // Show modal
     const bsModal = new bootstrap.Modal(modal);
     bsModal.show();
 }
-function showDeleteConfirmModal() {
-    const modal = document.getElementById('deleteConfirmModal');
-    const bsModal = new bootstrap.Modal(modal);
-    bsModal.show();
-}
-function showApproveRejectMessage(message, type = 'success') {
-    const modal = document.getElementById('approveRejectMessage');
-    const content = document.getElementById('approveRejectContent');
-    const title = document.getElementById('approveRejectLabel');
-    if (!modal || !content) return;
 
-    content.innerText = message;
 
-    title.innerText = type == 'success' ? 'Client Request Approved' : 'Client Request Rejected'
-    // Change header bg & footer button based on type
-    const header = modal.querySelector('.modal-header');
-    header.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-secondary');
-    header.classList.add('bg-' + type);
 
-    const footerBtn = modal.querySelector('#btnOkApproveReject');
-    footerBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary');
-    footerBtn.classList.add('btn-' + type);
 
-    const bsModal = new bootstrap.Modal(modal);
-    bsModal.show();
-}
 
-function showApproveRejectMessageByClient(message, type = 'success') {
-    const modal = document.getElementById('approveRejectMessageByClient');
-    const content = document.getElementById('approveRejectContentByClient');
-    const title = document.getElementById('approveRejectLabelByClient');
-    if (!modal || !content) return;
 
-    content.innerText = message;
 
-    title.innerText = type == 'success' ? 'Joint Account Request Approved' : 'Joint Account Request Rejected'
-    // Change header bg & footer button based on type
-    const header = modal.querySelector('.modal-header');
-    header.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-secondary');
-    header.classList.add('bg-' + type);
 
-    const footerBtn = modal.querySelector('#btnOkApproveRejectByClient');
-    footerBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary');
-    footerBtn.classList.add('btn-' + type);
 
-    const bsModal = new bootstrap.Modal(modal);
-    bsModal.show();
-}
-function showDeleteMessageByClientOnDashboard(message, type = 'success') {
-    const modal = document.getElementById('deleteMessageByClientOnDashboard');
-    const content = document.getElementById('deleteContentByClientOnDashboard');
-    const title = document.getElementById('deleteLabelByClientOnDashboard');
-    if (!modal || !content) return;
 
-    content.innerText = message;
 
-    title.innerText = type == 'success' ? 'Request Approved' : 'Request Deleted'
-    // Change header bg & footer button based on type
-    const header = modal.querySelector('.modal-header');
-    header.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-secondary');
-    header.classList.add('bg-' + type);
 
-    const footerBtn = modal.querySelector('#btnOkDeleteByClientOnDashboard');
-    footerBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary');
-    footerBtn.classList.add('btn-' + type);
 
-    const bsModal = new bootstrap.Modal(modal);
-    bsModal.show();
-}
+
+
+//function showRegisterSuccessMessage(message, type = 'success') {
+//    const modal = document.getElementById('registerSuccessMessage');
+//    const content = document.getElementById('registerSuccessContent');
+//    if (!modal || !content) return;
+
+//    content.innerText = message;
+
+
+//    // Change header bg & footer button based on type
+//    const header = modal.querySelector('.modal-header');
+//    header.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-secondary');
+//    header.classList.add('bg-' + type);
+
+//    const footerBtn = modal.querySelector('#btnOk');
+//    footerBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary');
+//    footerBtn.classList.add('btn-' + type);
+
+//    const bsModal = new bootstrap.Modal(modal);
+//    bsModal.show();
+//}
+//function showDeleteConfirmModal() {
+//    const modal = document.getElementById('deleteConfirmModal');
+//    const bsModal = new bootstrap.Modal(modal);
+//    bsModal.show();
+//}
+//function showApproveRejectMessage(message, type = 'success') {
+//    const modal = document.getElementById('approveRejectMessage');
+//    const content = document.getElementById('approveRejectContent');
+//    const title = document.getElementById('approveRejectLabel');
+//    if (!modal || !content) return;
+
+//    content.innerText = message;
+
+//    title.innerText = type == 'success' ? 'Client Request Approved' : 'Client Request Rejected'
+//    // Change header bg & footer button based on type
+//    const header = modal.querySelector('.modal-header');
+//    header.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-secondary');
+//    header.classList.add('bg-' + type);
+
+//    const footerBtn = modal.querySelector('#btnOkApproveReject');
+//    footerBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary');
+//    footerBtn.classList.add('btn-' + type);
+
+//    const bsModal = new bootstrap.Modal(modal);
+//    bsModal.show();
+//}
+
+//function showApproveRejectMessageByClient(message, type = 'success') {
+//    const modal = document.getElementById('approveRejectMessageByClient');
+//    const content = document.getElementById('approveRejectContentByClient');
+//    const title = document.getElementById('approveRejectLabelByClient');
+//    if (!modal || !content) return;
+
+//    content.innerText = message;
+
+//    title.innerText = type == 'success' ? 'Joint Account Request Approved' : 'Joint Account Request Rejected'
+//    // Change header bg & footer button based on type
+//    const header = modal.querySelector('.modal-header');
+//    header.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-secondary');
+//    header.classList.add('bg-' + type);
+
+//    const footerBtn = modal.querySelector('#btnOkApproveRejectByClient');
+//    footerBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary');
+//    footerBtn.classList.add('btn-' + type);
+
+//    const bsModal = new bootstrap.Modal(modal);
+//    bsModal.show();
+//}
+//function showDeleteMessageByClientOnDashboard(message, type = 'success') {
+//    const modal = document.getElementById('deleteMessageByClientOnDashboard');
+//    const content = document.getElementById('deleteContentByClientOnDashboard');
+//    const title = document.getElementById('deleteLabelByClientOnDashboard');
+//    if (!modal || !content) return;
+
+//    content.innerText = message;
+
+//    title.innerText = type == 'success' ? 'Request Approved' : 'Request Deleted'
+//    // Change header bg & footer button based on type
+//    const header = modal.querySelector('.modal-header');
+//    header.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-secondary');
+//    header.classList.add('bg-' + type);
+
+//    const footerBtn = modal.querySelector('#btnOkDeleteByClientOnDashboard');
+//    footerBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-info', 'btn-secondary');
+//    footerBtn.classList.add('btn-' + type);
+
+//    const bsModal = new bootstrap.Modal(modal);
+//    bsModal.show();
+//}
 
 
 window.onload = function () {

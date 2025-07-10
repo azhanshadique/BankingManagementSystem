@@ -24,8 +24,8 @@
 
     <%--<link href='<%= ResolveUrl("~/Content/CustomCSS/styles.css") %>' rel="stylesheet" />--%>
 
+     <script src='<%= ResolveUrl("~/Scripts/CustomJS/script.js") %>'></script>
 
-    <script src='<%= ResolveUrl("~/Scripts/CustomJS/script.js") %>'></script>
 
     <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
 </head>
@@ -136,13 +136,17 @@
             <hr class="text-black" />
 
             <!-- Menu links -->
-            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnClientManagement" runat="server">Client Management</asp:LinkButton>
-            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnViewProfile" runat="server" Visible="True">View Profile</asp:LinkButton>
-            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnManageAccounts" runat="server" Visible="True">Manage Accounts</asp:LinkButton>
-            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnDeposit" runat="server" Visible="True">Deposit</asp:LinkButton>
-            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnWithdraw" runat="server" Visible="True">Withdraw</asp:LinkButton>
-            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnTransferMoney" runat="server" Visible="True">Money Transfer</asp:LinkButton>
-            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnTransactionHistory" runat="server" Visible="True">Transaction History</asp:LinkButton>
+            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnClientManagement" runat="server" OnClick="BtnClientManagement_Click">Client Management</asp:LinkButton>
+            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnClientRequests" runat="server" OnClick="BtnClientRequests_Click">Client Requests</asp:LinkButton>
+
+
+            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnMyRequests" runat="server" OnClick="BtnMyRequests_Click">My Requests</asp:LinkButton>
+            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnViewProfile" runat="server" Visible="True" OnClick="BtnViewProfile_Click">View Profile</asp:LinkButton>
+            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnManageAccounts" runat="server" Visible="True" OnClick="BtnManageAccounts_Click">Manage Accounts</asp:LinkButton>
+            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnDeposit" runat="server" Visible="True" OnClick="BtnDeposit_Click">Deposit</asp:LinkButton>
+            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnWithdraw" runat="server" Visible="True" OnClick="BtnWithdraw_Click">Withdraw</asp:LinkButton>
+            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnTransferMoney" runat="server" Visible="True" OnClick="BtnTransferMoney_Click">Money Transfer</asp:LinkButton>
+            <asp:LinkButton CssClass="nav-link text-white mb-3" ID="lbtnTransactionHistory" runat="server" Visible="True" OnClick="BtnTransactionHistory_Click">Transaction History</asp:LinkButton>
 
         </div>
 
@@ -152,27 +156,9 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.7rem"></button>
         </div>
 
-        <!-- Registration Success Confirmation Modal -->
-        <div class="modal fade" id="registerSuccessMessage" tabindex="-1" aria-labelledby="registerSuccessLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content rounded-4 shadow">
-                    <div class="modal-header bg-success text-white rounded-top-4" style="height: 60px;">
-                        <h5 class="modal-title" id="registerSuccessLabel">Client Registration Successful</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-start" id="registerSuccessContent">
-                        Message here
-                    </div>
-                    <div class="modal-footer justify-content-end border-0">
-                        <%--<button type="button" class="btn btn-success py-1 px-3" data-bs-dismiss="modal">OK</button>--%>
-                        <asp:Button CssClass="btn btn-primary py-1 px-3" Style="padding: 2px 10px;" ID="btnOk" runat="server" Visible="true" OnClick="BtnOk_Click" data-bs-dismiss="modal" Text="OK"></asp:Button>
-                    </div>
-                </div>
-            </div>
-        </div>
+       
 
-
-        <!-- Logout Confirmation Modal -->
+                <!-- Logout Confirmation Modal -->
         <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content rounded-4 shadow">
@@ -189,64 +175,46 @@
                         <asp:Button CssClass="btn btn-primary py-1 px-3" Style="padding: 2px 10px;" ID="btnLogout" runat="server" Visible="true" OnClick="BtnLogout_Click" Text="Logout"></asp:Button>
                         <button type="button" class="btn btn-light border py-1 px-3" style="padding: 2px 10px;" data-bs-dismiss="modal">Cancel</button>
 
-                        <%--<asp:Button ID="lbtnLogout" runat="server" Text="Yes, Logout" CssClass="btn btn-danger" OnClick="BtnLogout_Click" />--%>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Approved / Rejected Confirmation Modal -->
-        <div class="modal fade" id="approveRejectMessage" tabindex="-1" aria-labelledby="approveRejectLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content rounded-4 shadow">
-                    <div class="modal-header bg-success text-white rounded-top-4" style="height: 60px;">
-                        <h5 class="modal-title" id="approveRejectLabel">Action Successful</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-start" id="approveRejectContent">
-                        Message here
-                    </div>
-                    <div class="modal-footer justify-content-end border-0">
-                        <%--<button type="button" class="btn btn-success py-1 px-3" data-bs-dismiss="modal">OK</button>--%>
-                        <asp:Button CssClass="btn btn-primary py-1 px-3" Style="padding: 2px 10px;" ID="btnOkApproveReject" runat="server" Visible="true" OnClick="BtnOkApproveReject_Click" data-bs-dismiss="modal" Text="OK"></asp:Button>
-                    </div>
-                </div>
+
+
+
+
+        <!-- General Dynamic Modal -->
+<div class="modal fade" id="generalModal" tabindex="-1" aria-labelledby="generalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header text-white rounded-top-4" style="height: 60px;">
+                <h5 class="modal-title" id="generalModalLabel">Modal Title</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-start" id="generalModalContent">
+                Modal body message
+            </div>
+            <div class="modal-footer justify-content-end border-0">
+               <%-- <asp:Button ID="btnGeneralModalOk" runat="server" CssClass="btn btn-primary py-1 px-3"
+                    Style="padding: 2px 10px;" Text="OK" data-bs-dismiss="modal" />--%>
+                <button id="btnGeneralModalOk" type="button" class="btn btn-primary py-1 px-3" style="padding: 2px 10px;">OK</button>
+
             </div>
         </div>
-        <div class="modal fade" id="approveRejectMessageByClient" tabindex="-1" aria-labelledby="approveRejectLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content rounded-4 shadow">
-                    <div class="modal-header bg-success text-white rounded-top-4" style="height: 60px;">
-                        <h5 class="modal-title" id="approveRejectLabelByClient">Action Successful</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-start" id="approveRejectContentByClient">
-                        Message here
-                    </div>
-                    <div class="modal-footer justify-content-end border-0">
-                        <%--<button type="button" class="btn btn-success py-1 px-3" data-bs-dismiss="modal">OK</button>--%>
-                        <asp:Button CssClass="btn btn-primary py-1 px-3" Style="padding: 2px 10px;" ID="btnOkApproveRejectByClient" runat="server" Visible="true" OnClick="BtnOkApproveRejectByClient_Click" data-bs-dismiss="modal" Text="OK"></asp:Button>
-                    </div>
-                </div>
-            </div>
-        </div>
-         <div class="modal fade" id="deleteMessageByClientOnDashboard" tabindex="-1" aria-labelledby="deleteLabelByClientOnDashboard" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content rounded-4 shadow">
-                    <div class="modal-header bg-success text-white rounded-top-4" style="height: 60px;">
-                        <h5 class="modal-title" id="deleteLabelByClientOnDashboard">Resquest Deleted</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-start" id="deleteContentByClientOnDashboard">
-                        Message here
-                    </div>
-                    <div class="modal-footer justify-content-end border-0">
-                        <%--<button type="button" class="btn btn-success py-1 px-3" data-bs-dismiss="modal">OK</button>--%>
-                        <asp:Button CssClass="btn btn-primary py-1 px-3" Style="padding: 2px 10px;" ID="btnOkDeleteByClientOnDashboard" runat="server" Visible="true" OnClick="BtnOkDeleteByClient_Click" data-bs-dismiss="modal" Text="OK"></asp:Button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
 
         <div id="mainContent" class="">
             <asp:ContentPlaceHolder ID="MainContent" runat="server" />
@@ -263,7 +231,7 @@
 
 
     <!-- Bootstrap JS Bundle -->
-
+       
     <script src='<%= ResolveUrl("~/Scripts/bootstrap.bundle.min.js") %>'></script>
 
 

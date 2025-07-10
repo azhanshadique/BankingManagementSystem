@@ -15,32 +15,21 @@ namespace BankingManagementSystem.Helpers
 
         public static async Task<ApiResponseMessage> RegisterClientAsync(ClientDTO client)
         {
-            var json = JsonConvert.SerializeObject(client);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            //var json = JsonConvert.SerializeObject(client);
+            //var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             string apiUrl = ConfigurationManager.AppSettings["RegisterClientApiUrl"];
 
-            HttpResponseMessage response = await httpClient.PostAsync(apiUrl, content);
+            HttpResponseMessage response = await httpClient.PostAsJsonAsync(apiUrl, client);
             string responseContent = await response.Content.ReadAsStringAsync();
 
             return new ApiResponseMessage
             {
                 MessageType = response.IsSuccessStatusCode ? "success" : "danger",
-                MessageContent = !string.IsNullOrEmpty(responseContent)
-                                    ? responseContent
-                                    : "Registration failed."
+                MessageContent = !string.IsNullOrEmpty(responseContent) ? responseContent : "Registration failed."
             };
         }
 
-        public static async Task<bool> CreateClientAsync(ClientDTO client)
-        {
-            var json = JsonConvert.SerializeObject(client);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            string apiUrl = ConfigurationManager.AppSettings["CreateClientApiUrl"];
-
-            HttpResponseMessage response = await httpClient.PostAsync(apiUrl, content);
-            return response.IsSuccessStatusCode;
-        }
+        
     }
 }

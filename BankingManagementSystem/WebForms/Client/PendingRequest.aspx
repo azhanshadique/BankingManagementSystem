@@ -7,12 +7,12 @@
     <h1 class="mt-5 mx-auto text-center ">My Requests</h1>
     <asp:Panel ID="pnlRequestTable" runat="server" CssClass="mt-4" class="container mt-5" Visible="true">
         <div class="container py-5">
-            
+
 
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i>Back</a>
+                <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back</a>
 
-                <div class="d-flex flex-column align-items-end justify-content-center" style="width: 200px;">
+                <div class="d-flex flex-column align-items-end justify-content-center mb-2" style="width: 200px;">
                     <h6 class="text-muted me-2 text-nowrap">Request</h6>
                     <asp:DropDownList ID="ddlRequestType" runat="server" AutoPostBack="true" CssClass="form-select" OnSelectedIndexChanged="DdlRequestType_SelectedIndexChanged">
                         <asp:ListItem Text="Received" Value="Received" />
@@ -21,11 +21,24 @@
                 </div>
             </div>
 
-            <asp:GridView ID="gvRequests" runat="server" CssClass="table table-bordered table-hover gridview-header-black" AutoGenerateColumns="false" AllowSorting="true" OnSorting="GvRequests_Sorting" OnRowCommand="GvRequests_RowCommand" OnRowCreated="GvRequests_RowCreated" ShowHeaderWhenEmpty="true" EmptyDataText="No requests found.">
+            <asp:GridView ID="gvRequests" runat="server" 
+                CssClass="table table-bordered table-hover gridview-header-black" 
+                AutoGenerateColumns="false" 
+                AllowSorting="true" 
+                OnSorting="GvRequests_Sorting" 
+                OnRowCommand="GvRequests_RowCommand" 
+                OnRowCreated="GvRequests_RowCreated" 
+                ShowHeaderWhenEmpty="true" 
+                EmptyDataText="No requests found."
+                AllowPaging="true" PageSize="5" 
+                OnPageIndexChanging="GvRequests_PageIndexChanging" 
+                PagerStyle-CssClass="grid-pager"  
+                PagerSettings-PageButtonCount="5">
+
                 <Columns>
                     <asp:BoundField DataField="RequestId" HeaderText="Request ID" SortExpression="RequestId" />
                     <asp:BoundField DataField="RequestType" HeaderText="Request Type" SortExpression="RequestType" />
-                    <asp:BoundField DataField="RequestedOn" HeaderText="Requested On" SortExpression="RequestedOn" DataFormatString="{0:dd-MM-yyyy HH:mm}" />
+                    <asp:BoundField DataField="RequestedOn" HeaderText="Requested On" SortExpression="RequestedOn" DataFormatString="{0:dd-MM-yyyy hh:mm tt}" />
                     <asp:BoundField DataField="Status" HeaderText="Status" SortExpression="RequestedOn" />
                     <asp:TemplateField HeaderText="Actions">
                         <ItemTemplate>
@@ -50,10 +63,11 @@
 
 
                     <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
-                        <a href='<%= Page.GetRouteUrl("ClientPendingRequestRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i>Back</a>
+                        <a href='<%= Page.GetRouteUrl("ClientPendingRequestRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back</a>
                         <%--<asp:Button ID="Button1" runat="server" CssClass="btn btn-sm btn-light border" Style="padding: 3px 10px;" Text="Back" OnClick="BtnReject_Click" />--%>
 
-                        <h3 class="mb-0 mx-auto text-center flex-grow-1">Joint Account Approval Request Details</h3>
+                        <%--<h3 class="mb-0 mx-auto text-center flex-grow-1">Joint Account Approval Request Details</h3>--%>
+                        <asp:Label ID="lblRequestHeading" runat="server" CssClass="font-degular text-center text-dark fs-2 mx-auto flex-grow-1 mb-6" Text="Request Details"></asp:Label>
 
                         <!-- Invisible spacer to balance layout -->
                         <%--<span style="width: 80px;"></span>--%>
@@ -156,7 +170,7 @@
                         </div>
                         <div class="row g-3">
                             <div class="col-3">
-                                <label for="txtAddress" class="form-label">Address</label>
+                                <label for="txtAddress" class="form-label">Address<span class="text-danger">*</span></label>
                                 <asp:TextBox ID="txtAddress" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="1" placeholder="Your complete address..." ReadOnly="true"></asp:TextBox>
                             </div>
                             <div class="col-md-3">
@@ -178,6 +192,7 @@
 
 
                     <!-- ACCOUNT DETAILS -->
+                     <asp:Panel ID="pnlAccountDetails" runat="server" Visible="true">
                     <h4 class="text-primary mb-3"><i class="fas fa-id-card me-2 fs-5"></i>Account Details</h4>
                     <div class="row g-3">
                         <div class="col-md-3">
@@ -206,7 +221,7 @@
                             </div>
                         </asp:Panel>
                     </div>
-
+                         </asp:Panel>
                     <hr class="my-4" />
 
                     <!-- LOGIN CREDENTIALS -->
@@ -225,8 +240,8 @@
                             <asp:TextBox ID="txtConfirmPassword" runat="server" CssClass="form-control" TextMode="Password" placeholder="Repeat password"></asp:TextBox>
                         </div>
                         <div class="col-md-3" style="display: block">
-                            <label for="txtPrimaryAccHolderClientId" class="form-label">Client ID<span class="text-danger">*</span></label>
-                            <asp:TextBox ID="txtPrimaryAccHolderClientId" runat="server" CssClass="form-control" placeholder="xxxxxx" ReadOnly="true"></asp:TextBox>
+                            <label for="txtClientId" class="form-label">Client ID<span class="text-danger">*</span></label>
+                            <asp:TextBox ID="txtClientId" runat="server" CssClass="form-control" placeholder="xxxxxx" ReadOnly="true"></asp:TextBox>
                         </div>
                     </div>
 
@@ -235,11 +250,17 @@
                     <hr class="my-4" />
 
                     <div class="d-flex justify-content-end gap-3">
+                        <asp:Panel ID="pnlBtnsAproveReject" runat="server" Visible="true">
+                            <%--<button type="button" class="btn btn-success btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#approveConfirmModal">Approve</button>--%>
 
-                        <asp:Button ID="btnEdit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6" Style="padding: 2px 10px; margin-top: 3px;" Text=" Edit " OnClick="BtnEdit_Click" />
-                        <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6" Style="padding: 2px 10px; margin-top: 3px;" Text="Update" OnClick="BtnUpdate_Click" Visible="false" />
-                        <button type="button" class="btn btn-success btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#approveConfirmModal">Approve</button>
-                        <button type="button" class="btn btn-danger btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#rejectConfirmModal">Reject</button>
+                            <asp:Button ID="btnApprove" runat="server" CssClass="btn btn-success btn-sm shadow-sm  fs-6 me-2" Style="padding: 2px 10px;" Text="Approve" OnClick="BtnApprove_Click" />
+                            <button type="button" class="btn btn-danger btn-sm shadow-sm  fs-6 me-2" style="padding: 2px 10px; margin-top: 2px;" data-bs-toggle="modal" data-bs-target="#rejectConfirmModal">Reject</button>
+                        </asp:Panel>
+                        <asp:Panel ID="pnlBntsEditUpdateDlt" runat="server" Visible="true">
+                            <asp:Button ID="btnEdit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6 me-2" Style="padding: 2px 10px; margin-top: 3px;" Text=" Edit " OnClick="BtnEdit_Click" />
+                            <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-warning btn-sm shadow-sm  fs-6 me-2" Style="padding: 2px 10px; margin-top: 3px;" Text="Update" OnClick="BtnUpdate_Click" Visible="false" />
+                            <button type="button" class="btn btn-danger btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 2px;" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">Delete</button>
+                        </asp:Panel>
                     </div>
 
                 </div>
@@ -262,7 +283,7 @@
                 <div class="modal-footer justify-content-end border-0">
 
                     <!-- Real Approve Button -->
-                    <asp:Button ID="btnApprove" runat="server" CssClass="btn btn-success btn-sm shadow-sm  fs-6" Style="padding: 3px 10px;" Text="Approve" OnClick="BtnApprove_Click" />
+                    <%--<asp:Button ID="btnApprove" runat="server" CssClass="btn btn-success btn-sm shadow-sm  fs-6" Style="padding: 3px 10px;" Text="Approve" OnClick="BtnApprove_Click" />--%>
                     <button type="button" class="btn btn-light border py-1 px-3" style="padding: 2px 10px;" data-bs-dismiss="modal">Cancel</button>
 
                 </div>
@@ -285,6 +306,28 @@
 
                     <!-- Real Reject Button -->
                     <asp:Button ID="btnReject" runat="server" CssClass="btn btn-danger btn-sm shadow-sm  fs-6" Style="padding: 3px 10px;" Text="Reject" OnClick="BtnReject_Click" />
+                    <button type="button" class="btn btn-light border py-1 px-3" style="padding: 2px 10px;" data-bs-dismiss="modal">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="rejectConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow">
+                <div class="modal-header bg-danger text-white rounded-top-4" style="height: 60px; border-top-left-radius: 14px; border-top-right-radius: 14px;">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Reject Joint Account Pending Request</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-start">
+                    Are you sure you want to delete the request?
+                </div>
+                <div class="modal-footer justify-content-end border-0">
+
+                    <!-- Real Delete Button -->
+                    <asp:Button ID="btnDelete" runat="server" CssClass="btn btn-danger btn-sm shadow-sm  fs-6" Style="padding: 2px 10px; margin-top: 3px;" Text="Delete" OnClick="BtnDelete_Click" />
                     <button type="button" class="btn btn-light border py-1 px-3" style="padding: 2px 10px;" data-bs-dismiss="modal">Cancel</button>
 
                 </div>

@@ -9,7 +9,7 @@ namespace BankingManagementSystem.Models.ConstraintTypes
 	{
 		CreateNewRegistration,
 		CreateNewAccount,
-		UpdateDetails,
+		UpdateProfileDetails,
         JointAccountApproval
     }
 }

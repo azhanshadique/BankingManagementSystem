@@ -1,4 +1,5 @@
-﻿using BankingManagementSystem.Models.Constants;
+﻿using BankingManagementSystem.Helpers;
+using BankingManagementSystem.Models.Constants;
 using BankingManagementSystem.Models.DTOs;
 using System;
 using System.Collections.Generic;
@@ -11,13 +12,11 @@ namespace BankingManagementSystem.DAL
 {
     public class RequestDAL
     {
-        private static readonly String CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
-
         public async static Task<int> SendJointAccountPendingRequestsAsync(int? clientId, string requestType, int? targetClientId, string payload)
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 {
                     SqlCommand cmd = new SqlCommand("sp_CreateJointAccountPendingRequests", con);
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -50,7 +49,7 @@ namespace BankingManagementSystem.DAL
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 {
                     using (SqlCommand cmd = new SqlCommand("sp_CreateAdminPendingRequest", con))
                     {
@@ -84,7 +83,7 @@ namespace BankingManagementSystem.DAL
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 {
                     SqlCommand cmd = new SqlCommand("sp_CheckDuplicateNewRegistrationRequest", con);
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -103,13 +102,35 @@ namespace BankingManagementSystem.DAL
             }
         }
 
+        public static async Task<bool> IsDuplicateUpdateProfileDetailsPendingRequestAsync(string aadhaar, string pan)
+        {
+            try
+            {
+                using (SqlConnection con = DBConnectionManager.GetConnection())
+                {
+                    SqlCommand cmd = new SqlCommand("sp_CheckDuplicateUpdateProfileDetailsRequest", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@AadhaarNumber", aadhaar);
+                    cmd.Parameters.AddWithValue("@PANNumber", pan);
+
+                    await con.OpenAsync();
+                    object result = await cmd.ExecuteScalarAsync();
+
+                    return Convert.ToInt32(result) > 0;
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error during Check Duplicate Update Profile Details Request.", ex);
+            }
+        }
 
         public static async Task<List<RequestDTO>> GetAllRequestsByStatusAsync(string status, string sortColumn, string sortDirection)
         {
             try
             {
                 var requests = new List<RequestDTO>();
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 using (SqlCommand cmd = new SqlCommand("sp_GetRequestsByStatusForAdmin", con))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -151,7 +172,7 @@ namespace BankingManagementSystem.DAL
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 {
                     SqlCommand cmd = new SqlCommand("sp_GetPendingRequestById", con);
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -188,7 +209,7 @@ namespace BankingManagementSystem.DAL
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 {
                     SqlCommand cmd = new SqlCommand("sp_GetAllRequestById", con);
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -224,12 +245,11 @@ namespace BankingManagementSystem.DAL
             }
         }
 
-
         public static async Task<bool> UpdateRequestStatusAsync(int requestId, string newStatus, int repliedBy)
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 {
                     SqlCommand cmd = new SqlCommand("sp_UpdateRequestStatus", con);
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -249,12 +269,11 @@ namespace BankingManagementSystem.DAL
             }
         }
 
-
         public static async Task<bool> UpdateRequestPayloadAsync(int requestId, string newPayload)
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 {
                     SqlCommand cmd = new SqlCommand("sp_UpdateRequestPayload", con);
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -272,12 +291,11 @@ namespace BankingManagementSystem.DAL
             }
         }
 
-
         public static async Task<bool> DeleteRequestByStatusAsync(int requestId, string status)
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 {
                     SqlCommand cmd = new SqlCommand("sp_DeleteRequestByStatus", con);
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -297,13 +315,12 @@ namespace BankingManagementSystem.DAL
 
 
         // Client Pending Requests
-
         public static async Task<List<RequestDTO>> GetReceivedRequestsForClientAsync(int clientId, string sortColumn, string sortDirection)
         {
             try
             {
                 var requests = new List<RequestDTO>();
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 {
                     SqlCommand cmd = new SqlCommand("sp_GetReceivedRequestsForClient", con);
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -324,7 +341,7 @@ namespace BankingManagementSystem.DAL
 
                             requests.Add(new RequestDTO
                             {
-                                RequestId = reader.GetInt32(idxRequestId),
+                                RequestId = reader.GetInt32(idxRequestId) - 1, // -1 to maintain the request id numbering across platform
                                 RequestType = reader.IsDBNull(idxRequestType) ? null : reader.GetString(idxRequestType),
                                 Payload = reader.IsDBNull(idxPayload) ? null : reader.GetString(idxPayload),
                                 RequestedOn = reader.GetDateTime(idxRequestedOn),
@@ -339,12 +356,13 @@ namespace BankingManagementSystem.DAL
                 throw new Exception("Database error during Get Received Requests For Client.", ex);
             }
         }
+
         public static async Task<List<RequestDTO>> GetSentRequestsByClientAsync(int clientId, string sortColumn, string sortDirection)
         {
             try
             {
                 var requests = new List<RequestDTO>();
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 {
                     SqlCommand cmd = new SqlCommand("sp_GetSentRequestsByClient", con);
                     cmd.CommandType = CommandType.StoredProcedure;

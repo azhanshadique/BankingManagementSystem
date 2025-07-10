@@ -250,10 +250,12 @@
     <Compile Include="BLL\AuthBLL.cs" />
     <Compile Include="BLL\ClientBLL.cs" />
     <Compile Include="BLL\RequestBLL.cs" />
+    <Compile Include="BLL\TransactionBLL.cs" />
     <Compile Include="BLL\ValidationServiceBLL.cs" />
     <Compile Include="Controllers\API\AdminController.cs" />
     <Compile Include="Controllers\API\AdminRequestsController.cs" />
     <Compile Include="Controllers\API\AuthController.cs" />
+    <Compile Include="Controllers\API\ClientController.cs" />
     <Compile Include="Controllers\API\PublicController.cs" />
     <Compile Include="Controllers\API\ClientRequestController.cs" />
     <Compile Include="Controllers\API\PageContentController.cs" />
@@ -262,10 +264,14 @@
     <Compile Include="DAL\AdminDAL.cs" />
     <Compile Include="DAL\ClientDAL.cs" />
     <Compile Include="DAL\RequestDAL.cs" />
+    <Compile Include="DAL\TransactionDAL.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\AdminService.cs" />
     <Compile Include="Helpers\AuthService.cs" />
+    <Compile Include="Helpers\ClientService.cs" />
+    <Compile Include="Helpers\DBConnectionManager.cs" />
     <Compile Include="Helpers\HttpClientProvider.cs" />
     <Compile Include="Helpers\JwtAuthenticationHandler.cs" />
     <Compile Include="Helpers\JwtHttpClientHandler.cs" />
@@ -278,20 +284,53 @@
     <Compile Include="Models\Constants\DbColumns.cs" />
     <Compile Include="Models\ConstraintTypes\RequestStatus.cs" />
     <Compile Include="Models\ConstraintTypes\RequestType.cs" />
+    <Compile Include="Models\DTOs\AccountDTO.cs" />
     <Compile Include="Models\DTOs\AuthRequestDTO.cs" />
     <Compile Include="Models\API\AuthTokenResponse.cs" />
     <Compile Include="Models\ConstraintTypes\UserRoles.cs" />
     <Compile Include="Models\DTOs\ClientDTO.cs" />
+    <Compile Include="Models\DTOs\DepositDTO.cs" />
     <Compile Include="Models\DTOs\RequestDTO.cs" />
+    <Compile Include="Models\DTOs\TransactionDTO.cs" />
+    <Compile Include="Models\DTOs\TransferDTO.cs" />
+    <Compile Include="Models\DTOs\WithdrawDTO.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="WebForms\Admin\PendingRequest.aspx.cs">
-      <DependentUpon>PendingRequest.aspx</DependentUpon>
+    <Compile Include="WebForms\Admin\ClientManagement\ClientManagement.aspx.cs">
+      <DependentUpon>ClientManagement.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Admin\PendingRequest.aspx.designer.cs">
-      <DependentUpon>PendingRequest.aspx</DependentUpon>
+    <Compile Include="WebForms\Admin\ClientManagement\ClientManagement.aspx.designer.cs">
+      <DependentUpon>ClientManagement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="WebForms\Admin\ClientRequests\ClientRequests.aspx.cs">
+      <DependentUpon>ClientRequests.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebForms\Admin\ClientRequests\ClientRequests.aspx.designer.cs">
+      <DependentUpon>ClientRequests.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="WebForms\Client\ClientProfile.aspx.cs">
+      <DependentUpon>ClientProfile.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebForms\Client\ClientProfile.aspx.designer.cs">
+      <DependentUpon>ClientProfile.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="WebForms\Client\Deposit.aspx.cs">
+      <DependentUpon>Deposit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebForms\Client\Deposit.aspx.designer.cs">
+      <DependentUpon>Deposit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="WebForms\Client\ManageAccounts.aspx.cs">
+      <DependentUpon>ManageAccounts.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebForms\Client\ManageAccounts.aspx.designer.cs">
+      <DependentUpon>ManageAccounts.aspx</DependentUpon>
     </Compile>
     <Compile Include="WebForms\Client\PendingRequest.aspx.cs">
       <DependentUpon>PendingRequest.aspx</DependentUpon>
@@ -299,6 +338,27 @@
     </Compile>
     <Compile Include="WebForms\Client\PendingRequest.aspx.designer.cs">
       <DependentUpon>PendingRequest.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="WebForms\Client\TransactionHistory.aspx.cs">
+      <DependentUpon>TransactionHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebForms\Client\TransactionHistory.aspx.designer.cs">
+      <DependentUpon>TransactionHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="WebForms\Client\Transfer.aspx.cs">
+      <DependentUpon>Transfer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebForms\Client\Transfer.aspx.designer.cs">
+      <DependentUpon>Transfer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="WebForms\Client\Withdraw.aspx.cs">
+      <DependentUpon>Withdraw.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WebForms\Client\Withdraw.aspx.designer.cs">
+      <DependentUpon>Withdraw.aspx</DependentUpon>
     </Compile>
     <Compile Include="WebForms\Home\About.aspx.cs">
       <DependentUpon>About.aspx</DependentUpon>
@@ -2490,8 +2550,15 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\CustomJS\script.js" />
-    <Content Include="WebForms\Admin\PendingRequest.aspx" />
+    <Content Include="WebForms\Admin\ClientManagement\ClientManagement.aspx" />
+    <Content Include="WebForms\Admin\ClientRequests\ClientRequests.aspx" />
+    <Content Include="WebForms\Client\ClientProfile.aspx" />
+    <Content Include="WebForms\Client\Deposit.aspx" />
+    <Content Include="WebForms\Client\ManageAccounts.aspx" />
     <Content Include="WebForms\Client\PendingRequest.aspx" />
+    <Content Include="WebForms\Client\TransactionHistory.aspx" />
+    <Content Include="WebForms\Client\Transfer.aspx" />
+    <Content Include="WebForms\Client\Withdraw.aspx" />
     <Content Include="WebForms\Home\About.aspx" />
     <Content Include="WebForms\Home\PublicRequest.aspx" />
     <Content Include="WebForms\Home\Dashboard.aspx" />

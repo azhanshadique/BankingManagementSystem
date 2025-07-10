@@ -14,6 +14,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Web;
 using System.Web.Helpers;
+using System.Web.Http.Results;
+using System.Web.Services.Description;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -128,29 +130,46 @@ namespace BankingManagementSystem.WebForms.SignUp
             {
                 ApiResponseMessage result = await RegistrationService.RegisterClientAsync(client);
 
-                string message;
+                string message = GetParsedErrorMessage(result.MessageContent);
 
-                if (result.MessageContent.StartsWith("{") && result.MessageContent.Contains("Message"))
-                {
-                    var parsed = JsonConvert.DeserializeObject<ApiErrorMessageWrapper>(result.MessageContent);
-                    message = parsed?.Message;
-                }
-                else
-                {
-                    message = result.MessageContent;
-                }
-                // Trim quotes if they exist
-                if (message.StartsWith("\"") && message.EndsWith("\""))
-                {
-                    message = message.Trim('"');
-                }
+
+                //if (result.MessageContent.StartsWith("{") && result.MessageContent.Contains("Message"))
+                //{
+                //    var parsed = JsonConvert.DeserializeObject<ApiErrorMessageWrapper>(result.MessageContent);
+                //    message = parsed?.Message;
+                //}
+                //else
+                //{
+                //    message = result.MessageContent;
+                //}
+                //// Trim quotes if they exist
+                //if (message.StartsWith("\"") && message.EndsWith("\""))
+                //{
+                //    message = message.Trim('"');
+                //}
 
                 //var parsed = JsonConvert.DeserializeObject<dynamic>(result.MessageContent);
                 //string message = parsed?.Message;
 
 
                 if (result.MessageType == "success")
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showRegisterSuccessMessage('{message}', '{result.MessageType}'); }}, 200);", true);
+                {
+                    string redirectUrl = ResolveClientUrl(Page.GetRouteUrl("DashboardRoute", null));
+
+                    string script = $@"
+                    setTimeout(function() {{
+                        showDynamicModal({{
+                            titleText: 'Client Registration Successful',
+                            messageText: '{message}',
+                            type: '{result.MessageType}',
+                            redirectUrl: '{redirectUrl}'
+                        }});
+                    }}, 300);";
+
+
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "showModal", script, true);
+                    //ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showRegisterSuccessMessage('{message}', '{result.MessageType}'); }}, 200);", true);
+                }
                 else
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('{message}', '{result.MessageType}');", true);
             }
@@ -158,6 +177,25 @@ namespace BankingManagementSystem.WebForms.SignUp
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('Registration failed due to a technical error.', 'danger');", true);
             }
+        }
+        protected string GetParsedErrorMessage(string Message)
+        {
+            string parsedMessage;
+            if (Message.StartsWith("{") && Message.Contains("Message"))
+            {
+                var parsed = JsonConvert.DeserializeObject<ApiErrorMessageWrapper>(Message);
+                parsedMessage = parsed?.Message;
+            }
+            else
+            {
+                parsedMessage = Message;
+            }
+            // Trim quotes if they exist
+            if (parsedMessage.StartsWith("\"") && parsedMessage.EndsWith("\""))
+            {
+                parsedMessage = parsedMessage.Trim('"');
+            }
+            return parsedMessage;
         }
         protected bool ValidateRequiredFields(Dictionary<string, string> requiredFields)
         {

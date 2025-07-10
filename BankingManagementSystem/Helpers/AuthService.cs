@@ -18,10 +18,10 @@ namespace BankingManagementSystem.Helpers
 
         public static async Task<AuthTokenResponse> AuthenticateUserAsync(AuthRequestDTO request, string apiUrl)
         {
-            var json = JsonConvert.SerializeObject(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            //var json = JsonConvert.SerializeObject(request);
+            //var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PostAsync(apiUrl, content);
+            var response = await httpClient.PostAsJsonAsync(apiUrl, request);
 
             if (response.IsSuccessStatusCode)
             {

@@ -12,7 +12,7 @@ namespace BankingManagementSystem.Controllers.API
     {
         [HttpPost]
         [Route("register-client")]
-        public async Task<IHttpActionResult> Register([FromBody] ClientDTO client)
+        public async Task<IHttpActionResult> RegisterAsync([FromBody] ClientDTO client)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Invalid client data.");
@@ -43,7 +43,7 @@ namespace BankingManagementSystem.Controllers.API
         
         [HttpPut]
         [Route("update/register-request/{id:int}")]
-        public async Task<IHttpActionResult> UpdatePublicRegisterRequest([FromUri] int id, [FromBody] ClientDTO client)
+        public async Task<IHttpActionResult> UpdatePublicRegisterRequestAsync([FromUri] int id, [FromBody] ClientDTO client)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Invalid client data.");
@@ -53,7 +53,7 @@ namespace BankingManagementSystem.Controllers.API
 
         [HttpPut]
         [Route("delete/request/{id:int}")]
-        public async Task<IHttpActionResult> DeletePublicRegisterRequest([FromUri] int id)
+        public async Task<IHttpActionResult> DeletePublicRegisterRequestAsync([FromUri] int id)
         {
             var (success, message) = await RequestBLL.DeleteRegisterRequestPublicAsync(id, id);
 

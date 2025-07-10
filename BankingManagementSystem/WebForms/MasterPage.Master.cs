@@ -64,6 +64,8 @@ namespace BankingManagementSystem.WebForms
             lblAdminDetails.Visible = false;
             lblAdminId.Visible = false;
             lbtnClientManagement.Visible = false;
+            lbtnClientRequests.Visible = false;
+            lbtnMyRequests.Visible = false;
             lbtnViewProfile.Visible = false;
             lbtnManageAccounts.Visible = false;
             lbtnDeposit.Visible = false;
@@ -80,6 +82,7 @@ namespace BankingManagementSystem.WebForms
                 lblClientDetails.Visible = true;
                 lblClientId.Visible = true;
 
+                lbtnMyRequests.Visible = true;
                 lbtnViewProfile.Visible = true;
                 lbtnManageAccounts.Visible = true;
                 lbtnDeposit.Visible = true;
@@ -96,6 +99,7 @@ namespace BankingManagementSystem.WebForms
                 lblAdminId.Visible = true;
 
                 lbtnClientManagement.Visible = true;
+                lbtnClientRequests.Visible = true;
 
                 lblAdminId.Text = $"Admin ID: {user.UserID}";
               
@@ -152,22 +156,59 @@ namespace BankingManagementSystem.WebForms
         {
             Response.Redirect(Page.GetRouteUrl("ClientLoginRoute", null));
         }
-
-        protected void BtnOk_Click(object sender, EventArgs e)
-        {
-            Response.Redirect(Page.GetRouteUrl("DashboardRoute", null));
-        }
-        protected void BtnOkApproveReject_Click(object sender, EventArgs e)
-        {
-            Response.Redirect(Page.GetRouteUrl("AdminPendingRequestRoute", null));
-        }
-        protected void BtnOkApproveRejectByClient_Click(object sender, EventArgs e)
+        protected void BtnMyRequests_Click(object sender, EventArgs e)
         {
             Response.Redirect(Page.GetRouteUrl("ClientPendingRequestRoute", null));
         }
-        protected void BtnOkDeleteByClient_Click(object sender, EventArgs e)
+        protected void BtnViewProfile_Click(object sender, EventArgs e)
         {
-            Response.Redirect(Page.GetRouteUrl("PublicRequestRoute", null));
+            Response.Redirect(Page.GetRouteUrl("ClientProfileRoute", null));
         }
+        protected void BtnManageAccounts_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Page.GetRouteUrl("ClientAccountsRoute", null));
+        }
+        protected void BtnDeposit_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Page.GetRouteUrl("DepositAmountRoute", null));
+        }
+        protected void BtnWithdraw_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Page.GetRouteUrl("WithdrawAmountRoute", null));
+        }
+         protected void BtnTransferMoney_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Page.GetRouteUrl("TransferAmountRoute", null));
+        }
+         protected void BtnTransactionHistory_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Page.GetRouteUrl("TransactionHistoryRoute", null));
+        }
+
+
+        protected void BtnClientManagement_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Page.GetRouteUrl("ClientLoginRoute", null));
+        }
+        protected void BtnClientRequests_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Page.GetRouteUrl("AdminClientRequestRedirect", null));
+        }
+        //protected void BtnOk_Click(object sender, EventArgs e)
+        //{
+        //    Response.Redirect(Page.GetRouteUrl("DashboardRoute", null));
+        //}
+        //protected void BtnOkApproveReject_Click(object sender, EventArgs e)
+        //{
+        //    Response.Redirect(Page.GetRouteUrl("AdminClientRequestRedirect", null));
+        //}
+        //protected void BtnOkApproveRejectByClient_Click(object sender, EventArgs e)
+        //{
+        //    Response.Redirect(Page.GetRouteUrl("ClientPendingRequestRoute", null));
+        //}
+        //protected void BtnOkDeleteByClient_Click(object sender, EventArgs e)
+        //{
+        //    Response.Redirect(Page.GetRouteUrl("PublicRequestRoute", null));
+        //}
     }
 }

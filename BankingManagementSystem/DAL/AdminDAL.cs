@@ -8,18 +8,17 @@ using System.Data;
 using System.Threading.Tasks;
 using BankingManagementSystem.Models.Constants;
 using BankingManagementSystem.Models.DTOs;
+using BankingManagementSystem.Helpers;
 
 namespace BankingManagementSystem.DAL
 {
     public static class AdminDAL
     {
-        private static readonly string CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
-
         public static async Task<User> CheckAdminCredentialsAsync(AuthRequestDTO admin)
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 using (SqlCommand cmd = new SqlCommand("sp_ValidateAdmin", con))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -61,7 +60,7 @@ namespace BankingManagementSystem.DAL
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 using (SqlCommand cmd = new SqlCommand("sp_CheckAdminExistsByAdminId", con))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -83,7 +82,7 @@ namespace BankingManagementSystem.DAL
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 using (SqlCommand cmd = new SqlCommand("sp_CreateClient", con))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -121,6 +120,48 @@ namespace BankingManagementSystem.DAL
             catch (SqlException ex)
             {
                 return (false, $"Database error during client creation. {ex.Message}");
+            }
+        } 
+
+        public static async Task<(bool IsSuccess, string Message)> UpdateClientProfileDetailsAsync(int clientId, ClientDTO client)
+        {
+            try
+            {
+                using (SqlConnection con = DBConnectionManager.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("sp_UpdateClientProfileDetails", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@ClientID", clientId);
+                    cmd.Parameters.AddWithValue("@FullName", client.FullName);
+                    cmd.Parameters.AddWithValue("@ParentName", client.ParentName);
+
+                    //DateTime.TryParse(client.DOB, out DateTime parsedDOB);
+                    cmd.Parameters.AddWithValue("@DOB", client.DOB);
+
+                    cmd.Parameters.AddWithValue("@Gender", client.Gender);
+                    cmd.Parameters.AddWithValue("@Nationality", client.Nationality);
+                    cmd.Parameters.AddWithValue("@Occupation", client.Occupation);
+                    cmd.Parameters.AddWithValue("@AadhaarNumber", client.AadhaarNumber);
+                    cmd.Parameters.AddWithValue("@PANNumber", client.PANNumber);
+                    cmd.Parameters.AddWithValue("@MobileNumber", client.MobileNumber);
+                    cmd.Parameters.AddWithValue("@EmailId", client.EmailId);
+                    cmd.Parameters.AddWithValue("@Address", client.Address);
+                    cmd.Parameters.AddWithValue("@State", client.State);
+                    cmd.Parameters.AddWithValue("@City", client.City);
+                    cmd.Parameters.AddWithValue("@Pincode", client.Pincode);
+                   
+                    cmd.Parameters.AddWithValue("@Username", client.Username);
+
+                    await con.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    return (true, "Client Updated successfully.");
+                }
+            }
+            catch (SqlException ex)
+            {
+                return (false, $"Database error during client data update. {ex.Message}");
             }
         }
     }

@@ -44,7 +44,7 @@ namespace BankingManagementSystem.Models.DTOs
 {
     public class ClientDTO
     {
-        //public int ClientId { get; set; }
+        public int ClientId { get; set; }
 
         // Personal Details
         [Required]
@@ -107,7 +107,7 @@ namespace BankingManagementSystem.Models.DTOs
 
 
         // Account Details
-        [Required]
+        //[Required]
         //[RegularExpression("^(Savings|Current)$", ErrorMessage = "Invalid account type")]
         public string AccountType { get; set; }
 
@@ -123,22 +123,24 @@ namespace BankingManagementSystem.Models.DTOs
 
 
         // Login Details
-        [Required]
+        //[Required]
         //[StringLength(50, MinimumLength = 6, ErrorMessage = "Username must be between 6 and 50 characters.")]
         public string Username { get; set; }
 
-        [Required]
+        //[Required]
         //[StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be at least 8 characters.")]
         public string Password { get; set; }
 
-        [Required]
+        //[Required]
         //[Compare("Password", ErrorMessage = "Passwords do not match")]
         public string ConfirmPassword { get; set; }
 
         // Approval Flags
-        public string CoHolderApproved { get; set; } = RequestStatus.Awaiting.ToString();
+        //public string CoHolderApproved { get; set; } = RequestStatus.Awaiting.ToString();
+        public string CoHolderApproved { get; set; }
 
-        public string AdminApproved { get; set; } = RequestStatus.Awaiting.ToString();
+        //public string AdminApproved { get; set; } = RequestStatus.Awaiting.ToString();
+        public string AdminApproved { get; set; }
 
         // Extra (optional)
         //public string Status { get; set; } // e.g., Active / Inactive 

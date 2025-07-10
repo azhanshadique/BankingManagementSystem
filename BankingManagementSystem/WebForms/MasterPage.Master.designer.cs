@@ -157,6 +157,8 @@ namespace BankingManagementSystem.WebForms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.LinkButton lbtnClientManagement;
+        protected global::System.Web.UI.WebControls.LinkButton lbtnClientRequests;
+        protected global::System.Web.UI.WebControls.LinkButton lbtnMyRequests;
 
         /// <summary>
         /// lbtnViewProfile control.
@@ -213,15 +215,6 @@ namespace BankingManagementSystem.WebForms
         protected global::System.Web.UI.WebControls.LinkButton lbtnTransactionHistory;
 
         /// <summary>
-        /// btnOk control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnOk;
-
-        /// <summary>
         /// btnLogout control.
         /// </summary>
         /// <remarks>
@@ -229,7 +222,15 @@ namespace BankingManagementSystem.WebForms
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnLogout;
-        protected global::System.Web.UI.WebControls.Button btnOkDeleteByClientOnDashboard;
+
+        /// <summary>
+        /// btnGeneralModalOk control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnGeneralModalOk;
 
         /// <summary>
         /// MainContent control.

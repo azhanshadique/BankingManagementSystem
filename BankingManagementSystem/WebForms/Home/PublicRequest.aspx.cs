@@ -9,6 +9,7 @@ using BankingManagementSystem.Models.API;
 using System.Threading.Tasks;
 using BankingManagementSystem.BLL;
 using System.Web.UI.WebControls;
+using System.Web;
 
 namespace BankingManagementSystem.WebForms.Home
 {
@@ -114,24 +115,7 @@ namespace BankingManagementSystem.WebForms.Home
 
             string adminStatus = (client.AdminApproved ?? "").Trim();
             SetStatusBadge(lblAdminApproval, adminStatus);
-            //string adminStatus = (client.AdminApproved ?? "").Trim();
-            //lblAdminApproval.Text = adminStatus;
-
-            //switch (adminStatus)
-            //{
-            //    case "Approved":
-            //        lblAdminApproval.CssClass = "badge bg-success fw-semibold text-white fs-6 px-6 py-2";
-            //        break;
-            //    case "Rejected":
-            //        lblAdminApproval.CssClass = "badge bg-danger fw-semibold text-white fs-6 px-6 py-2";
-            //        break;
-            //    case "Awaiting":
-            //        lblAdminApproval.CssClass = "badge bg-warning text-dark fw-semibold fs-6 px-6 py-2";
-            //        break;
-            //    default:
-            //        lblAdminApproval.CssClass = "badge bg-secondary text-white fw-semibold fs-6 px-6 py-2";
-            //        break;
-            //}
+          
         }
 
 
@@ -252,7 +236,9 @@ namespace BankingManagementSystem.WebForms.Home
                 JointClientId = string.IsNullOrWhiteSpace(txtJointClientId.Text.Trim()) ? 0 : Convert.ToInt32(txtJointClientId.Text.Trim()),
                 Username = txtUsername.Text.Trim(),
                 Password = txtPassword.Text,
-                ConfirmPassword = txtConfirmPassword.Text
+                ConfirmPassword = txtConfirmPassword.Text,
+                CoHolderApproved = RequestStatus.Awaiting.ToString(),
+                AdminApproved = RequestStatus.Awaiting.ToString()
             };
         }
 
@@ -291,15 +277,30 @@ namespace BankingManagementSystem.WebForms.Home
             }
         }
 
-        protected async void BtnReject_Click(object sender, EventArgs e)
-        {
-            int requestId = (int)ViewState["SelectedRequestId"];
-            bool result = await RequestsService.RejectRequestAsync(requestId, requestId);
-            if (result)
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showDeleteMessageByClientOnDashboard('Client Request ID: #{requestId} Deleted Successfully.', 'danger'); }}, 200);", true);
+        //protected async void BtnReject_Click(object sender, EventArgs e)
+        //{
+        //    int requestId = (int)ViewState["SelectedRequestId"];
+        //    bool result = await RequestsService.RejectRequestAsync(requestId, requestId);
+        //    if (result)
+        //    {
+        //        string message = $"Client Request ID: #{requestId} Deleted Successfully.";
 
-            await ReloadUI(result);
-        }
+        //        string redirectUrl = ResolveClientUrl(Page.GetRouteUrl("PublicRequestRoute", null));
+        //        string script = $@"
+        //        setTimeout(function() {{
+        //            showDynamicModal({{
+        //                titleText: 'Request Deleted',
+        //                messageText: '{HttpUtility.JavaScriptStringEncode(message)}',
+        //                type: 'danger',                      
+        //                redirectUrl:'{redirectUrl}'
+        //            }});
+        //        }}, 300);";
+
+        //        ScriptManager.RegisterStartupScript(this, this.GetType(), "showModal", script, true);
+        //        //ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showDeleteMessageByClientOnDashboard('Client Request ID: #{requestId} Deleted Successfully.', 'danger'); }}, 200);", true);
+        //    }
+        //    await ReloadUI(result);
+        //}
 
         private async Task ReloadUI(bool success)
         {
@@ -319,7 +320,22 @@ namespace BankingManagementSystem.WebForms.Home
                 if (response.MessageType == "success")
                 {
                     pnlRequestDetails.Visible = false;
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showDeleteConfirmModal('Client Request ID: #{requestId} Deleted Successfully.', 'danger'); }}, 200);", true);
+                    //ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showDeleteConfirmModal('Client Request ID: #{requestId} Deleted Successfully.', 'danger'); }}, 200);", true);
+
+                    string message = $"Your request with Request ID: #{requestId}  has been deleted successfully!";
+
+                    string redirectUrl = ResolveClientUrl(Page.GetRouteUrl("PublicRequestRoute", null));
+                    string script = $@"
+                    setTimeout(function() {{
+                        showDynamicModal({{
+                            titleText: 'Request Deleted',
+                            messageText: '{HttpUtility.JavaScriptStringEncode(message)}',
+                            type: 'danger',                      
+                            redirectUrl:'{redirectUrl}'
+                        }});
+                    }}, 300);";
+
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "showModal", script, true);
                 }
                 else
                 {

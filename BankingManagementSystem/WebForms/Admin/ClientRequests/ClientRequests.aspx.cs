@@ -11,13 +11,14 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http.Results;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-namespace BankingManagementSystem.WebForms.Admin
+namespace BankingManagementSystem.WebForms.Admin.ClientRequests
 {
-    public partial class PendingRequest : System.Web.UI.Page
+    public partial class ClientRequests : System.Web.UI.Page
     {
         private static string sortColumn = DbColumns.CreatedOn;
         private static string sortColumnDemo = "RepliedOn";
@@ -37,26 +38,24 @@ namespace BankingManagementSystem.WebForms.Admin
             {
                 string token = Request.Cookies["auth_token"]?.Value;
                 if (string.IsNullOrEmpty(token))
-                {
-                    Response.Redirect(Page.GetRouteUrl("AdminLoginRoute", null));
-                }
+                    RedirectToLogin();
 
                 var principal = JwtTokenManager.ValidateToken(token);
                 string role = principal.FindFirst(ClaimTypes.Role)?.Value;
                 adminId = Convert.ToInt32(principal.FindFirst("UserID")?.Value);
+                ViewState["AdminId"] = adminId;
 
                 if (role != UserRoles.ADMIN.ToString())
-                    Response.Redirect(Page.GetRouteUrl("AdminLoginRoute", null));
+                    RedirectToLogin();
 
-                string status = Session["RequestType"]?.ToString() ?? RequestStatus.Pending.ToString();
+                string status = Session["RequestStatus"]?.ToString() ?? RequestStatus.Pending.ToString();
                 ddlFilterStatus.SelectedValue = status;
                 await LoadRequests(status, sortColumn, sortDirection);
             }
             catch
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", "showAlert('Token Invalid!', 'danger');", true);
-                Response.Redirect(Page.GetRouteUrl("AdminLoginRoute", null));
-
+                RedirectToLogin();
             }
         }
         protected async Task LoadRequests(string status, string sortColumn, string sortDirection)
@@ -87,12 +86,21 @@ namespace BankingManagementSystem.WebForms.Admin
         protected async void DdlFilterStatus_SelectedIndexChanged(object sender, EventArgs e)
         {
             string selectedStatus = ddlFilterStatus.SelectedValue;
-            Session["RequestType"] = selectedStatus;
+            Session["RequestStatus"] = selectedStatus;
             sortColumn = selectedStatus == RequestStatus.Pending.ToString() ? DbColumns.CreatedOn : DbColumns.RepliedOn;
             sortDirection = "DESC";
+            gvRequests.PageIndex = 0;
             await LoadRequests(selectedStatus, sortColumn, sortDirection);
         }
+        protected async void GvRequests_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            gvRequests.PageIndex = e.NewPageIndex;
 
+            string selectedType = Session["RequestStatus"]?.ToString() ?? RequestStatus.Pending.ToString();
+
+            await LoadRequests(selectedType, sortColumn, sortDirection);
+
+        }
         protected void GvRequests_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             if (e.CommandName == "Show")
@@ -107,7 +115,7 @@ namespace BankingManagementSystem.WebForms.Admin
         {
             if (e.Row.RowType == DataControlRowType.Header)
             {
-                string status = Session["RequestType"]?.ToString()?.ToLower() ?? RequestStatus.Pending.ToString().ToLower();
+                string status = Session["RequestStatus"]?.ToString()?.ToLower() ?? RequestStatus.Pending.ToString().ToLower();
                 switch (status)
                 {
                     case "approved":
@@ -147,57 +155,123 @@ namespace BankingManagementSystem.WebForms.Admin
 
             await LoadRequests(ddlFilterStatus.SelectedValue, sortColumn, sortDirection);
         }
-
         protected async void ShowRequestDetails(int requestId)
         {
             var request = await RequestsService.GetRequestByIdAsync(requestId);
-            if (request != null)
-            {
-                var client = JsonConvert.DeserializeObject<ClientDTO>(request.Payload);
-                if (client == null)
-                {
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", $"showAlert('Error in Get Request By Id.', 'danger');", true);
-                    return;
-                }
 
-                if (request.RequestType == RequestType.CreateNewRegistration.ToString())
-                {
-                    pnlRequestTable.Visible = false;
-                    pnlRequestDetails.Visible = true;
-
-                    lblRequestType.Text = "Create New Registration";
-                    lblRequestStatus.Text = request.Status;
-                    lblRequestId.Text = $"#{requestId.ToString()}";
-
-                    if (request.Status == RequestStatus.Pending.ToString())
-                    {
-                        if (client.IsJointAccount)
-                        {
-                            lblCoHolderApprovalHeading.Visible = true;
-                            //lblCoHolderApproval.Text = client.CoHolderApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
-                            lblCoHolderApproval.Text = client.CoHolderApproved;
-
-                        }
-                        lblAdminApprovalHeading.Visible = true;
-                        //lblAdminApproval.Text = client.AdminApproved ? RequestStatus.Approved.ToString() : RequestStatus.Awaiting.ToString();
-                        lblAdminApproval.Text = client.AdminApproved;
-                        SetButtonState(true);
-                    }
-                    else
-                    {
-                        SetButtonState(false);
-                       
-                    }
-
-                    PopulateClientForm(client);
-                }
-            }
-            else
+            if (request == null)
             {
                 pnlRequestDetails.Visible = false;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", $"showAlert('Request not found.', 'danger');", true);
+                return;
+            }
+
+            var client = JsonConvert.DeserializeObject<ClientDTO>(request.Payload);
+            if (client == null)
+            {
+                pnlRequestDetails.Visible = false;
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert", $"showAlert('Invalid client data.', 'danger');", true);
+                return;
+            }
+            pnlRequestTable.Visible = false;
+            pnlRequestDetails.Visible = true;
+            PopulateClientForm(client);
+            lblRequestId.Text = $"#{requestId}";
+            bool isPending = request.Status == RequestStatus.Pending.ToString();
+            SetButtonState(isPending);
+
+            ViewState["RequestType"] = request.RequestType;
+            switch (request.RequestType)
+            {
+                case nameof(RequestType.CreateNewRegistration):
+                    lblRequestType.Text = "Create New Registration";
+                    SetStatusBadge(lblRequestStatus, request.Status?.Trim());
+
+                    SetApprovalLabels(client, isPending);
+                    pnlClientId.Visible = false;
+                    break;
+
+                case nameof(RequestType.UpdateProfileDetails):
+                    lblRequestType.Text = "Update Profile Details";
+                    SetStatusBadge(lblRequestStatus, request.Status?.Trim());
+                    SetApprovalLabels(client, isPending);
+                    pnlAccountDetails.Visible = false;
+                    pnlPasswords.Visible = false;
+                    pnlClientId.Visible = true;
+                    break;
+
+                case nameof(RequestType.CreateNewAccount):
+                    lblRequestType.Text = "Create New Account";
+                    pnlClientId.Visible = true;
+                    break;
+
+                default:
+                    pnlRequestDetails.Visible = false;
+                    break;
+            }
+
+           
+        }
+
+        private void SetApprovalLabels(ClientDTO client, bool isPending)
+        {
+            // Co-holder Approval
+            lblCoHolderApprovalHeading.Visible = client.IsJointAccount && isPending;
+            lblCoHolderApproval.Visible = client.IsJointAccount && isPending;
+
+            if (client.IsJointAccount)
+            {
+                string coHolderStatus = (client.CoHolderApproved ?? "").Trim();
+                SetStatusBadge(lblCoHolderApproval, coHolderStatus);
+            }
+
+            // Admin Approval
+            lblAdminApprovalHeading.Visible = isPending;
+            lblAdminApproval.Visible = isPending;
+
+            string adminStatus = (client.AdminApproved ?? "").Trim();
+            SetStatusBadge(lblAdminApproval, adminStatus);
+        }
+
+        private void SetButtonState(bool isPending)
+        {
+            //btnEdit.Visible = enable;
+            //btnUpdate.Visible = false;
+            //btnEdit.Enabled = enable;
+            //btnUpdate.Enabled = enable;
+            //btnApprove.Enabled = enable;
+            //btnReject.Enabled = enable;
+
+            //bool coApproved = client.CoHolderApproved == RequestStatus.Awaiting.ToString();
+            pnlButtons.Visible = isPending;
+            btnDelete.Visible = !isPending;
+        }
+
+        private void SetStatusBadge(Label label, string status)
+        {
+            label.Text = status;
+
+            switch (status)
+            {
+                case "Approved":
+                    label.CssClass = "badge bg-success fw-semibold text-white fs-6 px-6 py-2";
+                    break;
+                case "Rejected":
+                    label.CssClass = "badge bg-danger fw-semibold text-white fs-6 px-6 py-2";
+                    break;
+                case "Pending":
+                    label.CssClass = "badge bg-primary fw-semibold text-white fs-6 px-6 py-2";
+                    break;
+                case "Awaiting":
+                    label.CssClass = "badge bg-warning text-dark fw-semibold fs-6 px-6 py-2";
+                    break;
+                default:
+                    label.CssClass = "badge bg-secondary text-white fw-semibold fs-6 px-6 py-2";
+                    break;
             }
         }
 
+      
         private void PopulateClientForm(ClientDTO client)
         {
             txtFullName.Text = client.FullName;
@@ -221,17 +295,17 @@ namespace BankingManagementSystem.WebForms.Admin
             txtUsername.Text = client.Username;
             txtPassword.Attributes["value"] = client.Password;
             txtConfirmPassword.Attributes["value"] = client.Password;
+            txtClientId.Text = client.ClientId.ToString();
         }
 
-        private void SetButtonState(bool enable)
-        {
-            btnUpdate.Enabled = enable;
-            btnEdit.Enabled = enable;
-            btnApprove.Enabled = enable;
-            btnReject.Enabled = enable;
-        }
 
         protected void BtnEdit_Click(object sender, EventArgs e)
+        {
+            SetClientFormReadOnly(false);
+            btnEdit.Visible = false;
+            btnUpdate.Visible = true;
+        } 
+        protected void BtnDelete_Click(object sender, EventArgs e)
         {
             SetClientFormReadOnly(false);
             btnEdit.Visible = false;
@@ -267,11 +341,13 @@ namespace BankingManagementSystem.WebForms.Admin
             DateTime dob = DateTime.MinValue;
             bool isDobValid = DateTime.TryParse(txtDOB.Text, out dob);
 
+
+
             return new ClientDTO
             {
                 FullName = txtFullName.Text.Trim(),
                 ParentName = txtParentName.Text.Trim(),
-                DOB = isDobValid ? dob : (DateTime?)null, 
+                DOB = isDobValid ? dob : (DateTime?)null,
                 Gender = ddlGender.SelectedValue,
                 Nationality = txtNationality.Text.Trim(),
                 Occupation = txtOccupation.Text.Trim(),
@@ -288,7 +364,10 @@ namespace BankingManagementSystem.WebForms.Admin
                 JointClientId = string.IsNullOrWhiteSpace(txtJointClientId.Text.Trim()) ? 0 : Convert.ToInt32(txtJointClientId.Text.Trim()),
                 Username = txtUsername.Text.Trim(),
                 Password = txtPassword.Text,
-                ConfirmPassword = txtConfirmPassword.Text
+                ConfirmPassword = txtConfirmPassword.Text,
+                CoHolderApproved = lblCoHolderApproval.Text,
+                AdminApproved = RequestStatus.Awaiting.ToString(),
+                ClientId = Convert.ToInt32(txtClientId.Text.Trim())
             };
         }
 
@@ -298,30 +377,6 @@ namespace BankingManagementSystem.WebForms.Admin
 
             ClientDTO updatedClient = GetClient();
 
-            //ClientDTO updatedClient = new ClientDTO
-            //{
-            //    FullName = txtFullName.Text.Trim(),
-            //    ParentName = txtParentName.Text.Trim(),
-            //    DOB = txtDOB.Text,
-            //    Gender = ddlGender.SelectedValue,
-            //    Nationality = txtNationality.Text.Trim(),
-            //    Occupation = txtOccupation.Text.Trim(),
-            //    AadhaarNumber = txtAadhaar.Text.Trim(),
-            //    PANNumber = txtPan.Text.Trim(),
-            //    EmailId = txtEmail.Text.Trim(),
-            //    MobileNumber = txtMobile.Text.Trim(),
-            //    Address = txtAddress.Text.Trim(),
-            //    City = txtCity.Text.Trim(),
-            //    State = txtState.Text.Trim(),
-            //    Pincode = txtPincode.Text.Trim(),
-            //    AccountType = ddlAccountType.SelectedValue,
-            //    IsJointAccount = ddlIsJointAccount.SelectedValue == "Yes",
-            //    JointClientId = string.IsNullOrWhiteSpace(txtJointClientId.Text.Trim()) ? 0 : Convert.ToInt32(txtJointClientId.Text.Trim()),
-            //    Username = txtUsername.Text.Trim(),
-            //    Password = txtPassword.Text,
-            //    ConfirmPassword = txtConfirmPassword.Text
-            //};
-    
 
             try
             {
@@ -356,17 +411,54 @@ namespace BankingManagementSystem.WebForms.Admin
 
         protected async void BtnApprove_Click(object sender, EventArgs e)
         {
-            int requestId = (int)ViewState["SelectedRequestId"];
-            bool statusUpdated = await RequestsService.ApproveRequestAsync(requestId, adminId);
-            if (statusUpdated)
-            {
-                ClientDTO client = GetClient();
+            int requestId = (int)(ViewState["SelectedRequestId"] ?? 0);
+            int adminId = (int)(ViewState["AdminId"] ?? 0);
 
-                bool result = await RegistrationService.CreateClientAsync(client);
-                if(result)
-                    ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showApproveRejectMessage('Client Request ID: #{requestId} Approved Successfully.', 'success'); }}, 200);", true);
+            //bool statusUpdated = true;
+            bool statusUpdated = await RequestsService.ApproveRequestAsync(requestId, adminId);
+            if (!statusUpdated)
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "failAlert", "showAlert('Approval failed.', 'danger');", true);
+            }
+            bool result = false;
+            ClientDTO client = GetClient();
+            switch (ViewState["RequestType"].ToString())
+            {
+                case nameof(RequestType.CreateNewRegistration):
+                    result = await AdminService.CreateClientAsync(client);
+                    break;
+
+                case nameof(RequestType.UpdateProfileDetails):
+                    result = await AdminService.UpdateClientDetailsAsync(client);
+                    break;
+
+                case nameof(RequestType.CreateNewAccount):
+                    break;
+
+                default:
+                    //pnlRequestDetails.Visible = false;
+                    break;
+            }
+
+            if (statusUpdated && result)
+            {
+                string message = $"Client Request ID: #{requestId} Approved Successfully.";
+
+                string redirectUrl = ResolveClientUrl(Page.GetRouteUrl("AdminClientRequestRedirect", null));
+                string script = $@"
+                            setTimeout(function() {{
+                                showDynamicModal({{
+                                    titleText: 'Client Request Approved',
+                                    messageText: '{HttpUtility.JavaScriptStringEncode(message)}',
+                                    type: 'success',                      
+                                    redirectUrl:'{redirectUrl}'
+                                }});
+                            }}, 300);";
+
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "showModal", script, true);
                 await ReloadUI(result);
 
+                //ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showApproveRejectMessage('Client Request ID: #{requestId} Approved Successfully.', 'success'); }}, 200);", true);
             }
             else
             {
@@ -381,10 +473,27 @@ namespace BankingManagementSystem.WebForms.Admin
         protected async void BtnReject_Click(object sender, EventArgs e)
         {
             int requestId = (int)ViewState["SelectedRequestId"];
+            int adminId = (int)(ViewState["AdminId"] ?? 0);
+
             bool result = await RequestsService.RejectRequestAsync(requestId, adminId);
             if (result)
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showApproveRejectMessage('Client Request ID: #{requestId} Rejected Successfully.', 'danger'); }}, 200);", true);
+            {
+                string message = $"Client Request ID: #{requestId} Rejected Successfully.";
 
+                string redirectUrl = ResolveClientUrl(Page.GetRouteUrl("AdminClientRequestRedirect", null));
+                string script = $@"
+                setTimeout(function() {{
+                    showDynamicModal({{
+                        titleText: 'Client Request Rejected',
+                        messageText: '{HttpUtility.JavaScriptStringEncode(message)}',
+                        type: 'danger',                      
+                        redirectUrl:'{redirectUrl}'
+                    }});
+                }}, 300);";
+
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "showModal", script, true);
+                //ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showApproveRejectMessage('Client Request ID: #{requestId} Rejected Successfully.', 'danger'); }}, 200);", true);
+            }
             await ReloadUI(result);
         }
 
@@ -407,7 +516,12 @@ namespace BankingManagementSystem.WebForms.Admin
         {
             fsJointAccount.Visible = ddlIsJointAccount.SelectedValue == "Yes";
             if (!fsJointAccount.Visible) txtJointClientId.Text = string.Empty;
-        } 
-      
+        }
+
+
+        private void RedirectToLogin()
+        {
+            Response.Redirect(Page.GetRouteUrl("AdminLoginRoute", null));
+        }
     }
 }

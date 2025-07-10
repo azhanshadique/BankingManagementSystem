@@ -72,7 +72,7 @@
                         <div class="card-body">
                             <h5 class="card-title">View Profile</h5>
                             <p class="card-text">Check and update your profile information, contact details, and more.</p>
-                            <a class="btn btn-outline-dark" href="<%= ResolveUrl("~/WebForms/Client/ViewProfile.aspx") %>">Go to Profile <i class="fas fa-angle-right"></i></a>
+                            <a class="btn btn-outline-dark"  href='<%# Page.GetRouteUrl("ClientProfileRoute", null) %>'>Go to Profile <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
                 </section>
@@ -83,7 +83,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Manage Accounts</h5>
                             <p class="card-text">View account summary, open new accounts, and manage linked accounts.</p>
-                            <a class="btn btn-outline-dark" href="<%= ResolveUrl("~/WebForms/Client/ManageAccounts.aspx") %>">Manage Accounts <i class="fas fa-angle-right"></i></a>
+                            <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("ClientAccountsRoute", null) %>'>Manage Accounts <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
                 </section>
@@ -98,7 +98,7 @@
                                 <br />
                                 from anywhere.
                             </p>
-                            <a class="btn btn-outline-dark" href="<%= ResolveUrl("~/WebForms/Client/Deposit.aspx") %>">Deposit Now <i class="fas fa-angle-right"></i></a>
+                            <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("DepositAmountRoute", null) %>'>Deposit Now <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
                 </section>
@@ -109,7 +109,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Withdraw</h5>
                             <p class="card-text">Withdraw funds from your registered bank account - get quick access to your money anytime.</p>
-                            <a class="btn btn-outline-dark" href="<%= ResolveUrl("~/WebForms/Client/Withdraw.aspx") %>">Withdraw <i class="fas fa-angle-right"></i></a>
+                            <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("WithdrawAmountRoute", null) %>'>Withdraw <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
                 </section>
@@ -120,7 +120,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Transfer Money</h5>
                             <p class="card-text">Send money to another client quickly — instant and secure transfers 24/7.</p>
-                            <a class="btn btn-outline-dark" href="<%= ResolveUrl("~/WebForms/Client/MoneyTransfer.aspx") %>">Transfer <i class="fas fa-angle-right"></i></a>
+                            <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("TransferAmountRoute", null) %>'>Transfer <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
                 </section>
@@ -131,7 +131,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Transaction History</h5>
                             <p class="card-text">Track all your past transactions with details to ensure complete transparency and control.</p>
-                            <a class="btn btn-outline-dark" href="<%= ResolveUrl("~/WebForms/Client/TransactionHistory.aspx") %>">View History <i class="fas fa-angle-right"></i></a>
+                            <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("TransactionHistoryRoute", null) %>'>View History <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
                 </section>
@@ -162,8 +162,8 @@
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title">Client Management</h5>
-                            <p class="card-text">View, edit, or deactivate client and monitor their linked accounts.</p>
-                            <a class="btn btn-outline-dark" href='<%= ResolveUrl("~/WebForms/Admin/ClientManagement.aspx") %>'>Manage Clients <i class="fas fa-angle-right"></i></a>
+                            <p class="card-text">View, edit, or update client and monitor their linked accounts.</p>
+                            <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("ClientManagementRoute", null) %>'>Manage Clients <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
                 </section>
@@ -174,7 +174,7 @@
                         <div class="card-body">
                             <h5 class="card-title">View All Accounts</h5>
                             <p class="card-text">Browse all accounts across clients and access account summaries.</p>
-                            <a class="btn btn-outline-dark" href='<%= ResolveUrl("~/WebForms/Admin/ViewAllAccounts.aspx") %>'>View Accounts <i class="fas fa-angle-right"></i></a>
+                            <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("TransactionHistoryRoute", null) %>'>View Accounts <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
                 </section> 
@@ -185,7 +185,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Manage Client Requests</h5>
                             <p class="card-text">Manage client requests. View, Update, Approve or Reject requests.</p>
-                            <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("AdminPendingRequestRoute", null) %>'>Client Requests <i class="fas fa-angle-right"></i></a>
+                            <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("AdminClientRequestRedirect", null) %>'>Client Requests <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
                 </section>

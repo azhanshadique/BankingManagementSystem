@@ -127,3 +127,53 @@ main {
 /*    color: #ffc107 !important;*/
     color: black !important;
 }
+
+
+
+
+.grid-pager {
+    text-align: right !important;
+    padding: 15px 0;
+}
+
+/*    .grid-pager table {
+        margin: 0 auto;
+    }*/
+
+/*    .grid-pager td {
+        padding: 5px;
+    }*/
+
+.grid-pager a,
+.grid-pager span {
+    padding: 3px 10px;
+    margin: 2px;
+    border-radius: 6px;
+    border: 1px solid #007bff;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.grid-pager a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.grid-pager span {
+    background-color: #007bff;
+    color: white;
+    cursor: default;
+}
+
+
+.grid-pager table {
+    margin-left: auto;  ye bhi help karta hai 
+}
+
+.grid-pager td {
+    text-align: right !important;
+}
+
+
