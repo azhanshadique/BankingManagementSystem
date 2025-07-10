@@ -257,6 +257,8 @@
                             <button type="button" class="btn btn-danger btn-sm shadow-sm  fs-6 me-2" style="padding: 2px 10px; margin-top: 2px;" data-bs-toggle="modal" data-bs-target="#rejectConfirmModal">Reject</button>
                         </asp:Panel>
                         <asp:Panel ID="pnlBntsEditUpdateDlt" runat="server" Visible="true">
+                                                        <asp:Button ID="btnCancel" runat="server" CssClass="btn btn-secondary btn-sm shadow-sm  fs-6 me-2" Style="padding: 2px 10px; margin-top: 3px;" Text=" Cancel " OnClick="BtnCancel_Click" Visible="false" />
+
                             <asp:Button ID="btnEdit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6 me-2" Style="padding: 2px 10px; margin-top: 3px;" Text=" Edit " OnClick="BtnEdit_Click" />
                             <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-warning btn-sm shadow-sm  fs-6 me-2" Style="padding: 2px 10px; margin-top: 3px;" Text="Update" OnClick="BtnUpdate_Click" Visible="false" />
                             <button type="button" class="btn btn-danger btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 2px;" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">Delete</button>

@@ -147,7 +147,7 @@ namespace BankingManagementSystem.WebForms.Client
         {
             if (string.IsNullOrWhiteSpace(ddlFromAccountNumber.SelectedValue))
             {
-                ShowError("Please select an account number!");
+                ShowError("Please select an account!");
                 return false;
             }
             if (string.IsNullOrWhiteSpace(txtToAccount.Text.Trim()))

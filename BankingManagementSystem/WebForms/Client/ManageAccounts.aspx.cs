@@ -47,7 +47,7 @@ namespace BankingManagementSystem.WebForms.Client
                 ViewState["ClientId"] = clientId;
                
 
-                LoadAccountTypes();
+                //LoadAccountTypes();
 
                 string type = Session["AccountType"]?.ToString() ?? accountTypeAll;
                 ddlAccountType.SelectedValue = type;
@@ -150,14 +150,14 @@ namespace BankingManagementSystem.WebForms.Client
 
 
 
-        private void LoadAccountTypes()
-        {
-            ddlAccountType.Items.Clear();
-            ddlAccountType.Items.Add(new ListItem("All", "All"));
-            ddlAccountType.Items.Add(new ListItem("Savings", "Savings"));
-            ddlAccountType.Items.Add(new ListItem("Current", "Current"));
-            ddlAccountType.Items.Add(new ListItem("Joint", "Joint"));
-        }
+        //private void LoadAccountTypes()
+        //{
+        //    ddlAccountType.Items.Clear();
+        //    ddlAccountType.Items.Add(new ListItem("All", "All"));
+        //    ddlAccountType.Items.Add(new ListItem("Savings", "Savings"));
+        //    ddlAccountType.Items.Add(new ListItem("Current", "Current"));
+        //    ddlAccountType.Items.Add(new ListItem("Joint", "Joint"));
+        //}
 
         
         protected void BtnAddAccount_Click(object sender, EventArgs e)

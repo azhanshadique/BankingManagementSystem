@@ -1,31 +1,35 @@
 ﻿<%@ Page Title="" Language="C#" Async="true" MasterPageFile="~/WebForms/MasterPage.Master" AutoEventWireup="true" CodeBehind="ClientManagement.aspx.cs" Inherits="BankingManagementSystem.WebForms.Admin.ClientManagement.ClientManagement" %>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
+
+    <script>
+        function setAccountNumberToDelete(accountNumber) {
+            document.getElementById('<%= hfAccountNumberToDelete.ClientID %>').value = accountNumber;
+        }
+    </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
-        <h1 class="mt-5 mx-auto text-center ">Client Management</h1>
-        <div class="container mt-5 mx-auto text-center  d-flex justify-content-center align-items-center gap-0">
-            <%--<h3 class="mb-4">Client Requests</h3>--%>
-            <%--<div class="row mb-3 mx-auto">--%>
+    <h1 class="mt-5 mx-auto text-center ">Client Management</h1>
+    <div class="container mt-5 mx-auto text-center  d-flex justify-content-center align-items-center gap-0">
 
-                <div class="col-md-2">
-                                    <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back</a>
-                </div>
-                <div class="col-md-6">
-                    <asp:TextBox ID="txtSearchClientId" runat="server" CssClass="form-control" placeholder="Enter Client ID"></asp:TextBox>
-                </div>
-                <div class="col-md-2">
-                    <asp:Button ID="btnSearch" runat="server" CssClass="btn btn-primary" Text="Search" OnClick="BtnSearch_Click" />
-                </div>
-            <%--</div>--%>
+        <div class="col-md-2">
+            <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i>Back</a>
         </div>
-       
+        <div class="col-md-6">
+            <asp:TextBox ID="txtSearchClientId" runat="server" CssClass="form-control" placeholder="Enter Client ID"></asp:TextBox>
+        </div>
+        <div class="col-md-2">
+            <asp:Button ID="btnSearch" runat="server" CssClass="btn btn-primary" Text="Search" OnClick="BtnSearch_Click" />
+        </div>
+    </div>
 
 
 
-   
 
 
-        <%--Profile Details--%>
+
+
+    <%--Profile Details--%>
     <asp:Panel ID="pnlClientProfileDetails" runat="server" Visible="false">
         <div class="container py-5">
 
@@ -34,21 +38,15 @@
 
 
                     <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
-                        <a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back</a>
-                        <%--<asp:Button ID="Button1" runat="server" CssClass="btn btn-sm btn-light border" Style="padding: 3px 10px;" Text="Back" OnClick="BtnReject_Click" />--%>
-
-                        <h2 class="mb-0 mx-auto text-center flex-grow-1">Profile Details</h2>
-                        <asp:Button ID="btnAddAccount" runat="server" CssClass="btn btn-sm btn-success" Text="Client Linked Accounts >" />
+                        <%--<a href='<%= Page.GetRouteUrl("DashboardRoute", null) %>' class="btn btn-sm btn-light border"><i class="fas fa-angle-left"></i> Back</a>--%>
                         <!-- Invisible spacer to balance layout -->
-                        <%--<span style="width: 80px;"></span>--%>
-                      <%--  <div class="d-flex justify-content-center align-items-center">
-                            <h6 class="text-muted mt-2 fs-6 fw-medium">Request ID: &nbsp; </h6>
-                            <asp:Label ID="lblRequestId" runat="server" CssClass="text-dark  d-block fs-6 fw-semibold"></asp:Label>
-                        </div>--%>
+                        <span style="width: 80px;"></span>
+                        <h2 class="mb-2 mx-auto text-center flex-grow-1">Client Profile Details</h2>
+                        <asp:Button ID="btnShowAccount" runat="server" CssClass="btn btn-sm btn-primary" Text="Client Linked Accounts >" OnClick="BtnShowAccounts_Click" />
                     </div>
 
 
-                 
+
 
                     <!-- PERSONAL DETAILS -->
                     <h4 class="text-primary mb-3"><i class="fas fa-user-tag me-2 fs-5"></i>Personal Details</h4>
@@ -158,11 +156,12 @@
                     <hr class="my-4" />
 
                     <div class="d-flex justify-content-end gap-3">
-                       <%-- <asp:Panel ID="pnlBtnsAproveReject" runat="server" Visible="true">
+                        <%-- <asp:Panel ID="pnlBtnsAproveReject" runat="server" Visible="true">
                             <asp:Button ID="btnApprove" runat="server" CssClass="btn btn-success btn-sm shadow-sm  fs-6 me-2" Style="padding: 2px 10px;" Text="Approve" OnClick="BtnApprove_Click" />
                             <button type="button" class="btn btn-danger btn-sm shadow-sm  fs-6 me-2" style="padding: 2px 10px; margin-top: 2px;" data-bs-toggle="modal" data-bs-target="#rejectConfirmModal">Reject</button>
                         </asp:Panel>--%>
                         <asp:Panel ID="pnlBntsEditUpdateDlt" runat="server" Visible="true">
+                            <asp:Button ID="btnCancel" runat="server" CssClass="btn btn-secondary btn-sm shadow-sm  fs-6 me-2" Style="padding: 2px 10px; margin-top: 3px;" Text=" Cancel " OnClick="BtnCancel_Click" Visible="false" />
                             <asp:Button ID="btnEdit" runat="server" CssClass="btn btn-primary btn-sm shadow-sm  fs-6 me-2" Style="padding: 2px 10px; margin-top: 3px;" Text=" Edit " OnClick="BtnEdit_Click" />
                             <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-warning btn-sm shadow-sm  fs-6 me-2" Style="padding: 2px 10px; margin-top: 3px;" Text="Update" OnClick="BtnUpdate_Click" Visible="false" />
                             <%--<button type="button" class="btn btn-danger btn-sm shadow-sm  fs-6" style="padding: 2px 10px; margin-top: 2px;" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">Delete</button>--%>
@@ -175,49 +174,118 @@
 
     </asp:Panel>
 
-    <!-- Approve Modal -->
- <%--   <div class="modal fade" id="approveConfirmModal" tabindex="-1" aria-labelledby="approveConfirmModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow">
-                <div class="modal-header bg-success text-white rounded-top-4" style="height: 60px; border-top-left-radius: 14px; border-top-right-radius: 14px;">
-                    <h5 class="modal-title" id="approveConfirmModalLabel">Approve Joint Account Pending Request</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-start">
-                    Are you sure you want to approve the request?
-                </div>
-                <div class="modal-footer justify-content-end border-0">
+    <%--Account Details--%>
+    <asp:Panel ID="pnlClientAccountDetails" runat="server" Visible="false">
+        <div class="container py-5">
 
-                    <!-- Real Approve Button -->
-                    <asp:Button ID="btnApprove" runat="server" CssClass="btn btn-success btn-sm shadow-sm  fs-6" Style="padding: 3px 10px;" Text="Approve"  />
-                    <button type="button" class="btn btn-light border py-1 px-3" style="padding: 2px 10px;" data-bs-dismiss="modal">Cancel</button>
+            <div class="card shadow-sm rounded-4">
+                <div class="card-body px-5">
+
+
+                    <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+                        <asp:Button ID="btnShowProfile" runat="server" CssClass="btn btn-sm btn-primary" Text="< Client Profile Details" OnClick="BtnShowProfile_Click" />
+                        <h2 class="mb-0 mx-auto text-center flex-grow-1">Client Account Details</h2>
+
+                        <div class="mb-2">
+                            <asp:DropDownList ID="ddlAccountType" runat="server" CssClass="form-select w-auto d-inline-block me-3" AutoPostBack="true" OnSelectedIndexChanged="DdlAccountType_SelectedIndexChanged">
+                                <asp:ListItem Text="All Accounts" Value="All" />
+                                <asp:ListItem Text="Savings" Value="Savings" />
+                                <asp:ListItem Text="Current" Value="Current" />
+                                <asp:ListItem Text="Joint" Value="Joint" />
+                            </asp:DropDownList>
+
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+                    <asp:Panel ID="pnlAccountList" runat="server">
+
+
+
+                        <%-- <asp:GridView ID="gvAccounts" runat="server" AutoGenerateColumns="false" CssClass="table table-bordered table-hover" OnRowCreated="GvAccounts_RowCreated" ShowHeaderWhenEmpty="true" EmptyDataText="No accounts found.">--%>
+                        <asp:GridView ID="gvAccounts" runat="server"
+                            AutoGenerateColumns="false"
+                            CssClass="table table-bordered table-hover"
+                            OnRowCreated="GvAccounts_RowCreated"
+                            ShowHeaderWhenEmpty="true"
+                            EmptyDataText="No accounts found."
+                            AllowPaging="true" PageSize="5"
+                            OnPageIndexChanging="GvAccounts_PageIndexChanging"
+                            PagerStyle-CssClass="grid-pager"
+                            PagerSettings-PageButtonCount="5">
+
+                            <Columns>
+                                <asp:BoundField DataField="AccountNumber" HeaderText="Account Number" />
+                                <asp:BoundField DataField="AccountType" HeaderText="Type" />
+                                <asp:BoundField DataField="Balance" HeaderText="Balance" DataFormatString="{0:C}" />
+                                <%--<asp:BoundField DataField="Balance" HeaderText="Balance" DataFormatString='Rs. {0:N2}' HtmlEncode="false" />--%>
+
+                                <asp:BoundField DataField="Status" HeaderText="Status" />
+                                <%-- <asp:TemplateField HeaderText="Primary">
+                        <ItemTemplate>
+                            <%# Convert.ToBoolean(Eval("IsPrimary")) ? "Yes" : "No" %>
+                        </ItemTemplate>
+                    </asp:TemplateField>--%>
+                                <asp:TemplateField HeaderText="Joint Account">
+                                    <ItemTemplate>
+                                        <%# Convert.ToBoolean(Eval("IsJoint")) ? "Yes" : "No" %>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:BoundField DataField="CoHolderClientId" HeaderText="Co-Holder Client Id" />
+                                <asp:BoundField DataField="CoHolderName" HeaderText="Co-Holder Name" />
+                                <asp:TemplateField HeaderText="Actions">
+                                    <ItemTemplate>
+                                        <button type="button" class="btn btn-outline-danger btn-sm shadow-sm fs-6" style="padding: 2px 10px; margin-top: 3px;" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setAccountNumberToDelete('<%# Eval("AccountNumber") %>')">
+                                            Delete
+                                        </button>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+
+                            </Columns>
+                        </asp:GridView>
+
+                        <asp:HiddenField ID="hfAccountNumberToDelete" runat="server" />
+
+                    </asp:Panel>
 
                 </div>
+
             </div>
         </div>
-    </div>--%>
+    </asp:Panel>
+
 
     <!-- Reject Modal -->
-    <div class="modal fade" id="rejectConfirmModal" tabindex="-1" aria-labelledby="rejectConfirmModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 shadow">
                 <div class="modal-header bg-danger text-white rounded-top-4" style="height: 60px; border-top-left-radius: 14px; border-top-right-radius: 14px;">
-                    <h5 class="modal-title" id="rejectConfirmModalLabel">Delete Pending Request</h5>
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Delete Account</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-start">
-                    Are you sure you want to delete this request?
+                    Are you sure you want to delete this account?
+                    <br />
+                    <br />
+                    <i>(Note: If this is a joint account, deleting it will remove access from both account holders.)</i>
                 </div>
                 <div class="modal-footer justify-content-end border-0">
 
-                    <!-- Real Reject Button -->
-                    <%--<asp:Button ID="btnDelete" runat="server" CssClass="btn btn-danger btn-sm shadow-sm  fs-6" Style="padding: 3px 10px;" Text="Delete" OnClick="BtnDelete_Click"  />--%>
+                    <!-- Real Delete Button -->
+                    <asp:Button ID="btnDeleteAccount" runat="server" Text="Delete" CssClass="btn btn-danger border py-1 px-3" OnClick="BtnDeleteAccount_Click" />
                     <button type="button" class="btn btn-light border py-1 px-3" style="padding: 2px 10px;" data-bs-dismiss="modal">Cancel</button>
 
                 </div>
             </div>
         </div>
     </div>
+
+     
 
 
 

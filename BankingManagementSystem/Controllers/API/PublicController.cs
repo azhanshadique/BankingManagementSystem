@@ -67,32 +67,4 @@ namespace BankingManagementSystem.Controllers.API
 }
 
 
-//using BankingManagementSystem.BLL;
-//using BankingManagementSystem.DAL;
-//using BankingManagementSystem.Models.DTOs;
-//using System.Threading.Tasks;
-//using System.Web.Http;
-//using System.Web.Services.Description;
-
-//namespace BankingManagementSystem.Controllers.API
-//{
-//    [RoutePrefix("api/client")]
-//    public class ClientController : ApiController
-//    {
-//        [HttpPost]
-//        [Route("register")]
-//        public async Task<IHttpActionResult> RegisterClientAsync(ClientDTO client)
-//        {
-//            var result = await ClientBLL.RegisterNewClient(client);
-
-//            if (result.IsSuccess)
-//                return Ok(result.Message);
-//            else
-//                return BadRequest(result.Message);
-//        }
-
-
-
-//    }
-//}
 

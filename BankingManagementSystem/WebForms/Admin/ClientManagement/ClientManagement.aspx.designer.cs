@@ -15,7 +15,7 @@ namespace BankingManagementSystem.WebForms.Admin.ClientManagement
     {
 
         /// <summary>
-        /// txtRequestId control.
+        /// txtSearchClientId control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
@@ -31,6 +31,7 @@ namespace BankingManagementSystem.WebForms.Admin.ClientManagement
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnSearch;
+        protected global::System.Web.UI.WebControls.HiddenField hfAccountNumberToDelete;
 
         /// <summary>
         /// pnlClientProfileDetails control.
@@ -40,6 +41,15 @@ namespace BankingManagementSystem.WebForms.Admin.ClientManagement
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel pnlClientProfileDetails;
+
+        /// <summary>
+        /// btnShowAccount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnShowAccount;
 
         /// <summary>
         /// txtFullName control.
@@ -213,6 +223,15 @@ namespace BankingManagementSystem.WebForms.Admin.ClientManagement
         protected global::System.Web.UI.WebControls.Panel pnlBntsEditUpdateDlt;
 
         /// <summary>
+        /// btnCancel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCancel;
+
+        /// <summary>
         /// btnEdit control.
         /// </summary>
         /// <remarks>
@@ -229,5 +248,59 @@ namespace BankingManagementSystem.WebForms.Admin.ClientManagement
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnUpdate;
+
+        /// <summary>
+        /// pnlClientAccountDetails control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlClientAccountDetails;
+
+        /// <summary>
+        /// btnShowProfile control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnShowProfile;
+
+        /// <summary>
+        /// ddlAccountType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlAccountType;
+
+        /// <summary>
+        /// pnlAccountList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlAccountList;
+
+        /// <summary>
+        /// gvAccounts control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gvAccounts;
+
+        /// <summary>
+        /// btnDeleteAccount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnDeleteAccount;
     }
 }

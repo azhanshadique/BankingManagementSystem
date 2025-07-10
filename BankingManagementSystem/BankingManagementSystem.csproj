@@ -277,6 +277,7 @@
     <Compile Include="Helpers\JwtHttpClientHandler.cs" />
     <Compile Include="Helpers\JwtTokenManager.cs" />
     <Compile Include="Helpers\PageRender.cs" />
+    <Compile Include="Helpers\PasswordHasher.cs" />
     <Compile Include="Helpers\RegistrationService.cs" />
     <Compile Include="Helpers\RequestsService.cs" />
     <Compile Include="Models\API\ApiErrorMessageWrapper.cs" />

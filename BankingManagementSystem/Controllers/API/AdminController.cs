@@ -37,6 +37,22 @@ namespace BankingManagementSystem.Controllers.API
                 ? Ok(new { message })
                 : (IHttpActionResult)BadRequest(message);
         }
+        
+        [HttpDelete]
+        [Route("client-account")]
+        public async Task<IHttpActionResult> DeleteAccountAsync([FromUri] long accountNumber)
+        {
+            var (isDeleted, message) = await AdminBLL.DeleteClientAccountAsync(accountNumber);
+
+            return isDeleted
+                ? Ok(new { message })
+                : (IHttpActionResult)BadRequest(message);
+
+            //bool isDeleted = await AccountService.DeleteAccountAsync(accountNumber);
+            //if (isDeleted)
+            //    return Ok("Account deleted successfully.");
+            //return BadRequest("Failed to delete the account.");
+        }
     }
 
 }

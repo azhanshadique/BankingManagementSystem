@@ -298,18 +298,29 @@ namespace BankingManagementSystem.WebForms.Admin.ClientRequests
             txtClientId.Text = client.ClientId.ToString();
         }
 
-
+        protected void ToggleButtons(bool toggle)
+        {
+            btnEdit.Visible = !toggle;
+            btnUpdate.Visible = toggle;
+            btnCancel.Visible = toggle;
+        }
+        protected void BtnCancel_Click(object sender, EventArgs e)
+        {
+            int requestId = (int)ViewState["SelectedRequestId"];
+            SetClientFormReadOnly(true);
+            ToggleButtons(false);
+            ShowRequestDetails(requestId);
+        }
         protected void BtnEdit_Click(object sender, EventArgs e)
         {
             SetClientFormReadOnly(false);
-            btnEdit.Visible = false;
-            btnUpdate.Visible = true;
+            ToggleButtons(true);
+  
         } 
         protected void BtnDelete_Click(object sender, EventArgs e)
         {
             SetClientFormReadOnly(false);
-            btnEdit.Visible = false;
-            btnUpdate.Visible = true;
+            ToggleButtons(true);
         }
 
         private void SetClientFormReadOnly(bool isReadOnly)
@@ -382,23 +393,14 @@ namespace BankingManagementSystem.WebForms.Admin.ClientRequests
             {
                 ApiResponseMessage result = await RequestsService.UpdateRequestAsync(requestId, updatedClient);
 
-                string message = result.MessageContent;
+                //string message = result.MessageContent;
+                string message = GetParsedErrorMessage(result.MessageContent);
 
-              
-                if (result.MessageContent.StartsWith("{") && result.MessageContent.Contains("Message"))
-                {
-                    var parsed = JsonConvert.DeserializeObject<ApiErrorMessageWrapper>(result.MessageContent);
-                    message = parsed?.Message;
-                }
-                if (message.StartsWith("\"") && message.EndsWith("\""))
-                {
-                    message = message.Trim('"');
-                }
+                
                 string messageContent = result.MessageType == "success" ? "Request updated successfully." : message;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('{messageContent}', '{result.MessageType}');", true);
                 SetClientFormReadOnly(true);
-                btnEdit.Visible = true;
-                btnUpdate.Visible = false;
+                ToggleButtons(false);
                 ShowRequestDetails(requestId);
             }
             catch
@@ -496,7 +498,26 @@ namespace BankingManagementSystem.WebForms.Admin.ClientRequests
             }
             await ReloadUI(result);
         }
+        protected string GetParsedErrorMessage(string errorMessage)
+        {
+            string message;
+            if (errorMessage.StartsWith("{") && errorMessage.Contains("Message"))
+            {
+                var parsed = JsonConvert.DeserializeObject<ApiErrorMessageWrapper>(errorMessage);
+                message = parsed?.Message;
+            }
+            else
+            {
+                message = errorMessage;
+            }
+            // Trim quotes if they exist
+            if (message.StartsWith("\"") && message.EndsWith("\""))
+            {
+                message = message.Trim('"');
+            }
+            return message;
 
+        }
         private async Task ReloadUI(bool success)
         {
             if (success)

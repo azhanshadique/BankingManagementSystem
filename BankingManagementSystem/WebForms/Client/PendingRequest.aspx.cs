@@ -426,8 +426,7 @@ namespace BankingManagementSystem.WebForms.Client
                 string messageContent = result.MessageType == "success" ? "Request updated successfully." : message;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('{messageContent}', '{result.MessageType}');", true);
                 SetClientFormReadOnly(true);
-                btnEdit.Visible = true;
-                btnUpdate.Visible = false;
+                ToggleButtons(false);
             }
             catch
             {
@@ -525,12 +524,23 @@ namespace BankingManagementSystem.WebForms.Client
             }
             await ReloadUI(result);
         }
-
+        protected void ToggleButtons(bool toggle)
+        {
+            btnEdit.Visible = !toggle;
+            btnUpdate.Visible = toggle;
+            btnCancel.Visible = toggle;
+        }
         protected void BtnEdit_Click(object sender, EventArgs e)
         {
             SetClientFormReadOnly(false);
-            btnEdit.Visible = false;
-            btnUpdate.Visible = true;
+            ToggleButtons(true);
+        }
+        protected void BtnCancel_Click(object sender, EventArgs e)
+        {
+            int requestId = (int)ViewState["SelectedRequestId"];
+            SetClientFormReadOnly(true);
+            ToggleButtons(false);
+            ShowRequestDetails(requestId);
         }
         protected async void BtnDelete_Click(object sender, EventArgs e)
         {

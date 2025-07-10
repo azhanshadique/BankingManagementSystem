@@ -24,10 +24,7 @@ namespace BankingManagementSystem.BLL
         {
             return await AdminDAL.CreateClientAsync(client);
         }
-        //public static async Task<(bool IsSuccess, string Message)> UpdateClientDetailsAsync(int clientId, ClientDTO client)
-        //{
-        //    return await AdminDAL.UpdateClientDetailsAsync(clientId, client);
-        //}
+
         public static async Task<(bool IsSuccess, string Message)> UpdateClientDetailsAsync(int clientId, ClientDTO client)
         {
             if (!await ClientDAL.IsClientExistsByClientIdAsync(clientId))
@@ -39,7 +36,14 @@ namespace BankingManagementSystem.BLL
                 return await AdminDAL.UpdateClientProfileDetailsAsync(clientId, client);
             }
             return (false, Message);
-            //return (IsUpdated, IsUpdated ? "Request updated successfully." : "Failed to update request.");
+        }
+
+        public static async Task<(bool IsSuccess, string Message)> DeleteClientAccountAsync(long accountNumber)
+        {
+            decimal currentBalance = await TransactionDAL.GetBalanceAsync(accountNumber);
+            if (currentBalance < 0)
+                return (false, "Invalid account number.");
+            return await AdminDAL.DeleteClientAccountAsync(accountNumber);
         }
     }
 }

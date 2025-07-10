@@ -26,16 +26,6 @@ namespace BankingManagementSystem.Helpers
             HttpResponseMessage response = await httpClient.PutAsJsonAsync(apiUrl, client);
             return response.IsSuccessStatusCode;
         } 
-        //public static async Task<bool> UpdateClientDetailsAsync(ClientDTO client)
-        //{
-        //    var json = JsonConvert.SerializeObject(client);
-        //    var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        //    //string apiUrl = ConfigurationManager.AppSettings["UpdateClientApiUrl"];
-
-        //    HttpResponseMessage response = await httpClient.PostAsync(apiUrl, content);
-        //    return response.IsSuccessStatusCode;
-        //}
 
         public static async Task<bool> UpdateClientDetailsAsync(ClientDTO client)
         {
@@ -44,6 +34,15 @@ namespace BankingManagementSystem.Helpers
             string apiUrl = $"api/admin/update-client?clientId={client.ClientId}";
 
             HttpResponseMessage response = await httpClient.PutAsJsonAsync(apiUrl, client);
+            return response.IsSuccessStatusCode;
+           
+        }
+        
+        public static async Task<bool> DeleteAccountAsync(long accountNumber)
+        {
+            string apiUrl = $"api/admin/client-account?accountNumber={accountNumber}";
+
+            HttpResponseMessage response = await httpClient.DeleteAsync(apiUrl);
             return response.IsSuccessStatusCode;
            
         }

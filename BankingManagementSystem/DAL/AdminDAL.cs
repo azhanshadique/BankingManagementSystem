@@ -164,5 +164,26 @@ namespace BankingManagementSystem.DAL
                 return (false, $"Database error during client data update. {ex.Message}");
             }
         }
+        
+        public static async Task<(bool IsSuccess, string Message)> DeleteClientAccountAsync(long accountNumber)
+        {
+            try
+            {
+                using (SqlConnection con = DBConnectionManager.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("sp_DeleteClientAccount", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@AccountNumber", accountNumber);
+
+                    await con.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+                    return (true, "Account deleted successfully.");
+                }
+            }
+            catch (SqlException ex)
+            {
+                return (false, $"Database error during client account delete. {ex.Message}");
+            }
+        }
     }
 }

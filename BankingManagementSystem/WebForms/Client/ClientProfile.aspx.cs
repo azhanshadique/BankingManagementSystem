@@ -91,11 +91,18 @@ namespace BankingManagementSystem.WebForms.Client
             SetClientFormReadOnly(false);
             ToggleButtons(true);
             
-        } 
+        }
+        protected async void BtnCancel_Click(object sender, EventArgs e)
+        {
+            SetClientFormReadOnly(true);
+            ToggleButtons(false);
+            await ReloadUI(true);
+        }
         protected void ToggleButtons(bool toggle)
         {
             btnEdit.Visible = !toggle;
             btnUpdate.Visible = toggle;
+            btnCancel.Visible = toggle;
         }
         private void SetClientFormReadOnly(bool isReadOnly)
         {
