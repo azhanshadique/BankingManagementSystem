@@ -32,6 +32,7 @@ namespace BankingManagementSystem.WebForms.Home
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnSearch;
         protected global::System.Web.UI.WebControls.Button btnDelete;
+        protected global::System.Web.UI.WebControls.Button btnCancel;
 
         /// <summary>
         /// pnlSummary control.

@@ -179,12 +179,24 @@ namespace BankingManagementSystem.WebForms.Home
         }
 
 
-
+        protected void ToggleButtons(bool toggle)
+        {
+            btnEdit.Visible = !toggle;
+            btnUpdate.Visible = toggle;
+            btnCancel.Visible = toggle;
+        }
+        protected void BtnCancel_Click(object sender, EventArgs e)
+        {
+            int requestId = (int)ViewState["SelectedRequestId"];
+            SetClientFormReadOnly(true);
+            ToggleButtons(false);
+            ShowRequestDetails(requestId);
+        }
         protected void BtnEdit_Click(object sender, EventArgs e)
         {
             SetClientFormReadOnly(false);
-            btnEdit.Visible = false;
-            btnUpdate.Visible = true;
+            ToggleButtons(true);
+     
         }
 
         private void SetClientFormReadOnly(bool isReadOnly)
@@ -203,9 +215,9 @@ namespace BankingManagementSystem.WebForms.Home
             txtCity.ReadOnly = isReadOnly;
             txtState.ReadOnly = isReadOnly;
             txtPincode.ReadOnly = isReadOnly;
-            ddlAccountType.Enabled = !isReadOnly;
-            ddlIsJointAccount.Enabled = !isReadOnly;
-            txtJointClientId.ReadOnly = isReadOnly;
+            //ddlAccountType.Enabled = !isReadOnly;
+            //ddlIsJointAccount.Enabled = !isReadOnly;
+            //txtJointClientId.ReadOnly = isReadOnly;
             txtUsername.ReadOnly = isReadOnly;
             //txtPassword.ReadOnly = isReadOnly;
             //txtConfirmPassword.ReadOnly = isReadOnly;
@@ -267,9 +279,9 @@ namespace BankingManagementSystem.WebForms.Home
                 string messageContent = result.MessageType == "success" ? "Request updated successfully." : message;
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('{messageContent}', '{result.MessageType}');", true);
                 SetClientFormReadOnly(true);
-                btnEdit.Visible = true;
-                btnUpdate.Visible = false;
+                ToggleButtons(false);
                 await ReloadUI(true);
+
             }
             catch
             {

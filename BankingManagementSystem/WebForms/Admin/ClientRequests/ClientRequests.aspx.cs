@@ -464,7 +464,7 @@ namespace BankingManagementSystem.WebForms.Admin.ClientRequests
             }
             else
             {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "failAlert", "showAlert('Approval failed.', 'danger');", true);
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "failAlert", $"showAlert('Approval failed.', 'danger');", true);
             }
 
         }

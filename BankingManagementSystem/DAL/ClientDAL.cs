@@ -15,8 +15,56 @@ namespace BankingManagementSystem.DAL
 {
     public static class ClientDAL
     {
-
         public static async Task<User> CheckClientCredentialsAsync(AuthRequestDTO client)
+        {
+            try
+            {
+                using (SqlConnection con = DBConnectionManager.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("sp_ValidateClientPassword", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Username", client.Username);
+
+                    await con.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            
+                            int idxPassword = reader.GetOrdinal(DbColumns.Password);
+
+                            //string storedHash = reader["password"]?.ToString();
+                            string storedHash = reader.IsDBNull(idxPassword) ? null : reader.GetString(idxPassword);
+
+                            bool isValid = PasswordHasher.VerifyPassword(client.Password, storedHash);
+
+                            if (!isValid) return null;
+
+                            int idxClientId = reader.GetOrdinal(DbColumns.ClientId);
+                            int idxFullName = reader.GetOrdinal(DbColumns.FullName);
+                            int idxUsername = reader.GetOrdinal(DbColumns.Username);
+
+                            return new User
+                            {
+
+                                UserID = reader.GetInt32(idxClientId),
+                                FullName = reader.IsDBNull(idxFullName) ? null : reader.GetString(idxFullName),
+                                Username = reader.IsDBNull(idxUsername) ? null : reader.GetString(idxUsername),
+                                Role = UserRoles.CLIENT
+                            };
+                        }
+                    }
+                    return null;
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error during client login credentials validation.", ex);
+            }
+        }
+
+        public static async Task<User> CheckClientCredentialsAsync2(AuthRequestDTO client)
         {
             try
             {
@@ -238,12 +286,40 @@ namespace BankingManagementSystem.DAL
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ClientId", clientId);
-                    cmd.Parameters.AddWithValue("@Password", password);
+                    //cmd.Parameters.AddWithValue("@Password", password);
+
+                    //await con.OpenAsync();
+                    //object result = await cmd.ExecuteScalarAsync();
+                    //return Convert.ToInt32(result) > 0;
+
+
+                    //cmd.CommandType = CommandType.StoredProcedure;
+                    //cmd.Parameters.AddWithValue("@Username", client.Username);
 
                     await con.OpenAsync();
-                    object result = await cmd.ExecuteScalarAsync();
-                    return Convert.ToInt32(result) > 0;
-                }          
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+
+                            int idxPassword = reader.GetOrdinal(DbColumns.Password);
+
+                            string storedHash = reader.IsDBNull(idxPassword) ? null : reader.GetString(idxPassword);
+
+                            bool isValid = PasswordHasher.VerifyPassword(password, storedHash);
+
+                            if (!isValid) return false;
+
+                            return true;
+                            
+                        }
+                    }
+                    return false;
+                }
+
+
+                
             }
             catch (SqlException ex)
             {

@@ -34,7 +34,7 @@ namespace BankingManagementSystem.BLL
                 return false;
             }
 
-            if (!Regex.IsMatch(password, "[^a-zA-Z0-9]")) // special char
+            if (!Regex.IsMatch(password, "[^a-zA-Z0-9]"))
             {
                 errorMessage = "Password must contain at least one special character.";
                 return false;
@@ -45,8 +45,10 @@ namespace BankingManagementSystem.BLL
                 errorMessage = "Passwords do not match!";
                 return false;
             }
+
             return true;
         }
+
         public static bool IsValidDOB(DateTime? dob, out string errorMessage)
         {
             errorMessage = "";
@@ -80,6 +82,7 @@ namespace BankingManagementSystem.BLL
 
             return true;
         }
+
         public static bool IsValidGender(string gender, out string errorMessage)
         {
             errorMessage = "";
@@ -104,12 +107,14 @@ namespace BankingManagementSystem.BLL
         public static bool IsValidUsername(string username, out string errorMessage)
         {
             errorMessage = "";
+
             if (username.Length < 6)
             {
                 errorMessage = "Username must be at least 6 characters long.";
                 return false;
             }
-            if (Regex.IsMatch(username, "[^a-zA-Z0-9]")) // special char
+
+            if (Regex.IsMatch(username, "[^a-zA-Z0-9]"))
             {
                 errorMessage = "Username must not contain any special character.";
                 return false;
@@ -117,6 +122,7 @@ namespace BankingManagementSystem.BLL
 
             return true;
         }
+
         public static bool IsValidAadhaar(string aadhaar, out string errorMessage)
         {
             errorMessage = "";
@@ -127,7 +133,6 @@ namespace BankingManagementSystem.BLL
                 return false;
             }
 
-            // Aadhaar must be exactly 12 digits
             if (!Regex.IsMatch(aadhaar, @"^\d{12}$"))
             {
                 errorMessage = "Invalid Aadhaar number format. It must be exactly 12 digits.";
@@ -166,7 +171,6 @@ namespace BankingManagementSystem.BLL
                 return false;
             }
 
-            // Check if it's exactly 10 digits and starts with 6-9
             if (!Regex.IsMatch(mobileNumber, @"^[6-9]\d{9}$"))
             {
                 errorMessage = "Invalid mobile number format. It must be 10 digits starting with 6, 7, 8, or 9.";
@@ -194,7 +198,5 @@ namespace BankingManagementSystem.BLL
 
             return true;
         }
-
     }
 }
-

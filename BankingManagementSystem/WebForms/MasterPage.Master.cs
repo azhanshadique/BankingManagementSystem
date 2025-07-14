@@ -188,7 +188,7 @@ namespace BankingManagementSystem.WebForms
 
         protected void BtnClientManagement_Click(object sender, EventArgs e)
         {
-            Response.Redirect(Page.GetRouteUrl("ClientLoginRoute", null));
+            Response.Redirect(Page.GetRouteUrl("ClientManagementRoute", null));
         }
         protected void BtnClientRequests_Click(object sender, EventArgs e)
         {

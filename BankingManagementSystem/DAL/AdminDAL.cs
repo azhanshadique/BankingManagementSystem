@@ -19,6 +19,54 @@ namespace BankingManagementSystem.DAL
             try
             {
                 using (SqlConnection con = DBConnectionManager.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("sp_ValidateAdminPassword", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Username", admin.Username);
+
+                    await con.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+
+                            int idxPassword = reader.GetOrdinal(DbColumns.Password);
+
+                            string storedHash = reader.IsDBNull(idxPassword) ? null : reader.GetString(idxPassword);
+
+                            bool isValid = PasswordHasher.VerifyPassword(admin.Password, storedHash);
+
+                            if (!isValid) return null;
+
+                            int idxAdminId = reader.GetOrdinal(DbColumns.AdminId);
+                            int idxFullName = reader.GetOrdinal(DbColumns.FullName);
+                            int idxUsername = reader.GetOrdinal(DbColumns.Username);
+
+                            return new User
+                            {
+
+                                UserID = reader.GetInt32(idxAdminId),
+                                FullName = reader.IsDBNull(idxFullName) ? null : reader.GetString(idxFullName),
+                                Username = reader.IsDBNull(idxUsername) ? null : reader.GetString(idxUsername),
+                                Role = UserRoles.ADMIN
+                            };
+                        }
+                    }
+                    return null;
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error during client login credentials validation.", ex);
+            }
+        }
+
+        public static async Task<User> CheckAdminCredentialsAsync2(AuthRequestDTO admin)
+        {
+            try
+            {
+                using (SqlConnection con = DBConnectionManager.GetConnection())
                 using (SqlCommand cmd = new SqlCommand("sp_ValidateAdmin", con))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;

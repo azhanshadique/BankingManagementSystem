@@ -100,6 +100,7 @@ namespace BankingManagementSystem.WebForms.Client
             };
 
             //ApiResponseMessage response = await ClientService.DepositAmountAsync(depositDto);
+
             var result = await ClientService.DepositAmountAsync(depositDto);
             string message = GetParsedErrorMessage(result.Message);
             if (result.IsSuccess)

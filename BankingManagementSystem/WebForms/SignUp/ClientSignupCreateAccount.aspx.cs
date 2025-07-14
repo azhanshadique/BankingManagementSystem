@@ -1,23 +1,12 @@
-﻿using BankingManagementSystem.BLL;
-using BankingManagementSystem.DAL;
-using BankingManagementSystem.Helpers;
+﻿using BankingManagementSystem.Helpers;
 using BankingManagementSystem.Models.API;
 using BankingManagementSystem.Models.ConstraintTypes;
 using BankingManagementSystem.Models.DTOs;
-using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Web;
-using System.Web.Helpers;
-using System.Web.Http.Results;
-using System.Web.Services.Description;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace BankingManagementSystem.WebForms.SignUp
 {
@@ -25,182 +14,136 @@ namespace BankingManagementSystem.WebForms.SignUp
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
         }
+
         protected async void BtnSubmit_Click(object sender, EventArgs e)
         {
-            // Extract all input values into variables
-            string fullName = TextBox_fullname.Text.Trim();
-            string parentName = TextBox_parentname.Text.Trim();
-            string txtDOB = TextBox_dob.Text.Trim();
-            DateTime dob = DateTime.MinValue;
-            bool isDobValid = DateTime.TryParse(txtDOB, out dob);
-            string gender = ddl_gender.SelectedValue;
-            string nationality = TextBox_nationality.Text.Trim();
-            string occupation = TextBox_occupation.Text.Trim();
-            string aadhaar = TextBox_aadhaar.Text.Trim();
-            string pan = TextBox_pan.Text.Trim();
-            string mobile = TextBox_mobilenumber.Text.Trim();
-            string email = TextBox_emailid.Text.Trim();
-            string address = TextBox_fulladdress.Text.Trim();
-            string state = TextBox_state.Text.Trim();
-            string city = TextBox_city.Text.Trim();
-            string pincode = TextBox_pincode.Text.Trim();
-            string accountType = ddl_accounttype.SelectedValue;
-            string isJoint = ddlIsJointAccount.SelectedValue;
-            string jointClientId = TextBox_jointaccclient.Text.Trim();
-            string username = TextBox_username.Text.Trim().ToLower();
-            string password = TextBox_password.Text.Trim();
-            string confirmPassword = TextBox_confirmpassword.Text.Trim();
-            string termsCondition = CheckBox_terms.Checked ? "Yes" : "";
+            // Extract all input values from the form
+            Dictionary<string, string> fieldValues = ExtractFormFields();
 
-            // Store all required fields in a Dictionary
-            Dictionary<string, string> requiredFields = new Dictionary<string, string>
-            {
-                { "Full Name", fullName },
-                { "Parent\\'s Name", parentName },
-                { "DOB", dob.ToString() },
-                { "Gender", gender },
-                { "Nationality", nationality },
-                { "Occupation", occupation },
-                { "Aadhaar", aadhaar },
-                { "PAN", pan },
-                { "Mobile", mobile },
-                { "Email", email },
-                { "State", state },
-                { "City", city },
-                { "Pincode", pincode },
-                { "Account Type", accountType },
-                { "Is Joint Account", isJoint },
-                { "Username", username },
-                { "Password", password },
-                { "Confirm Password", confirmPassword },
-                { "Agree to Terms & Condition and Privacy Policy", termsCondition }
-            };
+            // Validate required fields (including joint client ID if applicable)
+            if (!ValidateRequiredFields(fieldValues)) return;
 
-
-            // Validate required fields
-            if (!ValidateRequiredFields(requiredFields))
-                return;
-
-            // Validate joint account required fields (if joint account)
-            if (isJoint == "Yes")
-            {
-
-                Dictionary<string, string> requiredJointFields = new Dictionary<string, string>
-                {
-                    { "Co-holder\\'s Client ID", jointClientId },
-                };
-
-                if (!ValidateRequiredFields(requiredJointFields))
-                {
-                    return;
-
-                }
-            }
-
-            // Create DTO
-            ClientDTO client = new ClientDTO
-            {
-                FullName = fullName,
-                ParentName = parentName,
-                DOB = dob.Date,
-                Gender = gender,
-                Nationality = nationality,
-                Occupation = occupation,
-                AadhaarNumber = aadhaar,
-                PANNumber = pan,
-                MobileNumber = mobile,
-                EmailId = email,
-                Address = address,
-                State = state,
-                City = city,
-                Pincode = pincode,
-                AccountType = accountType,
-                IsJointAccount = isJoint == "Yes",
-                JointClientId = string.IsNullOrWhiteSpace(jointClientId) ? 0 : Convert.ToInt32(jointClientId),
-                Username = username,
-                Password = password,
-                ConfirmPassword = confirmPassword,
-                CoHolderApproved = RequestStatus.Awaiting.ToString(),
-                AdminApproved = RequestStatus.Awaiting.ToString()
-            };
+            // Map extracted fields into a ClientDTO with hashed password
+            ClientDTO client = GetClientFromForm(fieldValues);
 
             try
             {
+                // Call the registration service to create client
                 ApiResponseMessage result = await RegistrationService.RegisterClientAsync(client);
+                string message = HttpUtility.JavaScriptStringEncode(GetParsedErrorMessage(result.MessageContent));
 
-                string message = GetParsedErrorMessage(result.MessageContent);
-
-
-                //if (result.MessageContent.StartsWith("{") && result.MessageContent.Contains("Message"))
-                //{
-                //    var parsed = JsonConvert.DeserializeObject<ApiErrorMessageWrapper>(result.MessageContent);
-                //    message = parsed?.Message;
-                //}
-                //else
-                //{
-                //    message = result.MessageContent;
-                //}
-                //// Trim quotes if they exist
-                //if (message.StartsWith("\"") && message.EndsWith("\""))
-                //{
-                //    message = message.Trim('"');
-                //}
-
-                //var parsed = JsonConvert.DeserializeObject<dynamic>(result.MessageContent);
-                //string message = parsed?.Message;
-
-
+                // Show success/failure feedback with modal or alert
                 if (result.MessageType == "success")
                 {
                     string redirectUrl = ResolveClientUrl(Page.GetRouteUrl("DashboardRoute", null));
-
                     string script = $@"
-                    setTimeout(function() {{
-                        showDynamicModal({{
-                            titleText: 'Client Registration Successful',
-                            messageText: '{message}',
-                            type: '{result.MessageType}',
-                            redirectUrl: '{redirectUrl}'
-                        }});
-                    }}, 300);";
-
+                        setTimeout(function() {{
+                            showDynamicModal({{
+                                titleText: 'Client Registration Successful',
+                                messageText: '{message}',
+                                type: '{result.MessageType}',
+                                redirectUrl: '{redirectUrl}'
+                            }});
+                        }}, 300);";
 
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "showModal", script, true);
-                    //ScriptManager.RegisterStartupScript(this, this.GetType(), "showSuccess", $"setTimeout(function(){{ showRegisterSuccessMessage('{message}', '{result.MessageType}'); }}, 200);", true);
                 }
                 else
+                {
                     ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('{message}', '{result.MessageType}');", true);
+                }
             }
-            catch (Exception ex)
+            catch
             {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", $"showAlert('Registration failed due to a technical error.', 'danger');", true);
+                // Handle unexpected server-side failure
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "customAlert", "showAlert('Registration failed due to a technical error.', 'danger');", true);
             }
         }
-        protected string GetParsedErrorMessage(string Message)
-        {
-            string parsedMessage;
-            if (Message.StartsWith("{") && Message.Contains("Message"))
-            {
-                var parsed = JsonConvert.DeserializeObject<ApiErrorMessageWrapper>(Message);
-                parsedMessage = parsed?.Message;
-            }
-            else
-            {
-                parsedMessage = Message;
-            }
-            // Trim quotes if they exist
-            if (parsedMessage.StartsWith("\"") && parsedMessage.EndsWith("\""))
-            {
-                parsedMessage = parsedMessage.Trim('"');
-            }
-            return parsedMessage;
-        }
-        protected bool ValidateRequiredFields(Dictionary<string, string> requiredFields)
-        {
 
-            foreach (var field in requiredFields)
+        // Extracts all values from the form controls into a dictionary
+        private Dictionary<string, string> ExtractFormFields()
+        {
+            return new Dictionary<string, string>
+            {
+                { "Full Name", TextBox_fullname.Text.Trim() },
+                { "Parent's Name", TextBox_parentname.Text.Trim() },
+                { "DOB", TextBox_dob.Text.Trim() },
+                { "Gender", ddl_gender.SelectedValue },
+                { "Nationality", TextBox_nationality.Text.Trim() },
+                { "Occupation", TextBox_occupation.Text.Trim() },
+                { "Aadhaar", TextBox_aadhaar.Text.Trim() },
+                { "PAN", TextBox_pan.Text.Trim() },
+                { "Mobile", TextBox_mobilenumber.Text.Trim() },
+                { "Email", TextBox_emailid.Text.Trim() },
+                { "Address", TextBox_fulladdress.Text.Trim() },
+                { "State", TextBox_state.Text.Trim() },
+                { "City", TextBox_city.Text.Trim() },
+                { "Pincode", TextBox_pincode.Text.Trim() },
+                { "Account Type", ddl_accounttype.SelectedValue },
+                { "Is Joint Account", ddlIsJointAccount.SelectedValue },
+                { "Joint Client ID", TextBox_jointaccclient.Text.Trim() },
+                { "Username", TextBox_username.Text.Trim().ToLower() },
+                { "Password", TextBox_password.Text.Trim() },
+                { "Confirm Password", TextBox_confirmpassword.Text.Trim() },
+                { "Agree to Terms", CheckBox_terms.Checked ? "Yes" : "" }
+            };
+        }
+
+        // Converts extracted values to a ClientDTO and hashes the password
+        private ClientDTO GetClientFromForm(Dictionary<string, string> values)
+        {
+            DateTime.TryParse(values["DOB"], out DateTime dob);
+            //string hashedPassword = PasswordHasher.HashPassword(values["Password"]);
+
+            return new ClientDTO
+            {
+                FullName = values["Full Name"],
+                ParentName = values["Parent's Name"],
+                DOB = dob.Date,
+                Gender = values["Gender"],
+                Nationality = values["Nationality"],
+                Occupation = values["Occupation"],
+                AadhaarNumber = values["Aadhaar"],
+                PANNumber = values["PAN"],
+                MobileNumber = values["Mobile"],
+                EmailId = values["Email"],
+                Address = values["Address"],
+                State = values["State"],
+                City = values["City"],
+                Pincode = values["Pincode"],
+                AccountType = values["Account Type"],
+                IsJointAccount = values["Is Joint Account"] == "Yes",
+                JointClientId = string.IsNullOrWhiteSpace(values["Joint Client ID"]) ? 0 : Convert.ToInt32(values["Joint Client ID"]),
+                Username = values["Username"],
+                Password = values["Password"],
+                ConfirmPassword = values["Confirm Password"],
+                CoHolderApproved = RequestStatus.Awaiting.ToString(),
+                AdminApproved = RequestStatus.Awaiting.ToString()
+            };
+        }
+
+        // Attempts to parse and clean the response message
+        protected string GetParsedErrorMessage(string message)
+        {
+            if (message.StartsWith("{") && message.Contains("Message"))
+            {
+                var parsed = JsonConvert.DeserializeObject<ApiErrorMessageWrapper>(message);
+                message = parsed?.Message;
+            }
+
+            if (message.StartsWith("\"") && message.EndsWith("\""))
+            {
+                message = message.Trim('"');
+            }
+
+            return message;
+        }
+
+        // Checks that all required fields have non-empty values
+        protected bool ValidateRequiredFields(Dictionary<string, string> fields)
+        {
+            foreach (var field in fields)
             {
                 if (string.IsNullOrWhiteSpace(field.Value))
                 {
@@ -211,53 +154,41 @@ namespace BankingManagementSystem.WebForms.SignUp
             return true;
         }
 
+        // Toggles joint account field visibility based on dropdown selection
         protected void DdlIsJoint_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (ddlIsJointAccount.SelectedValue == "Yes")
-            {
-                fsJointAccount.Visible = true;
-            }
-            else
-            {
+            fsJointAccount.Visible = ddlIsJointAccount.SelectedValue == "Yes";
+            if (!fsJointAccount.Visible)
                 TextBox_jointaccclient.Text = string.Empty;
-                fsJointAccount.Visible = false;
-
-            }
         }
+
+        // Resets all fields to default state
         protected void BtnClear_Click(object sender, EventArgs e)
         {
-            // Clear textboxes
-            TextBox_fullname.Text = "";
-            TextBox_parentname.Text = "";
-            TextBox_dob.Text = "";
-            TextBox_nationality.Text = "";
-            TextBox_occupation.Text = "";
-            TextBox_aadhaar.Text = "";
-            TextBox_pan.Text = "";
-            TextBox_mobilenumber.Text = "";
-            TextBox_emailid.Text = "";
-            TextBox_fulladdress.Text = "";
-            TextBox_state.Text = "";
-            TextBox_city.Text = "";
-            TextBox_pincode.Text = "";
-            TextBox_username.Text = "";
-            TextBox_password.Text = "";
-            TextBox_confirmpassword.Text = "";
-            TextBox_jointaccclient.Text = "";
+            TextBox_fullname.Text = string.Empty;
+            TextBox_parentname.Text = string.Empty;
+            TextBox_dob.Text = string.Empty;
+            TextBox_nationality.Text = string.Empty;
+            TextBox_occupation.Text = string.Empty;
+            TextBox_aadhaar.Text = string.Empty;
+            TextBox_pan.Text = string.Empty;
+            TextBox_mobilenumber.Text = string.Empty;
+            TextBox_emailid.Text = string.Empty;
+            TextBox_fulladdress.Text = string.Empty;
+            TextBox_state.Text = string.Empty;
+            TextBox_city.Text = string.Empty;
+            TextBox_pincode.Text = string.Empty;
+            TextBox_username.Text = string.Empty;
+            TextBox_password.Text = string.Empty;
+            TextBox_confirmpassword.Text = string.Empty;
+            TextBox_jointaccclient.Text = string.Empty;
 
-            // Reset dropdowns
             ddl_gender.SelectedIndex = 0;
             ddl_accounttype.SelectedIndex = 0;
             ddlIsJointAccount.SelectedIndex = 0;
 
-            // Hide Joint Account Section
             fsJointAccount.Visible = false;
-
-            // Uncheck checkbox
             CheckBox_terms.Checked = false;
         }
-
-
-       
     }
 }

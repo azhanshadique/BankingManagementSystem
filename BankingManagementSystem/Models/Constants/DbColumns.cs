@@ -27,6 +27,7 @@ namespace BankingManagementSystem.Models.Constants
         public const string Pincode = "pincode";
 
         public const string Username = "username";
+        public const string Password = "password";
 
         public const string RequestId = "request_id";
         public const string RequestType = "request_type";

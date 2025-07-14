@@ -23,7 +23,7 @@ namespace BankingManagementSystem.Helpers
 
             string apiUrl = ConfigurationManager.AppSettings["CreateClientApiUrl"];
 
-            HttpResponseMessage response = await httpClient.PutAsJsonAsync(apiUrl, client);
+            HttpResponseMessage response = await httpClient.PostAsJsonAsync(apiUrl, client);
             return response.IsSuccessStatusCode;
         } 
 

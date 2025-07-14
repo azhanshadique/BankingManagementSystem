@@ -169,7 +169,7 @@
                 </section>
 
                 <!-- View All Accounts -->
-                <section class="col-md-4">
+               <%-- <section class="col-md-4">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title">View All Accounts</h5>
@@ -177,7 +177,7 @@
                             <a class="btn btn-outline-dark" href='<%# Page.GetRouteUrl("TransactionHistoryRoute", null) %>'>View Accounts <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
-                </section> 
+                </section> --%>
 
                  <!-- Manage Client Requests -->
                 <section class="col-md-4">
