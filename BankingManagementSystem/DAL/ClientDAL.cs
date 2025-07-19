@@ -15,6 +15,30 @@ namespace BankingManagementSystem.DAL
 {
     public static class ClientDAL
     {
+        public static async Task<(bool IsSuccess, string Message)> LinkClientExistingAccount(LinkAccountDTO client)
+        {
+            try
+            {
+                using (SqlConnection con = DBConnectionManager.GetConnection())
+                using (SqlCommand cmd = new SqlCommand("sp_CreateClientOffline", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@ClientId", client.ClientId);
+                    cmd.Parameters.AddWithValue("@Username", client.Username);
+                    cmd.Parameters.AddWithValue("@Password", client.Password);
+
+                    await con.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    return (true, "Client existing account linked successfully.");
+                }
+            }
+            catch (SqlException ex)
+            {
+                return (false, $"Database error during client existing account linking. {ex.Message}");
+            }
+        }
         public static async Task<User> CheckClientCredentialsAsync(AuthRequestDTO client)
         {
             try
@@ -64,44 +88,44 @@ namespace BankingManagementSystem.DAL
             }
         }
 
-        public static async Task<User> CheckClientCredentialsAsync2(AuthRequestDTO client)
-        {
-            try
-            {
-                using (SqlConnection con = DBConnectionManager.GetConnection())
-                using (SqlCommand cmd = new SqlCommand("sp_ValidateClient", con))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@Username", client.Username);
-                    cmd.Parameters.AddWithValue("@Password", client.Password);
+        //public static async Task<User> CheckClientCredentialsAsync2(AuthRequestDTO client)
+        //{
+        //    try
+        //    {
+        //        using (SqlConnection con = DBConnectionManager.GetConnection())
+        //        using (SqlCommand cmd = new SqlCommand("sp_ValidateClient", con))
+        //        {
+        //            cmd.CommandType = CommandType.StoredProcedure;
+        //            cmd.Parameters.AddWithValue("@Username", client.Username);
+        //            cmd.Parameters.AddWithValue("@Password", client.Password);
 
-                    await con.OpenAsync();
+        //            await con.OpenAsync();
 
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                    {
-                        if (await reader.ReadAsync())
-                        {
-                            int idxClientId = reader.GetOrdinal(DbColumns.ClientId);
-                            int idxFullName = reader.GetOrdinal(DbColumns.FullName);
-                            int idxUsername = reader.GetOrdinal(DbColumns.Username);
+        //            using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+        //            {
+        //                if (await reader.ReadAsync())
+        //                {
+        //                    int idxClientId = reader.GetOrdinal(DbColumns.ClientId);
+        //                    int idxFullName = reader.GetOrdinal(DbColumns.FullName);
+        //                    int idxUsername = reader.GetOrdinal(DbColumns.Username);
 
-                            return new User
-                            {
-                                UserID = reader.GetInt32(idxClientId),
-                                FullName = reader.IsDBNull(idxFullName) ? null : reader.GetString(idxFullName),
-                                Username = reader.IsDBNull(idxUsername) ? null : reader.GetString(idxUsername),
-                                Role = UserRoles.CLIENT
-                            };
-                        }
-                    }
-                    return null;
-                }
-            }
-            catch (SqlException ex)
-            {
-                throw new Exception("Database error during client login credentials validation.", ex);
-            }
-        }
+        //                    return new User
+        //                    {
+        //                        UserID = reader.GetInt32(idxClientId),
+        //                        FullName = reader.IsDBNull(idxFullName) ? null : reader.GetString(idxFullName),
+        //                        Username = reader.IsDBNull(idxUsername) ? null : reader.GetString(idxUsername),
+        //                        Role = UserRoles.CLIENT
+        //                    };
+        //                }
+        //            }
+        //            return null;
+        //        }
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        throw new Exception("Database error during client login credentials validation.", ex);
+        //    }
+        //}
 
         public static async Task<int> IsClientExistsByPersonalDetailsAsync(string aadhaar, string pan)
         {

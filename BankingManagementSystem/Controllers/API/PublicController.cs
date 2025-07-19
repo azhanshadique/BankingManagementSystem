@@ -24,6 +24,20 @@ namespace BankingManagementSystem.Controllers.API
                 : (IHttpActionResult)BadRequest(Message);
         }
 
+        [HttpPost]
+        [Route("link-client")]
+        public async Task<IHttpActionResult> LinkAccountAsync([FromBody] LinkAccountDTO client)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid client data.");
+
+            var (IsSuccess, Message) = await ClientBLL.LinkClientAccount(client);
+
+            return IsSuccess
+                ? Ok(Message)
+                : (IHttpActionResult)BadRequest(Message);
+        }
+
 
         [HttpGet]
         [Route("register/request/{id:int}")]

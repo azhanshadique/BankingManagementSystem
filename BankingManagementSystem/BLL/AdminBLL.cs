@@ -24,7 +24,10 @@ namespace BankingManagementSystem.BLL
         {
             return await AdminDAL.CreateClientAsync(client);
         }
-
+        public static async Task<(bool IsSuccess, string Message)> CreateNewOfflineClientAsync(ClientDTO client)
+        {
+            return await AdminDAL.CreateOfflineClientAsync(client);
+        }
         public static async Task<(bool IsSuccess, string Message)> UpdateClientDetailsAsync(int clientId, ClientDTO client)
         {
             if (!await ClientDAL.IsClientExistsByClientIdAsync(clientId))

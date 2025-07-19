@@ -29,6 +29,20 @@ namespace BankingManagementSystem.Helpers
                 MessageContent = !string.IsNullOrEmpty(responseContent) ? responseContent : "Registration failed."
             };
         }
+        public static async Task<ApiResponseMessage> LinkClientAsync(LinkAccountDTO client)
+        {
+
+            string apiUrl = ConfigurationManager.AppSettings["LinkClientApiUrl"];
+
+            HttpResponseMessage response = await httpClient.PostAsJsonAsync(apiUrl, client);
+            string responseContent = await response.Content.ReadAsStringAsync();
+
+            return new ApiResponseMessage
+            {
+                MessageType = response.IsSuccessStatusCode ? "success" : "danger",
+                MessageContent = !string.IsNullOrEmpty(responseContent) ? responseContent : "Link Existing Account failed."
+            };
+        }
 
         
     }

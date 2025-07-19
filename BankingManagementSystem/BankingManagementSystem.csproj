@@ -291,6 +291,7 @@
     <Compile Include="Models\ConstraintTypes\UserRoles.cs" />
     <Compile Include="Models\DTOs\ClientDTO.cs" />
     <Compile Include="Models\DTOs\DepositDTO.cs" />
+    <Compile Include="Models\DTOs\LinkAccountDTO.cs" />
     <Compile Include="Models\DTOs\RequestDTO.cs" />
     <Compile Include="Models\DTOs\TransactionDTO.cs" />
     <Compile Include="Models\DTOs\TransferDTO.cs" />
@@ -312,88 +313,88 @@
     <Compile Include="WebForms\Admin\ClientRequests\ClientRequests.aspx.designer.cs">
       <DependentUpon>ClientRequests.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Client\ClientProfile.aspx.cs">
+    <Compile Include="WebForms\Client\Profile\ClientProfile.aspx.cs">
       <DependentUpon>ClientProfile.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Client\ClientProfile.aspx.designer.cs">
+    <Compile Include="WebForms\Client\Profile\ClientProfile.aspx.designer.cs">
       <DependentUpon>ClientProfile.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Client\Deposit.aspx.cs">
+    <Compile Include="WebForms\Client\Deposit\Deposit.aspx.cs">
       <DependentUpon>Deposit.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Client\Deposit.aspx.designer.cs">
+    <Compile Include="WebForms\Client\Deposit\Deposit.aspx.designer.cs">
       <DependentUpon>Deposit.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Client\ManageAccounts.aspx.cs">
+    <Compile Include="WebForms\Client\Accounts\ManageAccounts.aspx.cs">
       <DependentUpon>ManageAccounts.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Client\ManageAccounts.aspx.designer.cs">
+    <Compile Include="WebForms\Client\Accounts\ManageAccounts.aspx.designer.cs">
       <DependentUpon>ManageAccounts.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Client\PendingRequest.aspx.cs">
+    <Compile Include="WebForms\Client\Requests\PendingRequest.aspx.cs">
       <DependentUpon>PendingRequest.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Client\PendingRequest.aspx.designer.cs">
+    <Compile Include="WebForms\Client\Requests\PendingRequest.aspx.designer.cs">
       <DependentUpon>PendingRequest.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Client\TransactionHistory.aspx.cs">
+    <Compile Include="WebForms\Client\Transactions\TransactionHistory.aspx.cs">
       <DependentUpon>TransactionHistory.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Client\TransactionHistory.aspx.designer.cs">
+    <Compile Include="WebForms\Client\Transactions\TransactionHistory.aspx.designer.cs">
       <DependentUpon>TransactionHistory.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Client\Transfer.aspx.cs">
+    <Compile Include="WebForms\Client\Transfer\Transfer.aspx.cs">
       <DependentUpon>Transfer.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Client\Transfer.aspx.designer.cs">
+    <Compile Include="WebForms\Client\Transfer\Transfer.aspx.designer.cs">
       <DependentUpon>Transfer.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Client\Withdraw.aspx.cs">
+    <Compile Include="WebForms\Client\Withdraw\Withdraw.aspx.cs">
       <DependentUpon>Withdraw.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Client\Withdraw.aspx.designer.cs">
+    <Compile Include="WebForms\Client\Withdraw\Withdraw.aspx.designer.cs">
       <DependentUpon>Withdraw.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Home\About.aspx.cs">
+    <Compile Include="WebForms\Home\About\About.aspx.cs">
       <DependentUpon>About.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Home\About.aspx.designer.cs">
+    <Compile Include="WebForms\Home\About\About.aspx.designer.cs">
       <DependentUpon>About.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Home\PublicRequest.aspx.cs">
+    <Compile Include="WebForms\Home\Requests\PublicRequest.aspx.cs">
       <DependentUpon>PublicRequest.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Home\PublicRequest.aspx.designer.cs">
+    <Compile Include="WebForms\Home\Requests\PublicRequest.aspx.designer.cs">
       <DependentUpon>PublicRequest.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Home\Dashboard.aspx.cs">
+    <Compile Include="WebForms\Home\Dashboard\Dashboard.aspx.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Home\Dashboard.aspx.designer.cs">
+    <Compile Include="WebForms\Home\Dashboard\Dashboard.aspx.designer.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Login\AdminLogin.aspx.cs">
+    <Compile Include="WebForms\Login\Admin\AdminLogin.aspx.cs">
       <DependentUpon>AdminLogin.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Login\AdminLogin.aspx.designer.cs">
+    <Compile Include="WebForms\Login\Admin\AdminLogin.aspx.designer.cs">
       <DependentUpon>AdminLogin.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\Login\ClientLogin.aspx.cs">
+    <Compile Include="WebForms\Login\Client\ClientLogin.aspx.cs">
       <DependentUpon>ClientLogin.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\Login\ClientLogin.aspx.designer.cs">
+    <Compile Include="WebForms\Login\Client\ClientLogin.aspx.designer.cs">
       <DependentUpon>ClientLogin.aspx</DependentUpon>
     </Compile>
     <Compile Include="WebForms\MasterPage.Master.cs">
@@ -403,18 +404,18 @@
     <Compile Include="WebForms\MasterPage.Master.designer.cs">
       <DependentUpon>MasterPage.Master</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\SignUp\ClientSignupCreateAccount.aspx.cs">
+    <Compile Include="WebForms\SignUp\Create\ClientSignupCreateAccount.aspx.cs">
       <DependentUpon>ClientSignupCreateAccount.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\SignUp\ClientSignupCreateAccount.aspx.designer.cs">
+    <Compile Include="WebForms\SignUp\Create\ClientSignupCreateAccount.aspx.designer.cs">
       <DependentUpon>ClientSignupCreateAccount.aspx</DependentUpon>
     </Compile>
-    <Compile Include="WebForms\SignUp\ClientSignupLinkAccount.aspx.cs">
+    <Compile Include="WebForms\SignUp\Link\ClientSignupLinkAccount.aspx.cs">
       <DependentUpon>ClientSignupLinkAccount.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebForms\SignUp\ClientSignupLinkAccount.aspx.designer.cs">
+    <Compile Include="WebForms\SignUp\Link\ClientSignupLinkAccount.aspx.designer.cs">
       <DependentUpon>ClientSignupLinkAccount.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -2553,18 +2554,18 @@
     <Content Include="Scripts\CustomJS\script.js" />
     <Content Include="WebForms\Admin\ClientManagement\ClientManagement.aspx" />
     <Content Include="WebForms\Admin\ClientRequests\ClientRequests.aspx" />
-    <Content Include="WebForms\Client\ClientProfile.aspx" />
-    <Content Include="WebForms\Client\Deposit.aspx" />
-    <Content Include="WebForms\Client\ManageAccounts.aspx" />
-    <Content Include="WebForms\Client\PendingRequest.aspx" />
-    <Content Include="WebForms\Client\TransactionHistory.aspx" />
-    <Content Include="WebForms\Client\Transfer.aspx" />
-    <Content Include="WebForms\Client\Withdraw.aspx" />
-    <Content Include="WebForms\Home\About.aspx" />
-    <Content Include="WebForms\Home\PublicRequest.aspx" />
-    <Content Include="WebForms\Home\Dashboard.aspx" />
-    <Content Include="WebForms\Login\AdminLogin.aspx" />
-    <Content Include="WebForms\Login\ClientLogin.aspx" />
+    <Content Include="WebForms\Client\Profile\ClientProfile.aspx" />
+    <Content Include="WebForms\Client\Deposit\Deposit.aspx" />
+    <Content Include="WebForms\Client\Accounts\ManageAccounts.aspx" />
+    <Content Include="WebForms\Client\Requests\PendingRequest.aspx" />
+    <Content Include="WebForms\Client\Transactions\TransactionHistory.aspx" />
+    <Content Include="WebForms\Client\Transfer\Transfer.aspx" />
+    <Content Include="WebForms\Client\Withdraw\Withdraw.aspx" />
+    <Content Include="WebForms\Home\About\About.aspx" />
+    <Content Include="WebForms\Home\Requests\PublicRequest.aspx" />
+    <Content Include="WebForms\Home\Dashboard\Dashboard.aspx" />
+    <Content Include="WebForms\Login\Admin\AdminLogin.aspx" />
+    <Content Include="WebForms\Login\Client\ClientLogin.aspx" />
     <Content Include="Content\fontawesome\less\brands.less" />
     <Content Include="Content\fontawesome\less\fontawesome.less" />
     <Content Include="Content\fontawesome\less\regular.less" />
@@ -2688,8 +2689,8 @@
     <Content Include="Content\CustomFonts\Inter\static\Inter_28pt-SemiBoldItalic.ttf" />
     <Content Include="Content\CustomFonts\Inter\static\Inter_28pt-Thin.ttf" />
     <Content Include="Content\CustomFonts\Inter\static\Inter_28pt-ThinItalic.ttf" />
-    <Content Include="WebForms\SignUp\ClientSignupCreateAccount.aspx" />
-    <Content Include="WebForms\SignUp\ClientSignupLinkAccount.aspx" />
+    <Content Include="WebForms\SignUp\Create\ClientSignupCreateAccount.aspx" />
+    <Content Include="WebForms\SignUp\Link\ClientSignupLinkAccount.aspx" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />

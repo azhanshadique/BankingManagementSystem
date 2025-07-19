@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Web.Services.Description;
 
 namespace BankingManagementSystem.BLL
 {
@@ -17,7 +18,38 @@ namespace BankingManagementSystem.BLL
         {
             return await ClientDAL.CheckClientCredentialsAsync(client);
         }
+        public static async Task<(bool IsSuccess, string Message)> LinkClientAccount(LinkAccountDTO clientDto)
+        {
+            decimal currentBalance = await TransactionDAL.GetBalanceAsync(clientDto.AccountNumber);
+            if (currentBalance < 0)
+                return (false, "Invalid account.");
+            // check other validations 
 
+            // Client validation
+            if (!await ClientDAL.IsClientExistsByClientIdAsync(clientDto.ClientId))
+                return (false, "Invalid Client Id.");
+
+            // Joint account validation
+            if (clientDto.IsJointAccount && !await ClientDAL.IsClientExistsByClientIdAsync(clientDto.JointClientId))
+                return (false, "Invalid Co-holder details.");
+
+            string message = "";
+            // Username validation
+            if (!ValidationServiceBLL.IsValidUsername(clientDto.Username, out message)) return (false, message);
+            if (await ClientDAL.IsClientExistsByUsernameAsync(clientDto.Username))
+                return (false, "Username already taken, try another username.");
+
+            // Password validation
+            if (!ValidationServiceBLL.IsStrongPassword(clientDto.Password, clientDto.ConfirmPassword, out message))
+                return (false, message);
+
+            // Secure the password
+            string hashedPassword = PasswordHasher.HashPassword(clientDto.Password);
+            clientDto.Password = hashedPassword;
+            clientDto.ConfirmPassword = hashedPassword;
+
+            return await ClientDAL.LinkClientExistingAccount(clientDto);
+        }
         public static async Task<(bool IsSuccess, string Message)> RegisterNewClient(ClientDTO client)
         {
             string message = "";

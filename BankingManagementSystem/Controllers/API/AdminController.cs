@@ -37,7 +37,7 @@ namespace BankingManagementSystem.Controllers.API
                 ? Ok(new { message })
                 : (IHttpActionResult)BadRequest(message);
         }
-        
+
         [HttpDelete]
         [Route("client-account")]
         public async Task<IHttpActionResult> DeleteAccountAsync([FromUri] long accountNumber)
@@ -52,6 +52,20 @@ namespace BankingManagementSystem.Controllers.API
             //if (isDeleted)
             //    return Ok("Account deleted successfully.");
             //return BadRequest("Failed to delete the account.");
+        }
+
+        [HttpPost]
+        [Route("create-client/offline")]
+        public async Task<IHttpActionResult> CreateClientOfflineAsync([FromBody] ClientDTO client)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid client data.");
+
+            var (isSuccess, message) = await AdminBLL.CreateNewOfflineClientAsync(client);
+
+            return isSuccess
+                ? Ok(new { message })
+                : (IHttpActionResult)BadRequest(message);
         }
     }
 
